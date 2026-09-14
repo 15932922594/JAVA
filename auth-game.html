@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="cpfENOlyQlSaCyXifCBT8c">
+<head data-page-node-id="fvPGRcjZJADvmHLZ9qDXO5">
+<meta charset="UTF-8" data-page-node-id="p5cXTjQCut2fMyKPCSvC89" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="ORcHuk8qU0WAsmPComGLw3" />
+<title>PLAYER ACCESS // 登录 · 注册</title>
+<style>
+  :root{
+    --neon:#00f0ff; --neon2:#ff2bd6; --neon3:#a855f7;
+    --gold:#ffd166; --ok:#22e6a6; --bad:#ff4d6d;
+    --bg:#05060e; --panel:rgba(10,14,30,.82);
+    --line:rgba(0,240,255,.28);
+    --txt:#dff6ff; --muted:#7f9bbf;
+    --mono:"JetBrains Mono","Cascadia Code",Consolas,"Courier New",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;color:var(--txt);font-family:var(--sans);
+    background:radial-gradient(1200px 700px at 50% -20%, #16123a 0%, #070a18 45%, var(--bg) 100%);
+    overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  }
+  /* ---------- 背景层 ---------- */
+  #stars{position:fixed;inset:0;z-index:0}
+  .grid{
+    position:fixed;left:50%;bottom:0;width:240%;height:46%;z-index:1;pointer-events:none;
+    transform:translateX(-50%) perspective(320px) rotateX(60deg);transform-origin:bottom center;
+    background-image:
+      linear-gradient(rgba(0,240,255,.40) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,43,214,.30) 1px, transparent 1px);
+    background-size:64px 64px;opacity:.5;animation:grid 2.6s linear infinite;
+    -webkit-mask-image:linear-gradient(to top,#000 0%,transparent 88%);
+            mask-image:linear-gradient(to top,#000 0%,transparent 88%);
+  }
+  @keyframes grid{to{background-position:0 64px}}
+  .scan{
+    position:fixed;inset:0;z-index:6;pointer-events:none;
+    background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 2px,rgba(0,0,0,.16) 2px 3px);
+    mix-blend-mode:overlay;
+  }
+  .vig{position:fixed;inset:0;z-index:5;pointer-events:none;background:radial-gradient(120% 90% at 50% 40%,transparent 55%,rgba(0,0,0,.72) 100%)}
+
+  /* ---------- 舞台 ---------- */
+  .stage{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:26px}
+  .hud{
+    width:100%;max-width:1000px;position:relative;
+    background:var(--panel);backdrop-filter:blur(10px);
+    border:1px solid var(--line);
+    box-shadow:0 0 0 1px rgba(0,240,255,.08),0 0 42px -6px rgba(0,240,255,.35),inset 0 0 60px -30px rgba(255,43,214,.5);
+    clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px);
+    animation:boot .7s cubic-bezier(.2,1,.3,1) both;
+  }
+  @keyframes boot{from{opacity:0;transform:translateY(22px) scale(.97);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+  /* 四角装饰 */
+  .corner{position:absolute;width:22px;height:22px;border:2px solid var(--neon);pointer-events:none;filter:drop-shadow(0 0 6px var(--neon))}
+  .corner.tl{top:-1px;left:-1px;border-right:0;border-bottom:0}
+  .corner.tr{top:-1px;right:-1px;border-left:0;border-bottom:0;border-color:var(--neon2);filter:drop-shadow(0 0 6px var(--neon2))}
+  .corner.bl{bottom:-1px;left:-1px;border-right:0;border-top:0}
+  .corner.br{bottom:-1px;right:-1px;border-left:0;border-top:0;border-color:var(--neon2);filter:drop-shadow(0 0 6px var(--neon2))}
+
+  /* 顶栏 */
+  .topbar{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);
+    background:linear-gradient(90deg,rgba(0,240,255,.10),transparent 60%)}
+  .lights{display:flex;gap:7px}
+  .lights i{width:11px;height:11px;border-radius:50%;display:block}
+  .lights i:nth-child(1){background:#ff5f57;box-shadow:0 0 8px #ff5f57}
+  .lights i:nth-child(2){background:#febc2e;box-shadow:0 0 8px #febc2e}
+  .lights i:nth-child(3){background:#28c840;box-shadow:0 0 8px #28c840}
+  .topbar .ttl{font-family:var(--mono);font-size:12.5px;letter-spacing:2px;color:var(--neon);text-transform:uppercase}
+  .topbar .spacer{flex:1}
+  .stat{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;color:var(--ok);letter-spacing:1px}
+  .led{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.35}}
+
+  .body{display:grid;grid-template-columns:320px 1fr;gap:0}
+  /* ---------- 玩家卡片 ---------- */
+  .player{padding:26px 24px;border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(168,85,247,.08),transparent 70%)}
+  .avatar-wrap{position:relative;width:150px;height:150px;margin:0 auto 16px}
+  .hex{
+    width:150px;height:150px;display:grid;place-items:center;
+    clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+    background:linear-gradient(140deg,var(--neon),var(--neon3) 55%,var(--neon2));
+    animation:spinGlow 6s linear infinite;
+  }
+  @keyframes spinGlow{to{filter:hue-rotate(360deg)}}
+  .hex-in{width:140px;height:140px;display:grid;place-items:center;background:#0a0f22;
+    clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+  .ini{font-family:var(--mono);font-size:52px;font-weight:700;color:var(--neon);
+    text-shadow:0 0 18px var(--neon),0 0 40px var(--neon3);letter-spacing:2px}
+  .lvl{position:absolute;bottom:-6px;right:-6px;background:var(--gold);color:#20160a;font-family:var(--mono);
+    font-size:11px;font-weight:700;padding:3px 9px;border-radius:2px;letter-spacing:1px;box-shadow:0 0 14px rgba(255,209,102,.8)}
+
+  .pname{text-align:center;font-family:var(--mono);font-size:14px;letter-spacing:2px;color:var(--txt);
+    margin-bottom:4px;min-height:18px;text-transform:uppercase}
+  .pclass{text-align:center;font-size:11.5px;color:var(--muted);letter-spacing:2px;font-family:var(--mono);margin-bottom:18px}
+
+  .bar{margin-bottom:12px}
+  .bar .lab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-bottom:5px;letter-spacing:1px}
+  .track{height:9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:2px;overflow:hidden;position:relative}
+  .track > b{display:block;height:100%;width:0;border-radius:2px;transition:width .45s cubic-bezier(.2,1,.3,1)}
+  .hp > b{background:linear-gradient(90deg,#ff4d6d,#ff8fa3);box-shadow:0 0 12px #ff4d6d}
+  .mp > b{background:linear-gradient(90deg,#00f0ff,#7ef9ff);box-shadow:0 0 12px #00f0ff}
+  .xp > b{background:linear-gradient(90deg,var(--gold),#fff3c4);box-shadow:0 0 12px var(--gold)}
+  .track::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 6px,rgba(0,0,0,.35) 6px 7px);pointer-events:none}
+
+  .quote{margin-top:20px;font-family:var(--mono);font-size:11px;color:var(--neon);letter-spacing:1px;
+    border-left:2px solid var(--neon);padding-left:10px;line-height:1.7;min-height:36px}
+  .cursor{display:inline-block;width:7px;height:12px;background:var(--neon);margin-left:2px;animation:blink 1s step-end infinite;vertical-align:-1px}
+  @keyframes blink{50%{opacity:0}}
+
+  /* ---------- 表单区 ---------- */
+  .panel{padding:26px 30px 30px}
+  .tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+  .tab{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
+    padding:12px 8px;background:rgba(255,255,255,.03);color:var(--muted);border:1px solid rgba(255,255,255,.12);
+    transition:.2s;clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px);font-family:var(--mono);
+  }
+  .tab:hover{color:var(--txt);border-color:var(--line)}
+  .tab.on{color:#031018;background:linear-gradient(120deg,var(--neon),#7ef9ff);border-color:var(--neon);box-shadow:0 0 22px -2px var(--neon);font-weight:700}
+
+  .form{display:none;flex-direction:column;gap:14px;animation:fin .35s ease both}
+  .form.on{display:flex}
+  @keyframes fin{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase}
+  .box{position:relative;display:flex;align-items:center;gap:10px;padding:0 13px;
+    background:rgba(4,8,20,.85);border:1px solid rgba(0,240,255,.22);
+    clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+    transition:border-color .2s,box-shadow .2s}
+  .box:focus-within{border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 0 22px -4px var(--neon)}
+  .box svg.ic{color:var(--neon);flex:0 0 auto;opacity:.85}
+  .box input{flex:1;border:0;outline:0;background:transparent;color:var(--txt);font-family:var(--mono);
+    font-size:14px;padding:13px 0;min-width:0;letter-spacing:.5px}
+  .box input::placeholder{color:#4c6484}
+  .field.err .box{border-color:var(--bad);box-shadow:0 0 0 1px var(--bad),0 0 20px -4px var(--bad)}
+  .errmsg{display:none;font-family:var(--mono);font-size:11px;color:var(--bad);letter-spacing:.5px}
+  .field.err .errmsg{display:block}
+  .errmsg::before{content:"! ";font-weight:700}
+
+  .eye{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:6px;display:grid;place-items:center;transition:.2s}
+  .eye:hover{color:var(--neon)}
+
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:11.5px}
+  .chk{display:flex;align-items:center;gap:8px;color:var(--muted);cursor:pointer;user-select:none;letter-spacing:.5px}
+  .chk input{width:15px;height:15px;accent-color:var(--neon);cursor:pointer}
+  .lnk{color:var(--neon);text-decoration:none;letter-spacing:.5px}
+  .lnk:hover{text-shadow:0 0 10px var(--neon)}
+
+  /* 强度/安全等级 */
+  .sec{display:none;flex-direction:column;gap:6px}
+  .sec.on{display:flex}
+  .sec .lab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:1px}
+  .segs{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+  .segs i{height:6px;background:rgba(255,255,255,.08);clip-path:polygon(2px 0,100% 0,calc(100% - 2px) 100%,0 100%);transition:.25s}
+
+  /* 职业选择 */
+  .classes{display:none;grid-template-columns:repeat(3,1fr);gap:9px}
+  .classes.on{display:grid}
+  .cls{cursor:pointer;padding:11px 6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.12);
+    display:flex;flex-direction:column;align-items:center;gap:6px;transition:.2s;
+    clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+  .cls:hover{border-color:var(--line);background:rgba(0,240,255,.06)}
+  .cls.on{border-color:var(--neon);background:rgba(0,240,255,.12);box-shadow:0 0 18px -4px var(--neon)}
+  .cls svg{color:var(--neon)}
+  .cls span{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:var(--muted)}
+  .cls.on span{color:var(--txt)}
+
+  .submit{
+    margin-top:8px;position:relative;border:0;cursor:pointer;font-family:var(--mono);font-weight:700;
+    font-size:15px;letter-spacing:3px;text-transform:uppercase;color:#031018;padding:15px;
+    background:linear-gradient(120deg,var(--neon),#8affff 60%,var(--neon2));
+    clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);
+    box-shadow:0 0 26px -6px var(--neon);transition:transform .1s,box-shadow .2s,filter .2s;
+    display:flex;align-items:center;justify-content:center;gap:10px;overflow:hidden;
+  }
+  .submit:hover{filter:brightness(1.08);box-shadow:0 0 34px -4px var(--neon)}
+  .submit:active{transform:translateY(2px)}
+  .submit::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);animation:sheen 2.6s ease-in-out infinite}
+  @keyframes sheen{0%,60%{left:-60%}100%{left:120%}}
+  .submit:disabled{filter:grayscale(.4) brightness(.8);cursor:not-allowed}
+  .spin{width:15px;height:15px;border:2px solid rgba(3,16,24,.4);border-top-color:#031018;border-radius:50%;animation:sp .6s linear infinite;display:none}
+  .submit.loading .spin{display:block}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  .alt{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:2px;margin:2px 0}
+  .alt::before,.alt::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
+  .socials{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .soc{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;cursor:pointer;
+    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.12);color:var(--txt);
+    font-family:var(--mono);font-size:11.5px;letter-spacing:1px;transition:.2s;
+    clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px)}
+  .soc:hover{border-color:var(--neon2);background:rgba(255,43,214,.08);color:#fff;box-shadow:0 0 18px -6px var(--neon2)}
+
+  .hint{margin-top:14px;text-align:center;font-family:var(--mono);font-size:10.5px;letter-spacing:2px;color:var(--neon);animation:blink 1.3s step-end infinite}
+
+  /* 音效开关 */
+  .sound{position:fixed;right:20px;top:20px;z-index:8;width:44px;height:44px;display:grid;place-items:center;cursor:pointer;
+    background:var(--panel);border:1px solid var(--line);color:var(--neon);backdrop-filter:blur(8px);
+    clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px);transition:.2s}
+  .sound:hover{box-shadow:0 0 18px -4px var(--neon)}
+  .sound.muted{color:var(--muted)}
+
+  /* Toast */
+  .toast{position:fixed;left:50%;top:26px;transform:translate(-50%,-160%);z-index:20;display:flex;align-items:center;gap:10px;
+    padding:12px 20px;font-family:var(--mono);font-size:13px;letter-spacing:1px;color:var(--txt);
+    background:rgba(6,12,26,.95);border:1px solid var(--ok);box-shadow:0 0 26px -6px var(--ok);
+    clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+    transition:transform .4s cubic-bezier(.2,1,.3,1);max-width:92vw}
+  .toast.on{transform:translate(-50%,0)}
+  .toast .dot{width:9px;height:9px;background:var(--ok);box-shadow:0 0 10px var(--ok);flex:0 0 auto}
+  .toast.bad{border-color:var(--bad);box-shadow:0 0 26px -6px var(--bad)}
+  .toast.bad .dot{background:var(--bad);box-shadow:0 0 10px var(--bad)}
+
+  @media (max-width:860px){
+    .body{grid-template-columns:1fr}
+    .player{border-right:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:0 18px;align-items:center;padding:20px}
+    .avatar-wrap{width:96px;height:96px;margin:0}
+    .hex{width:96px;height:96px}.hex-in{width:88px;height:88px}.ini{font-size:34px}
+    .bars{grid-column:2}
+    .quote{display:none}
+    .pname,.pclass{text-align:left}
+  }
+  @media (max-width:520px){
+    .panel{padding:22px 18px 24px}
+    .hud{clip-path:none}
+  }
+</style>
+</head>
+<body data-page-node-id="ATSbBF7ldk7MFXbj6PFFnW">
+<canvas id="stars" data-page-node-id="ju6ahuI0lcjik7g8sfP0os"></canvas>
+<div class="grid" data-page-node-id="ygpd2agAPSUyS73h2jWu2G"></div>
+<div class="vig" data-page-node-id="uZhEbZi5lID7XycaWg97XQ"></div>
+<div class="scan" data-page-node-id="0Z5GQreHY5lGKbaqAMX4Pq"></div>
+
+<button class="sound muted" id="sound" title="音效开关" aria-label="音效开关" data-page-node-id="M4K3d9Q4fQ5Gn0lzE4rqHs">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" data-page-node-id="LOxrZIuLVRM215Aw7G1ARO"><path d="M4 9v6h4l5 4V5L8 9H4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" data-page-node-id="ITC8LJw0H3agwBP4NLY8FU"/><path id="wave" d="M16.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" data-page-node-id="kDAjz0ug9pvzyWhnBmpenp"/></svg>
+</button>
+
+<div class="stage" data-page-node-id="lMSmNaghkJezt58WooQrwC">
+  <div class="hud" data-page-node-id="ebnCfaAnNHAEY77BWaGIG4">
+    <span class="corner tl" data-page-node-id="UWucS3aERBCAmAgkoXhKCd"></span><span class="corner tr" data-page-node-id="Brixz308EEtCV9mefCACR8"></span><span class="corner bl" data-page-node-id="yJizqBB4Cg8KzlQYNxyjMA"></span><span class="corner br" data-page-node-id="OYbIc3PQF4gFLRAbeuMwla"></span>
+
+    <div class="topbar" data-page-node-id="icQ2jo2Cf5dsTAoHocXECt">
+      <div class="lights" data-page-node-id="fHHz2FOesg3K6U9qhE2D07"><i data-page-node-id="BePZJcAOnmAP2ehmWUapcq"></i><i data-page-node-id="YPUCZ2LwE0a6oXZAK8e7sR"></i><i data-page-node-id="XHYid3KRsKmCBoVOvTKvxR"></i></div>
+      <span class="ttl" data-page-node-id="VVrs2y1hb83rZq5mk5IxY2">Player Access Terminal v2.6</span>
+      <span class="spacer" data-page-node-id="gt50S6t7Z1FOgP9gCJ9CtD"></span>
+      <span class="stat" data-page-node-id="xLQAX0FclpyL5q87HpgYD9"><span class="led" data-page-node-id="gBD7gFzQnSyRKikHbAAMl7"></span><span id="srv" data-page-node-id="gsJxEP1yWch9Gom9ifNTxT">SERVER ONLINE</span></span>
+    </div>
+
+    <div class="body" data-page-node-id="RDbKqTctiIzUWzzXQjfkAC">
+      <!-- 玩家卡片 -->
+      <section class="player" data-page-node-id="ki2BsJrrwPRAjIohxFHE9y">
+        <div class="avatar-wrap" data-page-node-id="Kpga5ggHbn91mHHU7wINTy">
+          <div class="hex" data-page-node-id="Yk9PNCDDy6zk4BA6rC0R86"><div class="hex-in" data-page-node-id="tqT3UUEy8d23VsaFCqnRre"><span class="ini" id="avatar" data-page-node-id="itYOX8Ba9ABrSniixDnIDj">?</span></div></div>
+          <span class="lvl" data-page-node-id="8shRBFIIpvgDykB9DaDety">LV.<span id="lvl" data-page-node-id="zqiIVCSGJaSeMGvwIyzbly">01</span></span>
+        </div>
+        <div data-page-node-id="zA06VLxKizsos38ClDG2RW">
+          <div class="pname" id="pName" data-page-node-id="ZQ2pP8hoN5tNnjSwRF9dwl">UNKNOWN PILOT</div>
+          <div class="pclass" id="pClass" data-page-node-id="JXLQoSIXwZlppqr9FO8YfC">尚未选择职业</div>
+          <div class="bars" data-page-node-id="LF4XQHJUp1zfrrIt3pOc3k">
+            <div class="bar hp" data-page-node-id="MYljE8dq2BjVdqxk4EsRt6"><div class="lab" data-page-node-id="Mdxn4y54RqCCWOE3BTtUCt"><span data-page-node-id="1dvT38iKyErXEuFso7wS0s">HP 生命</span><span data-page-node-id="q72C7uAC32IDIZWHdsfyEm">100/100</span></div><div class="track" data-page-node-id="a5CSyCuSCffPbjDDGDIo0T"><b style="width:100%" data-page-node-id="JWYWHGck7QP4VC1KDbdQmC"></b></div></div>
+            <div class="bar mp" data-page-node-id="BG9uz7T0AiOJaHAtzLOEIt"><div class="lab" data-page-node-id="GRaOfeb2osWY74No3z18GN"><span data-page-node-id="VyfbaTWUV148zk0rATS3tK">MP 法力</span><span data-page-node-id="yLbWdzHo9nw4PIwAtGi0yX">80/100</span></div><div class="track" data-page-node-id="BTPXUgpknnILFXLENL5rqL"><b style="width:80%" data-page-node-id="6Y5DQDvBIBEdLH7ZrmS7VZ"></b></div></div>
+            <div class="bar xp" data-page-node-id="DRN65XoNkTtwnWzff9yrBi"><div class="lab" data-page-node-id="bJStOOpk6tACVW2oXANCw1"><span data-page-node-id="Gllh0ZLT3yfb6wtcdmejKC">EXP 经验</span><span id="xpTxt" data-page-node-id="jcxz6K8F8gEuptFxk7a9Ba">0%</span></div><div class="track" data-page-node-id="Rts1z7T9oPKFCFSoOCsOxi"><b id="xpBar" style="width:0" data-page-node-id="n3Xc0g3pEHzTYfVeSXLbO1"></b></div></div>
+          </div>
+          <div class="quote" id="quote" data-page-node-id="EXV43Mzlt9hbOZFP0F1Gqt">// 系统就绪，等待驾驶员接入<span class="cursor" data-page-node-id="Amld3gjreJ4bls9seDpYxF"></span></div>
+        </div>
+      </section>
+
+      <!-- 表单 -->
+      <section class="panel" data-page-node-id="DjyFBOIx62pAcUpPwAjk5T">
+        <div class="tabs" data-page-node-id="VxmhSf37xFCDExhfrHhlc8">
+          <button class="tab on" data-tab="login" type="button" data-page-node-id="5wUc0vXw8cAw8ZWbWauYr4">▶ 登录 LOGIN</button>
+          <button class="tab" data-tab="register" type="button" data-page-node-id="XBzkov5jENpi0YYZfjBwn2">✦ 注册 NEW GAME</button>
+        </div>
+
+        <!-- 登录 -->
+        <form class="form on" id="loginForm" novalidate data-page-node-id="usHrBD7VfRc6u3A54dtF91">
+          <div class="field" id="f-l-email" data-page-node-id="03eIYbBiXnIKFrhXGJx4yV">
+            <label data-page-node-id="EBmQ6XwEExiKuzzkbL1CAc">Email 账号</label>
+            <div class="box" data-page-node-id="qjBwGYZVtaeR3arSD8LrHU">
+              <svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" data-page-node-id="onHeTE3XkeSl8WU6ckov0v"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.7" data-page-node-id="aGpUtLJbkmtTBh60cgx2HV"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" data-page-node-id="1wq7ZhDDxOd4MkmolrS7fs"/></svg>
+              <input id="l-email" type="email" placeholder="pilot@nexus.net" autocomplete="email" data-page-node-id="SFg3G6yueuhq5g8cDqVQpW" />
+            </div>
+            <span class="errmsg" data-page-node-id="3bUA024I66lapfraJAg4Wq">邮箱格式不正确</span>
+          </div>
+          <div class="field" id="f-l-pass" data-page-node-id="774PHn2A8Nk6VGTzzAntAS">
+            <label data-page-node-id="SDCTOtJqAPLz2yngh56xrZ">Password 通行密钥</label>
+            <div class="box" data-page-node-id="U9N5bMyplQxO6hn2lumHfy">
+              <svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" data-page-node-id="xUeBuGby6XIJ1MMdTDHv6Y"><rect x="4" y="10" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.7" data-page-node-id="YcxPwTSfiKc6YTRAAEg05s"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" data-page-node-id="kabQmUXuPAhpXjWUmldnbB"/></svg>
+              <input id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password" data-page-node-id="8eSm8Fx4h6BoMBy6tbbjmp" />
+              <button class="eye" type="button" data-for="l-pass" aria-label="显示密码" data-page-node-id="pwW15ALl6IDbgI3CSYlQYJ"></button>
+            </div>
+            <span class="errmsg" data-page-node-id="U17kq4kwKmvnYCN9TZcbHo">密码至少 6 位</span>
+          </div>
+          <div class="row" data-page-node-id="tiLyNBgAkQCc2TkjGSplF5">
+            <label class="chk" data-page-node-id="6EgpSWij1ev7vT7u4koph1"><input type="checkbox" id="remember" data-page-node-id="8YzVhK53vzcr8AXDEpr8MZ" />保持登录</label>
+            <a class="lnk" href="#" onclick="return false" data-page-node-id="7F6kvvY8H20CFIbRy9Uh9H">找回密钥？</a>
+          </div>
+          <button class="submit" type="submit" data-page-node-id="3mH0RWUiij8mkrcAOHIhQo"><span class="spin" data-page-node-id="ODMBytuK7sViXciXZTDEwj"></span><span data-page-node-id="G4ygSZWKp9IB0Ch7Uyz5cw">进入游戏 START</span></button>
+          <div class="alt" data-page-node-id="pa9ShkdbE70lnH2658M86d">其他接入方式</div>
+          <div class="socials" data-page-node-id="AD3OhH741fa4ct9wAiNkgg">
+            <button class="soc" type="button" data-p="GitHub" data-page-node-id="Lsvqpo7bJ8IhKj33SWDLNS">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" data-page-node-id="oguiOL4xvD47m92eBwT1Eg"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49v-1.7c-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.9-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.27 2.75 1.05a9.3 9.3 0 0 1 5 0c1.91-1.32 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9v2.82c0 .27.18.6.69.49A10.02 10.02 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z" data-page-node-id="GS24IodPAxQOAsNLvgddj9"/></svg>GITHUB
+            </button>
+            <button class="soc" type="button" data-p="Google" data-page-node-id="UH3JwsLzo65maBrNpwU8IF">
+              <svg width="16" height="16" viewBox="0 0 24 24" data-page-node-id="Smw7GQfsUVm64XqE3PjDb5"><path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.05H12v3.88h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.9-1.75 2.98-4.33 2.98-7.35Z" data-page-node-id="H1OKKYpEjrDlwHERaZSEfH"/><path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.62-2.42l-3.24-2.5c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H3.06v2.59A10 10 0 0 0 12 22Z" data-page-node-id="Q9Avel4uDBt1F4cmf4U5rH"/><path fill="#FBBC05" d="M6.41 13.92a6 6 0 0 1 0-3.83V7.5H3.06a10 10 0 0 0 0 9l3.35-2.58Z" data-page-node-id="OSSHExFom1DOcpR5QEjQuC"/><path fill="#EA4335" d="M12 5.96c1.47 0 2.79.5 3.83 1.5l2.87-2.87C16.95 2.99 14.7 2 12 2A10 10 0 0 0 3.06 7.5l3.35 2.59C7.2 7.72 9.4 5.96 12 5.96Z" data-page-node-id="0Ux2toO80BN7Vc2CptqX5N"/></svg>GOOGLE
+            </button>
+          </div>
+        </form>
+
+        <!-- 注册 -->
+        <form class="form" id="registerForm" novalidate data-page-node-id="kzkhtOJUQYyFb11PKABIRT">
+          <div class="field" id="f-r-name" data-page-node-id="FepqCB5fbzqvwKdyMkS16i">
+            <label data-page-node-id="pMR452GFeo0U21SzyVsl6I">Pilot Name 昵称</label>
+            <div class="box" data-page-node-id="YOywYv23T5PdZ9TYMVzMij">
+              <svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" data-page-node-id="c5xawBKxOaODcktnpVYo5J"><circle cx="12" cy="8" r="3.6" stroke="currentColor" stroke-width="1.7" data-page-node-id="TAlYGFYlQ1BUCIxruaj6eD"/><path d="M5 19.5c1.3-3 4-4.5 7-4.5s5.7 1.5 7 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" data-page-node-id="uVskgW520BqOb1xkZWczbj"/></svg>
+              <input id="r-name" type="text" placeholder="给你的角色取名" autocomplete="username" maxlength="14" data-page-node-id="YpZ5XEIvvzDG8TdcV3bogW" />
+            </div>
+            <span class="errmsg" data-page-node-id="QSRFxnIHit4HHpxVyEczHH">昵称至少 2 个字符</span>
+          </div>
+          <div class="field" id="f-r-email" data-page-node-id="o1aLFhlAFzNdCzfHBZjtWX">
+            <label data-page-node-id="KQnJcmgTqEqldcVLuYB196">Email 账号</label>
+            <div class="box" data-page-node-id="3MIkb4nlAerBQ72oxI0jVA">
+              <svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" data-page-node-id="hVcw7KsQ9NIssvGPBzFmc5"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.7" data-page-node-id="b8dIdKtxZvwZzFeL9SpbAx"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" data-page-node-id="KWb2XV3Pqxa9m5AIXr42p2"/></svg>
+              <input id="r-email" type="email" placeholder="pilot@nexus.net" autocomplete="email" data-page-node-id="YEC4NtBFrgMrUi19gNbbJ1" />
+            </div>
+            <span class="errmsg" data-page-node-id="zSAMh9nvui9wcmVxThiM8L">邮箱格式不正确</span>
+          </div>
+          <div class="field" id="f-r-pass" data-page-node-id="yrwf169InoePMPeIpHydGI">
+            <label data-page-node-id="fLuiXbG6kfbHRuXBlGoWgs">Password 通行密钥</label>
+            <div class="box" data-page-node-id="R0KOV4Mcve5QRxG5P0T0r7">
+              <svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" data-page-node-id="M8J7MNEXG5CKXfr0k1iqrO"><rect x="4" y="10" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.7" data-page-node-id="UnZ2zhG40SpHizMFDmdKj0"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" data-page-node-id="pv4z4z0HaX7hqS4NKFAXDu"/></svg>
+              <input id="r-pass" type="password" placeholder="至少 6 位" autocomplete="new-password" data-page-node-id="t6jbFSkBoFC4HRBiL8DbB5" />
+              <button class="eye" type="button" data-for="r-pass" aria-label="显示密码" data-page-node-id="dvnCMyKJVqGc1KvvnVC5R3"></button>
+            </div>
+            <span class="errmsg" data-page-node-id="iaOahTPvJVmUIggHKW5DVD">密码至少 6 位</span>
+            <div class="sec" id="sec" data-page-node-id="VrzNTXLZ5S8g3xUuEiFWkv">
+              <div class="lab" data-page-node-id="nklQHAGhXqIu0BF6kfwGLj"><span data-page-node-id="cGdycJjroaS4t6X0mGHilV">SECURITY 安全等级</span><span id="secTxt" data-page-node-id="fDjxH1d6HkUPKZsZbhlRor">脆弱</span></div>
+              <div class="segs" id="segs" data-page-node-id="RUnq1NgBJokiBYq8aGXVWC"><i data-page-node-id="Y5H58FawPK9JxZZqdIen1O"></i><i data-page-node-id="uPMPRbylQoDvq0X6TZYacM"></i><i data-page-node-id="JlbwaFmg1S8J2hj8ZqNInQ"></i><i data-page-node-id="r7bq0af7R0OtaG8zhwjqrt"></i><i data-page-node-id="BgPAr7a83XpJuUcKhWCqcm"></i></div>
+            </div>
+          </div>
+          <div class="field" id="f-r-pass2" data-page-node-id="sVzCE7CoIVS7Hx82XHAtQC">
+            <label data-page-node-id="CCCIdaNhky4d4gxiLCp4qw">Confirm 确认密钥</label>
+            <div class="box" data-page-node-id="BqrDZjJJ16igZpq0i8ZhGn">
+              <svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" data-page-node-id="4N4gIOcT3hinWy0z2kmiCP"><path d="M12 3 4.5 6.5v5c0 4.4 3.1 8.4 7.5 9.5 4.4-1.1 7.5-5.1 7.5-9.5v-5L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" data-page-node-id="i5sfgoR7saoyA9JNGwGRR0"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" data-page-node-id="GBUXw1TmJc2jv3gxo8d1QA"/></svg>
+              <input id="r-pass2" type="password" placeholder="再输一次" autocomplete="new-password" data-page-node-id="cEASlEGVARDYFobC5nqesR" />
+              <button class="eye" type="button" data-for="r-pass2" aria-label="显示密码" data-page-node-id="D0pLDhm1HiXcT6kT3Qr3PW"></button>
+            </div>
+            <span class="errmsg" data-page-node-id="iJhbQT9tgGcUoexsV4zCif">两次密钥不一致</span>
+          </div>
+
+          <div class="field" id="f-r-class" data-page-node-id="6Hk2aqlMIfQhSFBDZmxEXJ">
+            <label data-page-node-id="XYDHVlxay51ZwelqGOJbDH">Class 选择职业</label>
+            <div class="classes on" id="classes" data-page-node-id="l5OxTLPYUomjnDC7iTCycv">
+              <div class="cls" data-cls="战士 WARRIOR" data-page-node-id="egiIBbRc22WCZJ0xV9bNVn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" data-page-node-id="3yN277NZ3tySgc7MrlcLJu"><path d="M14 3l7 7-9 9-4 1 1-4 9-9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" data-page-node-id="TrxIILdJRDBExkX1kMO40r"/><path d="M4 20l3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" data-page-node-id="Prizh6BFycgU1SZH6D0IBX"/></svg>
+                <span data-page-node-id="yRNoqMygAsmWgQP0fG4Tvu">战士</span>
+              </div>
+              <div class="cls" data-cls="法师 MAGE" data-page-node-id="wKgFnrWDAX3IvIUEL9rfzf">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" data-page-node-id="u7LWTB7EmnMIk3S0vEOcJr"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" data-page-node-id="9xSP40hwGbuqfgJOIHE0Ds"/><path d="M5 20l4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" data-page-node-id="wciDpgH4ilt8EvGrc5ZKe0"/></svg>
+                <span data-page-node-id="STeu7qMlOfExFFzTt4ODBw">法师</span>
+              </div>
+              <div class="cls" data-cls="刺客 ROGUE" data-page-node-id="qKGAceMbRAQtl9jdnVZJ9d">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" data-page-node-id="224WEP0cMrKI8pUyAa5HvN"><path d="M4 20l6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" data-page-node-id="WOr1PGvISe3RSvV4QNV1kB"/><path d="M10 14L19 5l-3 8-6 1Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" data-page-node-id="tzxMZlTcd6ZmWEE2rFBHmJ"/></svg>
+                <span data-page-node-id="2TC5eAce4N2LuAjC3aKsvk">刺客</span>
+              </div>
+            </div>
+            <span class="errmsg" data-page-node-id="WkS9BZJY8d2OotegmRZs1k">请选择一个职业</span>
+          </div>
+
+          <div class="field" id="f-r-terms" data-page-node-id="0BcUp9uMIDm5Ja375ifVkg">
+            <label class="chk" style="text-transform:none;font-size:11.5px" data-page-node-id="u6mv64MgGQOGshHtQnb5ct">
+              <input type="checkbox" id="terms" data-page-node-id="20unbOlRZFO6jMAiaoQ53D" />
+              我已阅读并同意 <a class="lnk" href="#" onclick="return false" data-page-node-id="kxrH0sphhfqGVCSKmwxmPL">服务条款</a> 与 <a class="lnk" href="#" onclick="return false" data-page-node-id="eyR2wt83OenMIDn4qpHZov">隐私政策</a>
+            </label>
+            <span class="errmsg" data-page-node-id="py7hQlI9oXuYkCKoMTmJWR">请先同意服务条款</span>
+          </div>
+
+          <button class="submit" type="submit" data-page-node-id="2bIkCnZnYpXTgDtN3L4b35"><span class="spin" data-page-node-id="hE00IkiIvTMBdmmgtsHQ6Y"></span><span data-page-node-id="IJjACe0YGyi09dqj8Ghmhc">创建角色 CREATE</span></button>
+        </form>
+
+        <div class="hint" id="hint" data-page-node-id="XWMc55xh3wpAbYX7N9bBNK">▶ PRESS START TO CONTINUE</div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" data-page-node-id="JvaoLfQR08yHfoRW5m0Nyd"><span class="dot" data-page-node-id="nEyrx5tpPh1kMIj3grVEe1"></span><span id="toastTxt" data-page-node-id="W732Pdqkbbl3Wlo87FsW0q"></span></div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+  var EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  /* ============ 星空穿越背景 ============ */
+  (function stars(){
+    var cv=$("stars"), ctx=cv.getContext("2d"), W,H,stars=[],N=170,dpr=Math.min(window.devicePixelRatio||1,2);
+    function resize(){W=cv.width=innerWidth*dpr;H=cv.height=innerHeight*dpr;cv.style.width=innerWidth+"px";cv.style.height=innerHeight+"px";}
+    function make(){stars=[];for(var i=0;i<N;i++){stars.push({x:Math.random()*W,y:Math.random()*H,z:Math.random()*W,s:Math.random()*1.6+.3});}}
+    resize();make();addEventListener("resize",function(){resize();make();});
+    var cx,cy;
+    function loop(){
+      cx=W/2;cy=H/2;
+      ctx.fillStyle="rgba(5,6,14,.35)";ctx.fillRect(0,0,W,H);
+      for(var i=0;i<stars.length;i++){
+        var s=stars[i];
+        s.z-=2.2*dpr; if(s.z<=1){s.z=W;s.x=Math.random()*W;s.y=Math.random()*H;}
+        var k=128/s.z, px=cx+(s.x-cx)*k, py=cy+(s.y-cy)*k;
+        if(px<0||px>W||py<0||py>H)continue;
+        var r=Math.max(.3,s.s*(1-k)*2);
+        ctx.beginPath();ctx.fillStyle="rgba(140,240,255,"+Math.min(.9,(1-k)*1.3)+")";
+        ctx.arc(px,py,r*dpr,0,6.283);ctx.fill();
+      }
+      requestAnimationFrame(loop);
+    }
+    loop();
+  })();
+
+  /* ============ 音效 (WebAudio, 默认静音) ============ */
+  var soundOn=false, actx=null;
+  function beep(freq,dur,type){
+    if(!soundOn)return;
+    try{
+      if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();
+      var o=actx.createOscillator(),g=actx.createGain();
+      o.type=type||"square";o.frequency.value=freq;
+      g.gain.setValueAtTime(.05,actx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+dur);
+      o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+dur);
+    }catch(e){}
+  }
+  $("sound").addEventListener("click",function(){
+    soundOn=!soundOn;this.classList.toggle("muted",!soundOn);
+    $("wave").style.opacity=soundOn?1:.25;
+    if(soundOn)beep(880,.09);
+  });
+  $("wave").style.opacity=.25;
+
+  /* ============ 打字机引语 ============ */
+  var lines=["// 系统就绪，等待驾驶员接入","// 检测到未知信号... 校验中","// 欢迎回来，指挥官。","// 输入密钥以解锁终端"];
+  var qEl=$("quote"),li=0,ci=0,del=false;
+  function type(){
+    var full=lines[li];
+    if(!del){ci++;if(ci>full.length){del=true;setTimeout(type,1800);return;}}
+    else{ci--;if(ci<0){del=false;li=(li+1)%lines.length;ci=0;}}
+    qEl.innerHTML=full.slice(0,ci).replace(/</g,"&lt;")+'<span class="cursor"></span>';
+    setTimeout(type,del?26:58);
+  }
+  type();
+
+  /* ============ 标签切换 ============ */
+  var tabs=document.querySelectorAll(".tab"),loginForm=$("loginForm"),regForm=$("registerForm"),hint=$("hint");
+  function switchTab(name){
+    tabs.forEach(function(t){t.classList.toggle("on",t.dataset.tab===name);});
+    var isLogin=name==="login";
+    loginForm.classList.toggle("on",isLogin);
+    regForm.classList.toggle("on",!isLogin);
+    hint.textContent=isLogin?"▶ PRESS START TO CONTINUE":"▶ 选择职业，开启新篇章";
+    if(name==="register"){ if(!selClass) $("f-r-class").classList.remove("err"); }
+    updateXp();beep(isLogin?660:520,.06);
+  }
+  tabs.forEach(function(t){t.addEventListener("click",function(){switchTab(t.dataset.tab);});});
+
+  /* ============ 密码显隐 ============ */
+  var EYE_ON='<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/></svg>';
+  var EYE_OFF='<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 4l16 16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M6.4 7.4A17 17 0 0 0 2.5 12S6 18.5 12 18.5c1.1 0 2.1-.2 3-.6M9.9 5.8A9.6 9.6 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3.1 3.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+  document.querySelectorAll(".eye").forEach(function(b){
+    b.innerHTML=EYE_ON;
+    b.addEventListener("click",function(){
+      var inp=$(b.dataset.for),show=inp.type==="password";
+      inp.type=show?"text":"password";b.innerHTML=show?EYE_OFF:EYE_ON;
+    });
+  });
+
+  /* ============ 安全等级 ============ */
+  var segs=document.querySelectorAll("#segs i"),secTxt=$("secTxt");
+  var SEGC=["#ff4d6d","#ff9f43","#ffd166","#3ddc97","#00f0ff"];
+  var SEGT=["脆弱","一般","尚可","坚固","牢不可破"];
+  $("r-pass").addEventListener("input",function(e){
+    var v=e.target.value;
+    $("sec").classList.toggle("on",v.length>0);
+    var s=0;
+    if(v.length>=6)s++;
+    if(v.length>=10)s++;
+    if(/[A-Z]/.test(v)&&/[a-z]/.test(v))s++;
+    if(/\d/.test(v))s++;
+    if(/[^A-Za-z0-9]/.test(v))s++;
+    s=Math.min(5,Math.max(v.length?1:0,s));
+    segs.forEach(function(el,i){el.style.background=i<s?SEGC[s-1]:"rgba(255,255,255,.08)";el.style.boxShadow=i<s?("0 0 8px "+SEGC[s-1]):"none";});
+    secTxt.textContent=SEGT[s-1]||"脆弱";secTxt.style.color=SEGC[s-1]||"#7f9bbf";
+    updateXp();
+  });
+
+  /* ============ 职业选择 ============ */
+  var selClass="";
+  document.querySelectorAll(".cls").forEach(function(c){
+    c.addEventListener("click",function(){
+      document.querySelectorAll(".cls").forEach(function(x){x.classList.remove("on");});
+      c.classList.add("on");selClass=c.dataset.cls;
+      $("f-r-class").classList.remove("err");
+      $("pClass").textContent=selClass;
+      beep(740,.08);updateXp();
+    });
+  });
+
+  /* ============ 玩家卡片联动 ============ */
+  function refreshAvatar(){
+    var n=(document.querySelector(".form.on").id==="loginForm"?$("l-email").value:$("r-name").value)||"";
+    var ch=n.trim().charAt(0).toUpperCase();
+    $("avatar").textContent=ch||"?";
+    $("pName").textContent=n.trim()?n.trim().toUpperCase():"UNKNOWN PILOT";
+  }
+  $("l-email").addEventListener("input",refreshAvatar);
+  $("r-name").addEventListener("input",refreshAvatar);
+
+  /* ============ EXP 经验条：随填写进度增长 ============ */
+  function updateXp(){
+    var pct,isLogin=loginForm.classList.contains("on");
+    if(isLogin){
+      var a=EMAIL.test($("l-email").value.trim())?1:0;
+      var b=$("l-pass").value.length>=6?1:0;
+      pct=(a+b)/2;
+    }else{
+      var n=$("r-name").value.trim().length>=2?1:0;
+      var e=EMAIL.test($("r-email").value.trim())?1:0;
+      var p=$("r-pass").value.length>=6?1:0;
+      var p2=($("r-pass2").value!==""&&$("r-pass2").value===$("r-pass").value)?1:0;
+      var c=selClass?1:0;
+      var t=$("terms").checked?1:0;
+      pct=(n+e+p+p2+c+t)/6;
+    }
+    var p100=Math.round(pct*100);
+    $("xpBar").style.width=p100+"%";$("xpTxt").textContent=p100+"%";
+    $("lvl").textContent=String(1+Math.floor(pct*9)).padStart(2,"0");
+  }
+  ["l-email","l-pass","r-name","r-email","r-pass2"].forEach(function(id){$(id).addEventListener("input",updateXp);});
+  $("terms").addEventListener("change",updateXp);
+
+  /* ============ Toast ============ */
+  var toast=$("toast"),toastTxt=$("toastTxt"),tT;
+  function showToast(msg,bad){
+    toastTxt.textContent=msg;toast.classList.toggle("bad",!!bad);toast.classList.add("on");
+    clearTimeout(tT);tT=setTimeout(function(){toast.classList.remove("on");},2800);
+  }
+
+  /* ============ 校验 ============ */
+  function fail(id,bad){$(id).classList.toggle("err",!!bad);return !bad;}
+  function submitForm(form,cb){
+    var btn=form.querySelector(".submit");btn.classList.add("loading");btn.disabled=true;
+    setTimeout(function(){btn.classList.remove("loading");btn.disabled=false;cb();},950);
+  }
+
+  /* ============ 登录提交 ============ */
+  loginForm.addEventListener("submit",function(e){
+    e.preventDefault();
+    var ok1=fail("f-l-email",!EMAIL.test($("l-email").value.trim()));
+    var ok2=fail("f-l-pass",$("l-pass").value.length<6);
+    if(!ok1||!ok2){beep(180,.18,"sawtooth");showToast("校验失败：请检查输入",true);return;}
+    submitForm(loginForm,function(){
+      beep(660,.08);setTimeout(function(){beep(990,.14);},90);
+      showToast("登陆成功 · 欢迎回来，指挥官！");
+    });
+  });
+
+  /* ============ 注册提交 ============ */
+  regForm.addEventListener("submit",function(e){
+    e.preventDefault();
+    var o1=fail("f-r-name",$("r-name").value.trim().length<2);
+    var o2=fail("f-r-email",!EMAIL.test($("r-email").value.trim()));
+    var o3=fail("f-r-pass",$("r-pass").value.length<6);
+    var o4=fail("f-r-pass2",$("r-pass2").value===""||$("r-pass2").value!==$("r-pass").value);
+    var o5=fail("f-r-class",!selClass);
+    var o6=fail("f-r-terms",!$("terms").checked);
+    if(!(o1&&o2&&o3&&o4&&o5&&o6)){beep(180,.18,"sawtooth");showToast("角色创建失败：信息不完整",true);return;}
+    submitForm(regForm,function(){
+      beep(660,.08);setTimeout(function(){beep(880,.08);},90);setTimeout(function(){beep(1180,.16);},180);
+      showToast("角色创建成功 · "+selClass+" 已加入战线！");
+      regForm.reset();selClass="";document.querySelectorAll(".cls").forEach(function(x){x.classList.remove("on");});
+      $("sec").classList.remove("on");$("pClass").textContent="尚未选择职业";refreshAvatar();updateXp();
+    });
+  });
+
+  /* ============ 清除错误态 ============ */
+  document.querySelectorAll(".box input, #terms").forEach(function(el){
+    el.addEventListener("input",function(){var f=el.closest(".field");if(f)f.classList.remove("err");});
+    el.addEventListener("change",function(){var f=el.closest(".field");if(f)f.classList.remove("err");});
+  });
+
+  /* ============ 第三方接入 ============ */
+  document.querySelectorAll(".soc").forEach(function(b){
+    b.addEventListener("click",function(){beep(600,.07);showToast("正在连接 "+b.dataset.p+" 授权网关...");});
+  });
+
+  updateXp();
+})();
+</script>
+</body>
+</html>
