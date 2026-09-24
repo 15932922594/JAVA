@@ -1,0 +1,25 @@
+{
+  "name": "valorant-agent-access",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "无畏契约风格特工登录页 —— Vue 3 + Vite 重构版",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "ssr:build": "vite build --ssr src/ssr-entry.js --outDir dist-ssr",
+    "verify:styles": "node scripts/verify-styles.mjs --original ../valorant-login.html --dist dist",
+    "verify:dom": "npm run ssr:build && node scripts/verify-dom.mjs --original ../valorant-login.html --ssr-entry dist-ssr/ssr-entry.js --allow \"SELECTED AGENT\" --allow \"↑ 从下方选择你的特工\"",
+    "smoke": "node scripts/smoke-test.mjs",
+    "verify": "npm run build && npm run verify:styles && npm run verify:dom && npm run smoke"
+  },
+  "dependencies": {
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "jsdom": "^30.1.1",
+    "vite": "^6.0.7"
+  }
+}
