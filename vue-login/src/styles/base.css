@@ -1,0 +1,46 @@
+/* ============================================================
+   全局基础样式 —— 变量、重置、body
+   （对应原 valorant-login.html 中 :root / * / html,body / body 部分）
+   ============================================================ */
+:root {
+  --bg: #0F1923;
+  --bg2: #0a1119;
+  --panel: #111a24;
+  --panel2: #16212c;
+  --red: #FF4655;
+  --red-d: #c0303d;
+  --cream: #ECE8E1;
+  --muted: #7f8e9b;
+  --line: rgba(236, 232, 225, .16);
+  --ac: #FF4655;
+  --disp: "Tungsten", "Oswald", "Arial Narrow", Impact, sans-serif;
+  --mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--cream);
+  font-family: var(--sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--red);
+  color: #fff;
+}
+
+#app {
+  min-height: 100%;
+}
