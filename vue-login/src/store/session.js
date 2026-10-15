@@ -18,6 +18,13 @@ export const state = reactive({
   agentIndex: 0,
   /** 当前面板：login | register */
   mode: 'login',
+  /**
+   * 当前视图：auth（登录页） | home（首页） | agents / arsenal / missions（分类浏览页）
+   * | intel（情报中心） | dash（作战终端）
+   * 项目暂未引入 vue-router，用这一份状态做页面切换；
+   * 后续接路由时把 switchView 换成 router.push 即可。
+   */
+  view: 'auth',
   /** 开机页是否已结束 */
   booted: false,
   /** 音效开关（默认静音，与原页面一致） */
@@ -112,7 +119,9 @@ function applyLogin(data, remember) {
   } else {
     localStorage.removeItem(TOKEN_KEY)
   }
-  // 顺带拉取会话列表（作战终端概览要显示在线设备数）
+  // 接入成功 -> 跳转首页
+  state.view = 'home'
+  // 顺带拉取会话列表（首页状态栏 / 作战终端都要显示在线设备数）
   loadSessions()
 }
 
@@ -142,6 +151,7 @@ export async function authLogout() {
   state.token = null
   state.dashTab = 'overview'
   state.sessions = []
+  state.view = 'auth'
   localStorage.removeItem(TOKEN_KEY)
   // 清空密码输入，避免残留
   state.login.pass = ''
@@ -159,6 +169,25 @@ export async function authRestore() {
   // token 失效/过期：清掉，走正常登录
   localStorage.removeItem(TOKEN_KEY)
   return false
+}
+
+/* ---------------- 页面视图切换 ---------------- */
+
+/**
+ * 切换视图：
+ *   auth     登录页
+ *   home     首页
+ *   agents   特工档案（category=AGENT）
+ *   arsenal  武器库（category=GEAR）
+ *   missions 作战任务（category=MISSION）
+ *   intel    情报中心（home_feed 动态流）
+ *   dash     作战终端（账号管理面板）
+ * 后续若引入 vue-router，把这里改成 router.push 即可，调用方不用动。
+ */
+export function switchView(view) {
+  if (!['auth', 'home', 'agents', 'arsenal', 'missions', 'intel', 'dash'].includes(view)) return
+  state.view = view
+  if (view === 'dash') loadSessions()
 }
 
 /* ---------------- 登录后主页（作战终端） ---------------- */
@@ -248,6 +277,7 @@ export function useSession() {
     authLogout,
     authRestore,
     authChangePass,
+    switchView,
     switchDashTab,
     loadSessions,
     revokeSession,

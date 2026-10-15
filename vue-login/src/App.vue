@@ -1,8 +1,9 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch, nextTick, provide } from 'vue'
-import { state, accent, authRestore, useSession } from './store/session'
+import { onBeforeUnmount, onMounted, ref, computed, watch, nextTick, provide } from 'vue'
+import { state, accent, authRestore, switchView, useSession } from './store/session'
 import { useParallax } from './composables/useParallax'
 import { FX_KEY } from './composables/useEffects'
+import { beep } from './composables/useSound'
 
 import FxBackground from './components/FxBackground.vue'
 import Crosshair from './components/Crosshair.vue'
@@ -13,8 +14,23 @@ import AgentShowcase from './components/AgentShowcase.vue'
 import AgentStrip from './components/AgentStrip.vue'
 import AuthPanel from './components/AuthPanel.vue'
 import AppToast from './components/AppToast.vue'
+import HomePage from './components/home/HomePage.vue'
+import ArchivePage from './components/home/ArchivePage.vue'
+import IntelPage from './components/home/IntelPage.vue'
 
 const { showToast } = useSession()
+
+/**
+ * 当前视图：auth（登录页）| home（首页）| agents / arsenal / missions（分类浏览页）
+ * | intel（情报中心）| dash（作战终端）
+ * 项目尚未引入 vue-router，用 store 里的 state.view 做切换。
+ */
+const view = computed(() => state.view)
+
+function backHome() {
+  beep(520, 0.06)
+  switchView('home')
+}
 
 /* 鼠标视差：写入 body 的 --mx / --my */
 useParallax()
@@ -88,15 +104,52 @@ onBeforeUnmount(() => clearTimeout(flashTimer))
   <!-- 准星跟随 -->
   <Crosshair />
 
-  <!-- 顶栏 -->
-  <TopHud />
+  <!-- ---------- 登录页 ---------- -->
+  <template v-if="view === 'auth'">
+    <!-- 顶栏 -->
+    <TopHud />
 
-  <div class="wrap">
-    <div class="stage">
-      <AgentShowcase />
+    <div class="wrap">
+      <div class="stage">
+        <AgentShowcase />
+        <AuthPanel />
+      </div>
+      <AgentStrip />
+    </div>
+  </template>
+
+  <!-- ---------- 首页（登录后） ---------- -->
+  <HomePage v-else-if="view === 'home'" />
+
+  <!-- ---------- 分类浏览页（导航栏进入） ---------- -->
+  <ArchivePage
+    v-else-if="view === 'agents'"
+    category="AGENT"
+    title="特工档案"
+    name-en="AGENT ARCHIVE"
+  />
+  <ArchivePage
+    v-else-if="view === 'arsenal'"
+    category="GEAR"
+    title="武器库"
+    name-en="ARSENAL"
+  />
+  <ArchivePage
+    v-else-if="view === 'missions'"
+    category="MISSION"
+    title="作战任务"
+    name-en="OPERATIONS"
+  />
+
+  <!-- ---------- 情报中心 ---------- -->
+  <IntelPage v-else-if="view === 'intel'" />
+
+  <!-- ---------- 作战终端（从首页用户菜单进入） ---------- -->
+  <div v-else class="wrap dashwrap">
+    <div class="dashbox">
+      <button class="back" type="button" @click="backHome">← 返回首页</button>
       <AuthPanel />
     </div>
-    <AgentStrip />
   </div>
 
   <!-- 点击涟漪 -->
@@ -164,11 +217,45 @@ onBeforeUnmount(() => clearTimeout(flashTimer))
   100% { opacity: 0; }
 }
 
+/* ---------- 作战终端（dash 视图） ---------- */
+.dashwrap { padding-top: 96px; }
+.dashbox {
+  width: 100%;
+  max-width: 660px;
+  margin: 0 auto;
+  animation: up .45s cubic-bezier(.2, 1, .3, 1) both;
+}
+@keyframes up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.back {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 9px 16px;
+  background: rgba(17, 26, 36, .8);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1.8px;
+  cursor: pointer;
+  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+  transition: .2s;
+}
+.back:hover {
+  color: var(--cream);
+  border-color: var(--ac);
+  box-shadow: 0 0 20px -8px var(--ac);
+}
+
 /* ---------- 响应式 ---------- */
 @media (max-width: 1020px) {
   .stage { grid-template-columns: 1fr; gap: 26px; }
 }
 @media (max-width: 640px) {
   .wrap { padding: 78px 16px 18px; }
+  .dashwrap { padding-top: 84px; }
 }
 </style>

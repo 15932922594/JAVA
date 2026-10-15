@@ -49,3 +49,32 @@ export const sessions = (token) => post('/api/auth/sessions', { token })
 
 /** 注销指定会话（踢出设备） */
 export const revoke = (token, sessionId) => post('/api/auth/revoke', { token, sessionId })
+
+/* ============================================================
+   首页相关接口 —— 后端已实现（HomeController）
+   ------------------------------------------------------------
+   表：archive_category（分级分类目录）/ agent_archive（档案）/ home_feed（动态）
+   建表脚本：springBootTest/sql/home.sql
+   ============================================================ */
+
+/**
+ * 分级分类检索
+ * @param {string} token
+ * @param {object} params
+ *   q            关键词（匹配名称 / 代号 / 简介 / 分类中文名）
+ *   category     一级分类编码 AGENT | GEAR | MISSION
+ *   subCategory  二级分类编码 ASSAULT | CONTROL | RIFLE …
+ *   tier         分级 S | A | B
+ *   page / size  分页
+ */
+export const search = (token, params = {}) => post('/api/home/search', { token, ...params })
+
+/** 分级分类目录（两级树 + 每类档案数） */
+export const homeCategories = (token) => post('/api/home/categories', { token })
+
+/** 首页概览：统计 / 精选档案 / 最新动态 */
+export const homeOverview = (token) => post('/api/home/overview', { token })
+
+/** 首页动态流（分页，kind 可选 NEWS | PATCH | MISSION） */
+export const homeFeed = (token, page = 1, size = 5, kind = '') =>
+  post('/api/home/feed', { token, page, size, kind })
