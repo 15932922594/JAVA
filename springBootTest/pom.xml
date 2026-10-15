@@ -42,6 +42,14 @@
 			<version>3.5.12</version>
 		</dependency>
 
+		<!-- 分页插件：自 3.5.9 起 PaginationInnerInterceptor 被拆到这个独立包，
+		     不引入会导致 selectPage 不加 LIMIT（全表查） -->
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-jsqlparser</artifactId>
+			<version>3.5.12</version>
+		</dependency>
+
 		<!-- MySQL 驱动（版本由 Spring Boot 父 POM 管理） -->
 		<dependency>
 			<groupId>com.mysql</groupId>

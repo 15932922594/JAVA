@@ -1,20 +1,20 @@
-logging.pattern.console=2026-10-12 09:12:25  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarting 53:Starting SpringBootTestApplication using Java 21.0.10 with PID 6988 (C:\Users\Administrator\Desktop\JAVA-main\springBootTest\target\classes started by Administrator in C:\Users\Administrator\Desktop\JAVA-main\springBootTest)
-logging.pattern.console=2026-10-12 09:12:25  INFO c.fenglin.springboottest.SpringBootTestApplication.logStartupProfileInfo 658:The following 1 profile is active: "dev"
-logging.pattern.console=2026-10-12 09:12:25  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-logging.pattern.console=2026-10-12 09:12:25  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-logging.pattern.console=2026-10-12 09:12:26  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.initialize 111:Tomcat initialized with port 49223 (http)
-logging.pattern.console=2026-10-12 09:12:26  INFO org.apache.catalina.core.StandardService.log 168:Starting service [Tomcat]
-logging.pattern.console=2026-10-12 09:12:26  INFO org.apache.catalina.core.StandardEngine.log 168:Starting Servlet engine: [Apache Tomcat/10.1.40]
-logging.pattern.console=2026-10-12 09:12:26  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring embedded WebApplicationContext
-logging.pattern.console=2026-10-12 09:12:26  INFO o.s.b.w.s.c.ServletWebServerApplicationContext.prepareWebApplicationContext 301:Root WebApplicationContext: initialization completed in 1178 ms
-logging.pattern.console=2026-10-12 09:12:26  INFO o.s.b.a.web.servlet.WelcomePageHandlerMapping.<init> 59:Adding welcome page: class path resource [static/index.html]
-logging.pattern.console=2026-10-12 09:12:26  INFO c.b.m.e.spring.MybatisPlusApplicationContextAware.setApplicationContext 40:Register ApplicationContext instances org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4f6bd45d
-logging.pattern.console=2026-10-12 09:12:26  INFO o.s.b.d.autoconfigure.OptionalLiveReloadServer.startServer 59:LiveReload server is running on port 35729
-logging.pattern.console=2026-10-12 09:12:27  WARN o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext.refresh 635:Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
-logging.pattern.console=2026-10-12 09:12:27  INFO o.s.b.a.logging.ConditionEvaluationReportLogger.logMessage 82:
+logging.pattern.console=2026-10-15 13:59:40  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarting 53:Starting SpringBootTestApplication using Java 21.0.10 with PID 2516 (C:\Users\Administrator\Desktop\JAVA-main\springBootTest\target\classes started by Administrator in C:\Users\Administrator\Desktop\JAVA-main\springBootTest)
+logging.pattern.console=2026-10-15 13:59:40  INFO c.fenglin.springboottest.SpringBootTestApplication.logStartupProfileInfo 658:The following 1 profile is active: "dev"
+logging.pattern.console=2026-10-15 13:59:40  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+logging.pattern.console=2026-10-15 13:59:40  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+logging.pattern.console=2026-10-15 13:59:42  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.initialize 111:Tomcat initialized with port 55121 (http)
+logging.pattern.console=2026-10-15 13:59:42  INFO org.apache.catalina.core.StandardService.log 168:Starting service [Tomcat]
+logging.pattern.console=2026-10-15 13:59:42  INFO org.apache.catalina.core.StandardEngine.log 168:Starting Servlet engine: [Apache Tomcat/10.1.40]
+logging.pattern.console=2026-10-15 13:59:43  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring embedded WebApplicationContext
+logging.pattern.console=2026-10-15 13:59:43  INFO o.s.b.w.s.c.ServletWebServerApplicationContext.prepareWebApplicationContext 301:Root WebApplicationContext: initialization completed in 2385 ms
+logging.pattern.console=2026-10-15 13:59:43  INFO o.s.b.a.web.servlet.WelcomePageHandlerMapping.<init> 59:Adding welcome page: class path resource [static/index.html]
+logging.pattern.console=2026-10-15 13:59:44  INFO c.b.m.e.spring.MybatisPlusApplicationContextAware.setApplicationContext 40:Register ApplicationContext instances org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4f6bd45d
+logging.pattern.console=2026-10-15 13:59:44  INFO o.s.b.d.autoconfigure.OptionalLiveReloadServer.startServer 59:LiveReload server is running on port 35729
+logging.pattern.console=2026-10-15 13:59:44  WARN o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext.refresh 635:Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+logging.pattern.console=2026-10-15 13:59:44  INFO o.s.b.a.logging.ConditionEvaluationReportLogger.logMessage 82:
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-logging.pattern.console=2026-10-12 09:12:27  ERROR o.s.b.diagnostics.LoggingFailureAnalysisReporter.report 40:
+logging.pattern.console=2026-10-15 13:59:44  ERROR o.s.b.diagnostics.LoggingFailureAnalysisReporter.report 40:
 
 ***************************
 APPLICATION FAILED TO START
@@ -22,69 +22,119 @@ APPLICATION FAILED TO START
 
 Description:
 
-Web server failed to start. Port 49223 was already in use.
+Web server failed to start. Port 55121 was already in use.
 
 Action:
 
-Identify and stop the process that's listening on port 49223 or configure this application to listen on another port.
+Identify and stop the process that's listening on port 55121 or configure this application to listen on another port.
 
-logging.pattern.console=2026-10-12 09:14:57  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarting 53:Starting SpringBootTestApplication using Java 21.0.10 with PID 10064 (C:\Users\Administrator\Desktop\JAVA-main\springBootTest\target\classes started by Administrator in C:\Users\Administrator\Desktop\JAVA-main\springBootTest)
-logging.pattern.console=2026-10-12 09:14:57  INFO c.fenglin.springboottest.SpringBootTestApplication.logStartupProfileInfo 658:The following 1 profile is active: "dev"
-logging.pattern.console=2026-10-12 09:14:57  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-logging.pattern.console=2026-10-12 09:14:57  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-logging.pattern.console=2026-10-12 09:14:58  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.initialize 111:Tomcat initialized with port 8081 (http)
-logging.pattern.console=2026-10-12 09:14:58  INFO org.apache.catalina.core.StandardService.log 168:Starting service [Tomcat]
-logging.pattern.console=2026-10-12 09:14:58  INFO org.apache.catalina.core.StandardEngine.log 168:Starting Servlet engine: [Apache Tomcat/10.1.40]
-logging.pattern.console=2026-10-12 09:14:58  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring embedded WebApplicationContext
-logging.pattern.console=2026-10-12 09:14:58  INFO o.s.b.w.s.c.ServletWebServerApplicationContext.prepareWebApplicationContext 301:Root WebApplicationContext: initialization completed in 966 ms
-logging.pattern.console=2026-10-12 09:14:58  INFO o.s.b.a.web.servlet.WelcomePageHandlerMapping.<init> 59:Adding welcome page: class path resource [static/index.html]
-logging.pattern.console=2026-10-12 09:14:58  INFO c.b.m.e.spring.MybatisPlusApplicationContextAware.setApplicationContext 40:Register ApplicationContext instances org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4932611a
-logging.pattern.console=2026-10-12 09:14:58  INFO o.s.b.d.autoconfigure.OptionalLiveReloadServer.startServer 59:LiveReload server is running on port 35729
-logging.pattern.console=2026-10-12 09:14:58  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.start 243:Tomcat started on port 8081 (http) with context path '/'
-logging.pattern.console=2026-10-12 09:14:58  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarted 59:Started SpringBootTestApplication in 2.013 seconds (process running for 2.337)
-logging.pattern.console=2026-10-12 09:15:13  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring DispatcherServlet 'dispatcherServlet'
-logging.pattern.console=2026-10-12 09:15:13  INFO org.springframework.web.servlet.DispatcherServlet.initServletBean 532:Initializing Servlet 'dispatcherServlet'
-logging.pattern.console=2026-10-12 09:15:13  INFO org.springframework.web.servlet.DispatcherServlet.initServletBean 554:Completed initialization in 1 ms
-logging.pattern.console=2026-10-12 09:16:14  INFO com.zaxxer.hikari.HikariDataSource.getConnection 109:HikariPool-1 - Starting...
-logging.pattern.console=2026-10-12 09:16:14  INFO com.zaxxer.hikari.pool.HikariPool.checkFailFast 554:HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2834cd09
-logging.pattern.console=2026-10-12 09:16:14  INFO com.zaxxer.hikari.HikariDataSource.getConnection 122:HikariPool-1 - Start completed.
-logging.pattern.console=2026-10-12 09:29:55  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarting 53:Starting SpringBootTestApplication using Java 21.0.10 with PID 9988 (C:\Users\Administrator\Desktop\JAVA-main\springBootTest\target\classes started by Administrator in C:\Users\Administrator\Desktop\JAVA-main\springBootTest)
-logging.pattern.console=2026-10-12 09:29:55  INFO c.fenglin.springboottest.SpringBootTestApplication.logStartupProfileInfo 658:The following 1 profile is active: "dev"
-logging.pattern.console=2026-10-12 09:29:55  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-logging.pattern.console=2026-10-12 09:29:55  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-logging.pattern.console=2026-10-12 09:29:56  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.initialize 111:Tomcat initialized with port 8081 (http)
-logging.pattern.console=2026-10-12 09:29:56  INFO org.apache.catalina.core.StandardService.log 168:Starting service [Tomcat]
-logging.pattern.console=2026-10-12 09:29:56  INFO org.apache.catalina.core.StandardEngine.log 168:Starting Servlet engine: [Apache Tomcat/10.1.40]
-logging.pattern.console=2026-10-12 09:29:56  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring embedded WebApplicationContext
-logging.pattern.console=2026-10-12 09:29:56  INFO o.s.b.w.s.c.ServletWebServerApplicationContext.prepareWebApplicationContext 301:Root WebApplicationContext: initialization completed in 1156 ms
-logging.pattern.console=2026-10-12 09:29:57  INFO o.s.b.a.web.servlet.WelcomePageHandlerMapping.<init> 59:Adding welcome page: class path resource [static/index.html]
-logging.pattern.console=2026-10-12 09:29:57  INFO c.b.m.e.spring.MybatisPlusApplicationContextAware.setApplicationContext 40:Register ApplicationContext instances org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4932611a
-logging.pattern.console=2026-10-12 09:29:57  INFO o.s.b.d.autoconfigure.OptionalLiveReloadServer.startServer 59:LiveReload server is running on port 35729
-logging.pattern.console=2026-10-12 09:29:57  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.start 243:Tomcat started on port 8081 (http) with context path '/'
-logging.pattern.console=2026-10-12 09:29:57  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarted 59:Started SpringBootTestApplication in 2.397 seconds (process running for 2.769)
-logging.pattern.console=2026-10-12 09:46:34  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring DispatcherServlet 'dispatcherServlet'
-logging.pattern.console=2026-10-12 09:46:34  INFO org.springframework.web.servlet.DispatcherServlet.initServletBean 532:Initializing Servlet 'dispatcherServlet'
-logging.pattern.console=2026-10-12 09:46:34  INFO org.springframework.web.servlet.DispatcherServlet.initServletBean 554:Completed initialization in 0 ms
-logging.pattern.console=2026-10-12 09:46:45  INFO com.zaxxer.hikari.HikariDataSource.getConnection 109:HikariPool-1 - Starting...
-logging.pattern.console=2026-10-12 09:46:45  INFO com.zaxxer.hikari.pool.HikariPool.checkFailFast 554:HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@20ff3aff
-logging.pattern.console=2026-10-12 09:46:45  INFO com.zaxxer.hikari.HikariDataSource.getConnection 122:HikariPool-1 - Start completed.
-logging.pattern.console=2026-10-12 09:49:01  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarting 53:Starting SpringBootTestApplication using Java 21.0.10 with PID 12136 (C:\Users\Administrator\Desktop\JAVA-main\springBootTest\target\classes started by Administrator in C:\Users\Administrator\Desktop\JAVA-main\springBootTest)
-logging.pattern.console=2026-10-12 09:49:01  INFO c.fenglin.springboottest.SpringBootTestApplication.logStartupProfileInfo 658:The following 1 profile is active: "dev"
-logging.pattern.console=2026-10-12 09:49:01  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-logging.pattern.console=2026-10-12 09:49:01  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-logging.pattern.console=2026-10-12 09:49:02  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.initialize 111:Tomcat initialized with port 8081 (http)
-logging.pattern.console=2026-10-12 09:49:02  INFO org.apache.catalina.core.StandardService.log 168:Starting service [Tomcat]
-logging.pattern.console=2026-10-12 09:49:02  INFO org.apache.catalina.core.StandardEngine.log 168:Starting Servlet engine: [Apache Tomcat/10.1.40]
-logging.pattern.console=2026-10-12 09:49:02  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring embedded WebApplicationContext
-logging.pattern.console=2026-10-12 09:49:02  INFO o.s.b.w.s.c.ServletWebServerApplicationContext.prepareWebApplicationContext 301:Root WebApplicationContext: initialization completed in 792 ms
-logging.pattern.console=2026-10-12 09:49:02  INFO o.s.b.a.web.servlet.WelcomePageHandlerMapping.<init> 59:Adding welcome page: class path resource [static/index.html]
-logging.pattern.console=2026-10-12 09:49:02  INFO c.b.m.e.spring.MybatisPlusApplicationContextAware.setApplicationContext 40:Register ApplicationContext instances org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@632f7267
-logging.pattern.console=2026-10-12 09:49:02  WARN o.s.b.d.autoconfigure.OptionalLiveReloadServer.startServer 62:Unable to start LiveReload server
-logging.pattern.console=2026-10-12 09:49:02  WARN o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext.refresh 635:Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
-logging.pattern.console=2026-10-12 09:49:02  INFO o.s.b.a.logging.ConditionEvaluationReportLogger.logMessage 82:
+logging.pattern.console=2026-10-15 14:00:10  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarting 53:Starting SpringBootTestApplication using Java 21.0.10 with PID 5536 (C:\Users\Administrator\Desktop\JAVA-main\springBootTest\target\classes started by Administrator in C:\Users\Administrator\Desktop\JAVA-main\springBootTest)
+logging.pattern.console=2026-10-15 14:00:10  INFO c.fenglin.springboottest.SpringBootTestApplication.logStartupProfileInfo 658:The following 1 profile is active: "dev"
+logging.pattern.console=2026-10-15 14:00:11  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+logging.pattern.console=2026-10-15 14:00:11  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+logging.pattern.console=2026-10-15 14:00:13  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.initialize 111:Tomcat initialized with port 8081 (http)
+logging.pattern.console=2026-10-15 14:00:13  INFO org.apache.catalina.core.StandardService.log 168:Starting service [Tomcat]
+logging.pattern.console=2026-10-15 14:00:13  INFO org.apache.catalina.core.StandardEngine.log 168:Starting Servlet engine: [Apache Tomcat/10.1.40]
+logging.pattern.console=2026-10-15 14:00:13  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring embedded WebApplicationContext
+logging.pattern.console=2026-10-15 14:00:13  INFO o.s.b.w.s.c.ServletWebServerApplicationContext.prepareWebApplicationContext 301:Root WebApplicationContext: initialization completed in 2962 ms
+logging.pattern.console=2026-10-15 14:00:14  INFO o.s.b.a.web.servlet.WelcomePageHandlerMapping.<init> 59:Adding welcome page: class path resource [static/index.html]
+logging.pattern.console=2026-10-15 14:00:15  INFO c.b.m.e.spring.MybatisPlusApplicationContextAware.setApplicationContext 40:Register ApplicationContext instances org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4f6bd45d
+logging.pattern.console=2026-10-15 14:00:15  INFO o.s.b.d.autoconfigure.OptionalLiveReloadServer.startServer 59:LiveReload server is running on port 35729
+logging.pattern.console=2026-10-15 14:00:15  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.start 243:Tomcat started on port 8081 (http) with context path '/'
+logging.pattern.console=2026-10-15 14:00:15  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarted 59:Started SpringBootTestApplication in 5.798 seconds (process running for 6.485)
+logging.pattern.console=2026-10-15 14:00:21  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring DispatcherServlet 'dispatcherServlet'
+logging.pattern.console=2026-10-15 14:00:21  INFO org.springframework.web.servlet.DispatcherServlet.initServletBean 532:Initializing Servlet 'dispatcherServlet'
+logging.pattern.console=2026-10-15 14:00:22  INFO org.springframework.web.servlet.DispatcherServlet.initServletBean 554:Completed initialization in 3 ms
+logging.pattern.console=2026-10-15 14:00:22  INFO com.zaxxer.hikari.HikariDataSource.getConnection 109:HikariPool-1 - Starting...
+logging.pattern.console=2026-10-15 14:00:22  INFO com.zaxxer.hikari.pool.HikariPool.checkFailFast 554:HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@78e311ec
+logging.pattern.console=2026-10-15 14:00:22  INFO com.zaxxer.hikari.HikariDataSource.getConnection 122:HikariPool-1 - Start completed.
+logging.pattern.console=2026-10-15 14:19:42  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarting 53:Starting SpringBootTestApplication using Java 21.0.10 with PID 6112 (C:\Users\Administrator\Desktop\JAVA-main\springBootTest\target\classes started by Administrator in C:\Users\Administrator\Desktop\JAVA-main\springBootTest)
+logging.pattern.console=2026-10-15 14:19:42  INFO c.fenglin.springboottest.SpringBootTestApplication.logStartupProfileInfo 658:The following 1 profile is active: "dev"
+logging.pattern.console=2026-10-15 14:19:42  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+logging.pattern.console=2026-10-15 14:19:42  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+logging.pattern.console=2026-10-15 14:19:43  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.initialize 111:Tomcat initialized with port 8081 (http)
+logging.pattern.console=2026-10-15 14:19:43  INFO org.apache.catalina.core.StandardService.log 168:Starting service [Tomcat]
+logging.pattern.console=2026-10-15 14:19:43  INFO org.apache.catalina.core.StandardEngine.log 168:Starting Servlet engine: [Apache Tomcat/10.1.40]
+logging.pattern.console=2026-10-15 14:19:43  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring embedded WebApplicationContext
+logging.pattern.console=2026-10-15 14:19:43  INFO o.s.b.w.s.c.ServletWebServerApplicationContext.prepareWebApplicationContext 301:Root WebApplicationContext: initialization completed in 741 ms
+logging.pattern.console=2026-10-15 14:19:43  INFO o.s.b.a.web.servlet.WelcomePageHandlerMapping.<init> 59:Adding welcome page: class path resource [static/index.html]
+logging.pattern.console=2026-10-15 14:19:43  INFO c.b.m.e.spring.MybatisPlusApplicationContextAware.setApplicationContext 40:Register ApplicationContext instances org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@433b3e96
+logging.pattern.console=2026-10-15 14:19:43  WARN o.s.b.d.autoconfigure.OptionalLiveReloadServer.startServer 62:Unable to start LiveReload server
+logging.pattern.console=2026-10-15 14:19:43  WARN o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext.refresh 635:Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+logging.pattern.console=2026-10-15 14:19:43  INFO o.s.b.a.logging.ConditionEvaluationReportLogger.logMessage 82:
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-logging.pattern.console=2026-10-12 09:49:02  ERROR o.s.b.diagnostics.LoggingFailureAnalysisReporter.report 40:
+logging.pattern.console=2026-10-15 14:19:43  ERROR o.s.b.diagnostics.LoggingFailureAnalysisReporter.report 40:
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8081 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8081 or configure this application to listen on another port.
+
+logging.pattern.console=2026-10-15 14:30:30  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarting 53:Starting SpringBootTestApplication using Java 21.0.10 with PID 9068 (C:\Users\Administrator\Desktop\JAVA-main\springBootTest\target\classes started by Administrator in C:\Users\Administrator\Desktop\JAVA-main\springBootTest)
+logging.pattern.console=2026-10-15 14:30:30  INFO c.fenglin.springboottest.SpringBootTestApplication.logStartupProfileInfo 658:The following 1 profile is active: "dev"
+logging.pattern.console=2026-10-15 14:30:30  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+logging.pattern.console=2026-10-15 14:30:30  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+logging.pattern.console=2026-10-15 14:30:31  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.initialize 111:Tomcat initialized with port 8081 (http)
+logging.pattern.console=2026-10-15 14:30:31  INFO org.apache.catalina.core.StandardService.log 168:Starting service [Tomcat]
+logging.pattern.console=2026-10-15 14:30:31  INFO org.apache.catalina.core.StandardEngine.log 168:Starting Servlet engine: [Apache Tomcat/10.1.40]
+logging.pattern.console=2026-10-15 14:30:31  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring embedded WebApplicationContext
+logging.pattern.console=2026-10-15 14:30:31  INFO o.s.b.w.s.c.ServletWebServerApplicationContext.prepareWebApplicationContext 301:Root WebApplicationContext: initialization completed in 1043 ms
+logging.pattern.console=2026-10-15 14:30:32  INFO o.s.b.a.web.servlet.WelcomePageHandlerMapping.<init> 59:Adding welcome page: class path resource [static/index.html]
+logging.pattern.console=2026-10-15 14:30:32  INFO c.b.m.e.spring.MybatisPlusApplicationContextAware.setApplicationContext 40:Register ApplicationContext instances org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4932611a
+logging.pattern.console=2026-10-15 14:30:32  INFO o.s.b.d.autoconfigure.OptionalLiveReloadServer.startServer 59:LiveReload server is running on port 35729
+logging.pattern.console=2026-10-15 14:30:32  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.start 243:Tomcat started on port 8081 (http) with context path '/'
+logging.pattern.console=2026-10-15 14:30:32  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarted 59:Started SpringBootTestApplication in 2.231 seconds (process running for 2.576)
+logging.pattern.console=2026-10-15 14:31:10  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring DispatcherServlet 'dispatcherServlet'
+logging.pattern.console=2026-10-15 14:31:10  INFO org.springframework.web.servlet.DispatcherServlet.initServletBean 532:Initializing Servlet 'dispatcherServlet'
+logging.pattern.console=2026-10-15 14:31:10  INFO org.springframework.web.servlet.DispatcherServlet.initServletBean 554:Completed initialization in 1 ms
+logging.pattern.console=2026-10-15 14:31:27  INFO com.zaxxer.hikari.HikariDataSource.getConnection 109:HikariPool-1 - Starting...
+logging.pattern.console=2026-10-15 14:31:27  INFO com.zaxxer.hikari.pool.HikariPool.checkFailFast 554:HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@723c0a7a
+logging.pattern.console=2026-10-15 14:31:27  INFO com.zaxxer.hikari.HikariDataSource.getConnection 122:HikariPool-1 - Start completed.
+logging.pattern.console=2026-10-15 14:32:42  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarting 53:Starting SpringBootTestApplication using Java 21.0.10 with PID 7488 (C:\Users\Administrator\Desktop\JAVA-main\springBootTest\target\classes started by Administrator in C:\Users\Administrator\Desktop\JAVA-main\springBootTest)
+logging.pattern.console=2026-10-15 14:32:42  INFO c.fenglin.springboottest.SpringBootTestApplication.logStartupProfileInfo 658:The following 1 profile is active: "dev"
+logging.pattern.console=2026-10-15 14:32:42  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+logging.pattern.console=2026-10-15 14:32:42  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+logging.pattern.console=2026-10-15 14:32:43  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.initialize 111:Tomcat initialized with port 8081 (http)
+logging.pattern.console=2026-10-15 14:32:44  INFO org.apache.catalina.core.StandardService.log 168:Starting service [Tomcat]
+logging.pattern.console=2026-10-15 14:32:44  INFO org.apache.catalina.core.StandardEngine.log 168:Starting Servlet engine: [Apache Tomcat/10.1.40]
+logging.pattern.console=2026-10-15 14:32:44  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring embedded WebApplicationContext
+logging.pattern.console=2026-10-15 14:32:44  INFO o.s.b.w.s.c.ServletWebServerApplicationContext.prepareWebApplicationContext 301:Root WebApplicationContext: initialization completed in 1045 ms
+logging.pattern.console=2026-10-15 14:32:44  INFO o.s.b.a.web.servlet.WelcomePageHandlerMapping.<init> 59:Adding welcome page: class path resource [static/index.html]
+logging.pattern.console=2026-10-15 14:32:44  INFO c.b.m.e.spring.MybatisPlusApplicationContextAware.setApplicationContext 40:Register ApplicationContext instances org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4932611a
+logging.pattern.console=2026-10-15 14:32:44  INFO o.s.b.d.autoconfigure.OptionalLiveReloadServer.startServer 59:LiveReload server is running on port 35729
+logging.pattern.console=2026-10-15 14:32:44  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.start 243:Tomcat started on port 8081 (http) with context path '/'
+logging.pattern.console=2026-10-15 14:32:44  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarted 59:Started SpringBootTestApplication in 2.176 seconds (process running for 2.514)
+logging.pattern.console=2026-10-15 14:33:23  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring DispatcherServlet 'dispatcherServlet'
+logging.pattern.console=2026-10-15 14:33:23  INFO org.springframework.web.servlet.DispatcherServlet.initServletBean 532:Initializing Servlet 'dispatcherServlet'
+logging.pattern.console=2026-10-15 14:33:23  INFO org.springframework.web.servlet.DispatcherServlet.initServletBean 554:Completed initialization in 1 ms
+logging.pattern.console=2026-10-15 14:33:23  INFO com.zaxxer.hikari.HikariDataSource.getConnection 109:HikariPool-1 - Starting...
+logging.pattern.console=2026-10-15 14:33:23  INFO com.zaxxer.hikari.pool.HikariPool.checkFailFast 554:HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6f659b17
+logging.pattern.console=2026-10-15 14:33:23  INFO com.zaxxer.hikari.HikariDataSource.getConnection 122:HikariPool-1 - Start completed.
+logging.pattern.console=2026-10-15 14:54:36  INFO c.fenglin.springboottest.SpringBootTestApplication.logStarting 53:Starting SpringBootTestApplication using Java 21.0.10 with PID 11284 (C:\Users\Administrator\Desktop\JAVA-main\springBootTest\target\classes started by Administrator in C:\Users\Administrator\Desktop\JAVA-main\springBootTest)
+logging.pattern.console=2026-10-15 14:54:36  INFO c.fenglin.springboottest.SpringBootTestApplication.logStartupProfileInfo 658:The following 1 profile is active: "dev"
+logging.pattern.console=2026-10-15 14:54:36  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+logging.pattern.console=2026-10-15 14:54:36  INFO o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor.logTo 252:For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+logging.pattern.console=2026-10-15 14:54:37  INFO o.s.boot.web.embedded.tomcat.TomcatWebServer.initialize 111:Tomcat initialized with port 8081 (http)
+logging.pattern.console=2026-10-15 14:54:37  INFO org.apache.catalina.core.StandardService.log 168:Starting service [Tomcat]
+logging.pattern.console=2026-10-15 14:54:37  INFO org.apache.catalina.core.StandardEngine.log 168:Starting Servlet engine: [Apache Tomcat/10.1.40]
+logging.pattern.console=2026-10-15 14:54:37  INFO o.a.c.core.ContainerBase.[Tomcat].[localhost].[/].log 168:Initializing Spring embedded WebApplicationContext
+logging.pattern.console=2026-10-15 14:54:37  INFO o.s.b.w.s.c.ServletWebServerApplicationContext.prepareWebApplicationContext 301:Root WebApplicationContext: initialization completed in 757 ms
+logging.pattern.console=2026-10-15 14:54:37  INFO o.s.b.a.web.servlet.WelcomePageHandlerMapping.<init> 59:Adding welcome page: class path resource [static/index.html]
+logging.pattern.console=2026-10-15 14:54:37  INFO c.b.m.e.spring.MybatisPlusApplicationContextAware.setApplicationContext 40:Register ApplicationContext instances org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@433b3e96
+logging.pattern.console=2026-10-15 14:54:37  WARN o.s.b.d.autoconfigure.OptionalLiveReloadServer.startServer 62:Unable to start LiveReload server
+logging.pattern.console=2026-10-15 14:54:37  WARN o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext.refresh 635:Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+logging.pattern.console=2026-10-15 14:54:37  INFO o.s.b.a.logging.ConditionEvaluationReportLogger.logMessage 82:
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+logging.pattern.console=2026-10-15 14:54:37  ERROR o.s.b.diagnostics.LoggingFailureAnalysisReporter.report 40:
 
 ***************************
 APPLICATION FAILED TO START
