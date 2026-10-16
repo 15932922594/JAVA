@@ -41,6 +41,9 @@ public class AgentArchive {
     /** 简介 */
     private String bio;
 
+    /** 人物故事 / 背景档案（详情页展示，\n\n 分段） */
+    private String story;
+
     /** 立绘地址，可为空 */
     private String img;
 
@@ -136,6 +139,14 @@ public class AgentArchive {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public String getStory() {
+        return story;
+    }
+
+    public void setStory(String story) {
+        this.story = story;
     }
 
     public String getImg() {

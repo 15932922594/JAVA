@@ -1,9 +1,0 @@
-com\fenglin\springboottest\mapper\AgentSessionMapper.class
-com\fenglin\springboottest\entity\AgentUser.class
-com\fenglin\springboottest\mapper\AgentUserMapper.class
-com\fenglin\springboottest\common\Result.class
-com\fenglin\springboottest\util\PasswordUtil.class
-com\fenglin\springboottest\entity\AgentSession.class
-com\fenglin\springboottest\config\WebCorsConfig.class
-com\fenglin\springboottest\service\AgentUserService.class
-com\fenglin\springboottest\controller\AuthController.class

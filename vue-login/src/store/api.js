@@ -72,6 +72,12 @@ export const search = (token, params = {}) => post('/api/home/search', { token, 
 /** 分级分类目录（两级树 + 每类档案数） */
 export const homeCategories = (token) => post('/api/home/categories', { token })
 
+/**
+ * 档案详情（点击卡片展开）
+ * 比检索列表多返回 story（人物故事，长文本）
+ */
+export const homeDetail = (token, code) => post('/api/home/detail', { token, code })
+
 /** 首页概览：统计 / 精选档案 / 最新动态 */
 export const homeOverview = (token) => post('/api/home/overview', { token })
 

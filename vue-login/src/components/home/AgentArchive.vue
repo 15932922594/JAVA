@@ -4,6 +4,7 @@
    数据来源：后端 /api/home/search（agent_archive 表）
    字段：name / mono / role("中文 · EN") / tier / color / bio / img / stats[]
    img 为空的条目（装备、任务）回退为 mono 徽标
+   点击卡片 → 抛出 open 事件（父组件拉 /api/home/detail 展示详情弹窗）
    ============================================================ */
 import { STAT_LABELS, roleShort } from '../../data/agents'
 
@@ -17,6 +18,8 @@ defineProps({
   /** 是否处于筛选/搜索状态（空态文案不同） */
   filtered: { type: Boolean, default: false }
 })
+
+const emit = defineEmits(['open'])
 </script>
 
 <template>
@@ -35,7 +38,19 @@ defineProps({
     </template>
 
     <template v-else>
-      <article v-for="a in agents" :key="a.id" class="card" :style="{ '--c': a.color }">
+      <!-- 点击整张卡片 → 打开档案详情（介绍 + 人物故事） -->
+      <article
+        v-for="a in agents"
+        :key="a.id"
+        class="card"
+        :style="{ '--c': a.color }"
+        role="button"
+        tabindex="0"
+        :aria-label="`查看档案 ${a.name}`"
+        @click="emit('open', a.code)"
+        @keydown.enter.prevent="emit('open', a.code)"
+        @keydown.space.prevent="emit('open', a.code)"
+      >
         <div class="media">
           <span class="wm">{{ a.mono }}</span>
 
@@ -45,6 +60,9 @@ defineProps({
 
           <span class="role">{{ roleShort(a.role) }}</span>
           <span v-if="a.tier" class="tier">{{ a.tier }}</span>
+
+          <!-- 悬停提示：可查看详情 -->
+          <span class="hint">查看档案 <i>→</i></span>
         </div>
 
         <div class="body">
@@ -94,9 +112,15 @@ defineProps({
   border: 1px solid var(--line);
   clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
   overflow: hidden;
+  cursor: pointer;
   transition: transform .28s cubic-bezier(.2, 1, .3, 1), border-color .28s, box-shadow .28s;
   animation: rise .5s cubic-bezier(.2, 1, .3, 1) both;
 }
+.card:focus-visible {
+  outline: 2px solid var(--c);
+  outline-offset: 2px;
+}
+.card:active { transform: translateY(-2px) scale(.995); }
 @keyframes rise {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: none; }
@@ -183,6 +207,29 @@ defineProps({
   background: var(--c);
   clip-path: polygon(0 0, 100% 0, 100% 68%, 68% 100%, 0 100%);
 }
+
+/* 悬停提示：可点开档案详情 */
+.hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #0b1017;
+  background: var(--c);
+  transform: translateY(100%);
+  transition: transform .28s cubic-bezier(.2, 1, .3, 1);
+}
+.hint i { font-style: normal; font-size: 12px; }
+.card:hover .hint,
+.card:focus-visible .hint { transform: none; }
 
 /* 无立绘时的字母徽标 */
 .badge {

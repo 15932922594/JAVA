@@ -15,6 +15,7 @@ import java.util.Map;
  * 首页接口：供 vue-login 首页调用
  *   POST /api/home/categories  分级分类目录（两级树 + 各类档案数）
  *   POST /api/home/search      分级分类检索（关键词 + 一级/二级分类 + 分级 + 分页）
+ *   POST /api/home/detail      档案详情（介绍 + 人物故事 story）
  *   POST /api/home/overview    首页概览（统计 + 精选 + 最新动态）
  *   POST /api/home/feed        首页动态流（分页）
  */
@@ -59,6 +60,19 @@ public class HomeController {
         long page = toLong(body.get("page"), 1);
         long size = toLong(body.get("size"), 12);
         return Result.ok(homeService.search(q, category, sub, tier, page, size));
+    }
+
+    /** 档案详情：{ token, code } → 档案完整结构（含 story 人物故事） */
+    @PostMapping("/detail")
+    public Result<Object> detail(@RequestBody Map<String, Object> body) {
+        if (requireLogin(body) == null) {
+            return Result.fail(401, "notfound");
+        }
+        Map<String, Object> detail = homeService.detail(str(body.get("code")));
+        if (detail == null) {
+            return Result.fail(404, "archive-notfound");
+        }
+        return Result.ok(detail);
     }
 
     /** 首页概览：{ token } → 统计 / 精选档案 / 最新动态 */

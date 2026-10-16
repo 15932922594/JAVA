@@ -9,6 +9,7 @@ import { state, switchView, useSession } from '../../store/session'
 import { search, homeCategories } from '../../store/api'
 import HomeNav from './HomeNav.vue'
 import AgentArchive from './AgentArchive.vue'
+import AgentDetailModal from './AgentDetailModal.vue'
 import { beep } from '../../composables/useSound'
 
 const props = defineProps({
@@ -111,6 +112,15 @@ watch(query, () => {
 watch([sub, tier], () => load(true))
 watch(token, (v) => v && init())
 
+/* ---------- 档案详情弹窗（点击卡片打开：介绍 + 人物故事） ---------- */
+const detailCode = ref('')
+
+function openDetail(code) {
+  if (!code) return
+  beep(640, 0.05)
+  detailCode.value = code
+}
+
 function backHome() {
   beep(520, 0.06)
   switchView('home')
@@ -193,13 +203,27 @@ onMounted(init)
 
       <!-- ========== 网格 ========== -->
       <section class="grid-wrap">
-        <AgentArchive :agents="list" :query="query.trim()" :loading="loading" :filtered="active" />
+        <AgentArchive
+          :agents="list"
+          :query="query.trim()"
+          :loading="loading"
+          :filtered="active"
+          @open="openDetail"
+        />
 
         <div v-if="!loading && page < pages" class="more">
           <button type="button" @click="loadMore">加载更多 · 剩余 {{ total - list.length }} 条</button>
         </div>
       </section>
     </main>
+
+    <!-- ========== 档案详情（点击卡片打开：介绍 + 人物故事） ========== -->
+    <AgentDetailModal
+      v-if="detailCode"
+      :code="detailCode"
+      :token="token"
+      @close="detailCode = ''"
+    />
   </div>
 </template>
 

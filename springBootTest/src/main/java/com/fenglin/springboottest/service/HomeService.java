@@ -161,6 +161,31 @@ public class HomeService extends ServiceImpl<AgentArchiveMapper, AgentArchive> {
     }
 
     /* ==========================================================
+       2.5 档案详情（点击卡片展开：介绍 + 人物故事）
+       ========================================================== */
+
+    /**
+     * 按档案代号取详情。
+     * 相比检索列表多返回 story（人物故事，可能较长，检索列表不携带）。
+     *
+     * @param code 档案代号，如 vector
+     * @return 详情结构；查不到返回 null
+     */
+    public Map<String, Object> detail(String code) {
+        if (!has(code)) {
+            return null;
+        }
+        AgentArchive a = getOne(new QueryWrapper<AgentArchive>()
+                .eq("code", code.trim()).eq("status", 1), false);
+        if (a == null) {
+            return null;
+        }
+        Map<String, Object> m = toArchiveMap(a);
+        m.put("story", a.getStory() == null ? "" : a.getStory());
+        return m;
+    }
+
+    /* ==========================================================
        3. 首页概览
        ========================================================== */
 

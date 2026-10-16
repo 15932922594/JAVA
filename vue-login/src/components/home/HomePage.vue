@@ -11,6 +11,7 @@ import { search, homeCategories, homeOverview, homeFeed } from '../../store/api'
 import HomeNav from './HomeNav.vue'
 import HomeSearch from './HomeSearch.vue'
 import AgentArchive from './AgentArchive.vue'
+import AgentDetailModal from './AgentDetailModal.vue'
 
 const { showToast } = useSession()
 
@@ -126,6 +127,15 @@ const META = computed(() => {
   ]
 })
 
+/* ---------- 档案详情弹窗 ---------- */
+/** 当前打开的档案代号，空串表示关闭 */
+const detailCode = ref('')
+
+function openDetail(code) {
+  if (!code) return
+  detailCode.value = code
+}
+
 /* ---------- 初始化：目录 + 概览 + 动态 + 首次检索 ---------- */
 onMounted(async () => {
   if (!token.value) return
@@ -207,6 +217,7 @@ onMounted(async () => {
           :query="query.trim()"
           :loading="loading"
           :filtered="active"
+          @open="openDetail"
         />
 
         <div v-if="!loading && page < pages" class="more">
@@ -241,6 +252,14 @@ onMounted(async () => {
       <span class="sp"></span>
       <span>SYS <b>OK</b> · 数据源 agent_archive · /api/home</span>
     </footer>
+
+    <!-- ========== 档案详情（点击卡片打开：介绍 + 人物故事） ========== -->
+    <AgentDetailModal
+      v-if="detailCode"
+      :code="detailCode"
+      :token="token"
+      @close="detailCode = ''"
+    />
   </div>
 </template>
 

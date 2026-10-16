@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS agent_archive (
   mono           VARCHAR(8)   NOT NULL DEFAULT '' COMMENT '单字符缩写，卡片水印用',
   color          VARCHAR(16)  NOT NULL DEFAULT '#FF4655' COMMENT '主题色，卡片主色',
   bio            VARCHAR(255) NOT NULL DEFAULT '' COMMENT '简介，参与关键词匹配',
+  story          TEXT         NULL COMMENT '人物故事 / 背景档案（\n\n 分段，详情弹窗展示）',
   img            VARCHAR(255) NOT NULL DEFAULT '' COMMENT '立绘地址，可为空（前端回退为 mono 徽标）',
   firepower      INT          NOT NULL DEFAULT 0 COMMENT '火力',
   mobility       INT          NOT NULL DEFAULT 0 COMMENT '机动',
@@ -71,31 +72,51 @@ CREATE TABLE IF NOT EXISTS agent_archive (
   KEY idx_heat (heat)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='首页档案主表（特工/装备/任务）';
 
--- 特工档案（与前端 public/agents/*.png 对应）
+-- 特工档案（与前端 public/agents/*.png 对应，story 为人物故事）
 INSERT IGNORE INTO agent_archive
-  (code, name, mono, category_code, sub_code, tier, color, bio, img, firepower, mobility, control, defense, heat, featured, sort) VALUES
-  ('vector',   'VECTOR',   'V', 'AGENT', 'ASSAULT',  'S', '#FF4655', '以极高机动性撕裂防线的突进型特工，擅长在瞬间改写交火态势。', '/agents/vector.png',   92, 76, 44, 38, 98, 1, 10),
-  ('arclight', 'ARCLIGHT', 'A', 'AGENT', 'RECON',    'A', '#00E0C6', '用电弧脉冲扫描战场，为队伍点亮迷雾中的每一个目标。',       '/agents/arclight.png', 58, 86, 72, 46, 91, 1, 11),
-  ('phantom',  'PHANTOM',  'P', 'AGENT', 'CONTROL',  'S', '#A66CFF', '制造幻象与烟幕，掌控每一次交火的节奏与视野。',             '/agents/phantom.png',  52, 74, 93, 50, 95, 1, 12),
-  ('onyx',     'ONYX',     'O', 'AGENT', 'SENTINEL', 'A', '#FFB443', '以坚固壁垒庇护队友，是阵地攻防中不可撼动的支点。',         '/agents/onyx.png',     46, 52, 64, 96, 88, 1, 13),
-  ('tempest',  'TEMPEST',  'T', 'AGENT', 'CONTROL',  'A', '#4DA6FF', '召唤风暴封锁通路，让敌人在自己的领地寸步难行。',           '/agents/tempest.png',  54, 70, 90, 62, 84, 0, 14),
-  ('ember',    'EMBER',    'E', 'AGENT', 'ASSAULT',  'B', '#FF6B4A', '以烈焰灼烧前线的爆发型特工，高风险，也高回报。',           '/agents/ember.png',    90, 64, 52, 54, 79, 0, 15),
--- 装备库
-  ('vandal',   'VANDAL',   'V', 'GEAR',  'RIFLE',    'S', '#FF4655', '高伤害全自动步枪，远距离头部一枪致命，正面交火的标杆。',   '/agents/vandal.png', 88, 52, 40, 30, 96, 1, 20),
-  ('phantom-w','PHANTOM-W','P', 'GEAR',  'RIFLE',    'A', '#A66CFF', '消音步枪，后坐可控，适合中距离压制与隐蔽推进。',           '/agents/phantom-w.png', 76, 66, 52, 34, 90, 0, 21),
-  ('spectre',  'SPECTRE',  'S', 'GEAR',  'SMG',      'A', '#00E0C6', '高射速冲锋枪，近距离泼洒压制，经济局的性价比之选。',       '/agents/spectre.png', 70, 74, 44, 28, 82, 0, 22),
-  ('operator', 'OPERATOR', 'O', 'GEAR',  'SNIPER',   'S', '#FFB443', '一击必杀的重型狙击枪，架点封锁整条通路的终极答案。',       '/agents/operator.png', 99, 30, 36, 44, 93, 1, 23),
-  ('marshal',  'MARSHAL',  'M', 'GEAR',  'SNIPER',   'B', '#4DA6FF', '轻型狙击枪，机动性更好，命中躯干即可终结交火。',           '/agents/marshal.png', 82, 58, 40, 36, 71, 0, 24),
-  ('classic',  'CLASSIC',  'C', 'GEAR',  'SIDEARM',  'B', '#FF6B4A', '开局标配手枪，右键三连发在贴脸距离拥有惊喜爆发。',         '/agents/classic.png', 54, 60, 32, 26, 68, 0, 25),
-  ('sheriff',  'SHERIFF',  'H', 'GEAR',  'SIDEARM',  'A', '#FF4655', '高伤害左轮，一发入魂，是翻盘局最廉价的希望。',            '/agents/sheriff.png', 86, 50, 34, 30, 87, 0, 26),
-  ('odin',     'ODIN',     'D', 'GEAR',  'RIFLE',    'A', '#00E0C6', '弹链供弹的重机枪，穿墙压制能力冠绝全场。',                 '/agents/odin.png', 94, 24, 58, 48, 80, 0, 27),
--- 作战任务
-  ('ascent',   'ASCENT',   'A', 'MISSION','RANKED',   'A', '#4DA6FF', '双点位地图，中路可开闭的闸门决定了整局的攻防节奏。',      '/missions/ascent.png', 62, 70, 66, 58, 92, 1, 30),
-  ('bind',     'BIND',     'B', 'MISSION','RANKED',   'S', '#A66CFF', '无中路的双点图，两处单向传送门让绕后变得随心所欲。',      '/missions/bind.png', 66, 78, 70, 54, 90, 0, 31),
-  ('haven',    'HAVEN',    'H', 'MISSION','RANKED',   'A', '#FFB443', '罕见的三点位地图，战线被拉长，信息收集比枪法更重要。',    '/missions/haven.png', 60, 64, 74, 62, 86, 0, 32),
-  ('range',    'RANGE',    'R', 'MISSION','TRAINING', 'B', '#3DDC97', '训练场，靶机与 bots 全开放，压枪与急停的日常修行地。',    '/missions/range.png', 30, 40, 20, 20, 74, 0, 33),
-  ('nightfall','NIGHTFALL','N', 'MISSION','EVENT',    'S', '#FF4655', '限时行动：夜幕下的据点争夺，视野受限，投掷物价值翻倍。',  '/missions/nightfall.png', 78, 72, 80, 60, 89, 1, 34),
-  ('breakout', 'BREAKOUT', 'K', 'MISSION','EVENT',    'B', '#FF6B4A', '限时行动：护送与突围交替，节奏快到没有喘息窗口。',        '/missions/breakout.png', 74, 80, 56, 46, 70, 0, 35);
+  (code, name, mono, category_code, sub_code, tier, color, bio, img, firepower, mobility, control, defense, heat, featured, sort, story) VALUES
+  ('vector',   'VECTOR',   'V', 'AGENT', 'ASSAULT',  'S', '#FF4655', '以极高机动性撕裂防线的突进型特工，擅长在瞬间改写交火态势。', '/agents/vector.png',   92, 76, 44, 38, 98, 1, 10,
+   '档案解密等级：Ω。\n\n VECTOR 原是环城竞速联盟最年轻的冠军车手，一场针对护送车队的伏击改变了她的轨迹——她以 217km/h 的极速连穿三道封锁线，把十二名伤员从火线上完整带回。战后审查官问她凭什么敢那样开，她只回了一句：「速度就是我的掩体。」\n\n 入队三年，她的突入记录无人打破：从破墙到占点，平均用时 1.7 秒。教官在评语栏里写：她不是在冲锋，是在瞬移。'),
+  ('arclight', 'ARCLIGHT', 'A', 'AGENT', 'RECON',    'A', '#00E0C6', '用电弧脉冲扫描战场，为队伍点亮迷雾中的每一个目标。',       '/agents/arclight.png', 58, 86, 72, 46, 91, 1, 11,
+   '档案解密等级：Ω。\n\n ARCLIGHT 曾是深空监听站的值守员，在长达四年的孤站生活里，他练就了从宇宙噪声中分辨一句耳语的耐心。一次例行检修中，他从一段被判定为背景辐射的信号里，还原出敌方跳频通讯的完整频率表，整个战区的预警时间因此提前了十一分钟。\n\n 如今他把监听天线换成了电弧脉冲，战场在他眼中是一张不断刷新的点云图。队友的说法更直接：「他开枪之前，地图早就打完了。」'),
+  ('phantom',  'PHANTOM',  'P', 'AGENT', 'CONTROL',  'S', '#A66CFF', '制造幻象与烟幕，掌控每一次交火的节奏与视野。',             '/agents/phantom.png',  52, 74, 93, 50, 95, 1, 12,
+   '档案解密等级：Ω。\n\n 关于 PHANTOM 的入职档案只有一页，且一半被涂黑。已知信息：他曾在敌后情报部门服役九年，执行过十七次任务，无一次留下影像记录；他的上一任搭档坚称自己从未见过他的正脸。\n\n 他从不解释能力原理，只留下一句被全体队员记住的话：「你们看到的，是我想让你们看到的。」第一次和他在训练场对枪的人，最后都在朝空气开火。'),
+  ('onyx',     'ONYX',     'O', 'AGENT', 'SENTINEL', 'A', '#FFB443', '以坚固壁垒庇护队友，是阵地攻防中不可撼动的支点。',         '/agents/onyx.png',     46, 52, 64, 96, 88, 1, 13,
+   '档案解密等级：Ω。\n\n ONYX 是全队唯一拒绝佩枪的特工。他曾是一支山地救援队的队长，在一次雪崩中用身体撑住坍塌的冰缝整整四十分钟，让七名被困者全部脱险——他的左肩里至今留着三枚钢钉，阴雨天会替他记住那天的气温。\n\n 入队后，他把「守住」变成了战术：他站的防线没有后退这个词。指挥部对他的评估只有一行字：把任何交火地点，变成我方主场。'),
+  ('tempest',  'TEMPEST',  'T', 'AGENT', 'CONTROL',  'A', '#4DA6FF', '召唤风暴封锁通路，让敌人在自己的领地寸步难行。',           '/agents/tempest.png',  54, 70, 90, 62, 84, 0, 14,
+   '档案解密等级：Ω。\n\n TEMPEST 出生在气旋观测船「信风号」上，整个童年在风暴眼里度过。十六岁那年，她用自己的气象模型提前六小时预报了一场被官方判定「不可能生成」的台风，救下了一整座港口。\n\n 现在她召唤的风暴只封锁一件东西：敌人的退路。被她控住过通道的对手给出了一致评价：宁可绕路三公里。'),
+  ('ember',    'EMBER',    'E', 'AGENT', 'ASSAULT',  'B', '#FF6B4A', '以烈焰灼烧前线的爆发型特工，高风险，也高回报。',           '/agents/ember.png',    90, 64, 52, 54, 79, 0, 15,
+   '档案解密等级：Ω。\n\n EMBER 的档案从一个失败开始：爆破课程三次不及格，理由都是「当量超出教学大纲上限」。教官最后在评语里写：这不是学不会，是不甘心只炸那么大。\n\n 他是全队公认的疯子，也是公认的幸运儿——七次被判定「阵亡」的战报，七次都活着回来了。他的战前动员只有一句话：「烧完这把，就赢了。」'),
+-- 装备库（story 为背景档案一句话）
+  ('vandal',   'VANDAL',   'V', 'GEAR',  'RIFLE',    'S', '#FF4655', '高伤害全自动步枪，远距离头部一枪致命，正面交火的标杆。',   '/agents/vandal.png', 88, 52, 40, 30, 96, 1, 20,
+   '流水线上的第一支 VANDAL 编号 V-0001，至今仍在一线服役，其命中率常年霸榜军械库。'),
+  ('phantom-w','PHANTOM-W','P', 'GEAR',  'RIFLE',    'A', '#A66CFF', '消音步枪，后坐可控，适合中距离压制与隐蔽推进。',           '/agents/phantom-w.png', 76, 66, 52, 34, 90, 0, 21,
+   '消音组件让它被称作「听不见的死神」，每一支出厂前都要在静音舱里过最后一道检测。'),
+  ('spectre',  'SPECTRE',  'S', 'GEAR',  'SMG',      'A', '#00E0C6', '高射速冲锋枪，近距离泼洒压制，经济局的性价比之选。',       '/agents/spectre.png', 70, 74, 44, 28, 82, 0, 22,
+   '经济局之王。老队员的说法：手头紧的时候，SPECTRE 比勇气可靠。'),
+  ('operator', 'OPERATOR', 'O', 'GEAR',  'SNIPER',   'S', '#FFB443', '一击必杀的重型狙击枪，架点封锁整条通路的终极答案。',       '/agents/operator.png', 99, 30, 36, 44, 93, 1, 23,
+   '每一支 OPERATOR 的镜桥都由匠人手工校准，编号刻在枪托内侧，遗失即全员追责。'),
+  ('marshal',  'MARSHAL',  'M', 'GEAR',  'SNIPER',   'B', '#4DA6FF', '轻型狙击枪，机动性更好，命中躯干即可终结交火。',           '/agents/marshal.png', 82, 58, 40, 36, 71, 0, 24,
+   '西部时代的精神续作。MARSHAL 的准星上没有多余的花纹，因为它只服务一件事。'),
+  ('classic',  'CLASSIC',  'C', 'GEAR',  'SIDEARM',  'B', '#FF6B4A', '开局标配手枪，右键三连发在贴脸距离拥有惊喜爆发。',         '/agents/classic.png', 54, 60, 32, 26, 68, 0, 25,
+   '所有人拿到的第一支枪。训练营墙上的标语：CLASSIC 用得好，你缺的从来不是枪。'),
+  ('sheriff',  'SHERIFF',  'H', 'GEAR',  'SIDEARM',  'A', '#FF4655', '高伤害左轮，一发入魂，是翻盘局最廉价的希望。',            '/agents/sheriff.png', 86, 50, 34, 30, 87, 0, 26,
+   '赌徒的选择。一发命中叫翻盘，一发落空叫下班。'),
+  ('odin',     'ODIN',     'D', 'GEAR',  'RIFLE',    'A', '#00E0C6', '弹链供弹的重机枪，穿墙压制能力冠绝全场。',                 '/agents/odin.png', 94, 24, 58, 48, 80, 0, 27,
+   '代号来自北欧主神。士兵们说，它开火的时候，整条走廊都在替对面祈祷。'),
+-- 作战任务（story 为背景档案一句话）
+  ('ascent',   'ASCENT',   'A', 'MISSION','RANKED',   'A', '#4DA6FF', '双点位地图，中路可开闭的闸门决定了整局的攻防节奏。',      '/missions/ascent.png', 62, 70, 66, 58, 92, 1, 30,
+   '高空平台 ASCENT 由旧轨道电梯中转站改建，中央闸门的开合至今沿用战前的机械逻辑。'),
+  ('bind',     'BIND',     'B', 'MISSION','RANKED',   'S', '#A66CFF', '无中路的双点图，两处单向传送门让绕后变得随心所欲。',      '/missions/bind.png', 66, 78, 70, 54, 90, 0, 31,
+   'BIND 的单向传送门是战前物流网络的遗产，如今搬运的只有子弹与坏消息。'),
+  ('haven',    'HAVEN',    'H', 'MISSION','RANKED',   'A', '#FFB443', '罕见的三点位地图，战线被拉长，信息收集比枪法更重要。',    '/missions/haven.png', 60, 64, 74, 62, 86, 0, 32,
+   'HAVEN 原是边境疗养院，三点位的布局让它成为侦察兵最爱的战场。'),
+  ('range',    'RANGE',    'R', 'MISSION','TRAINING', 'B', '#3DDC97', '训练场，靶机与 bots 全开放，压枪与急停的日常修行地。',    '/missions/range.png', 30, 40, 20, 20, 74, 0, 33,
+   'RANGE 的靶机每天被击倒两万次，然后被维修技师救活两万次。'),
+  ('nightfall','NIGHTFALL','N', 'MISSION','EVENT',    'S', '#FF4655', '限时行动：夜幕下的据点争夺，视野受限，投掷物价值翻倍。',  '/missions/nightfall.png', 78, 72, 80, 60, 89, 1, 34,
+   'NIGHTFALL 行动只在停电的街区展开，目击报告里提到最多的东西是红色探照灯。'),
+  ('breakout', 'BREAKOUT', 'K', 'MISSION','EVENT',    'B', '#FF6B4A', '限时行动：护送与突围交替，节奏快到没有喘息窗口。',        '/missions/breakout.png', 74, 80, 56, 46, 70, 0, 35,
+   'BREAKOUT 的原型是一次真实的监狱护送行动，代号沿用至今。');
 
 -- ---------- 3. 首页动态流 ----------
 CREATE TABLE IF NOT EXISTS home_feed (
