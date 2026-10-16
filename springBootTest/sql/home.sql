@@ -90,12 +90,12 @@ INSERT IGNORE INTO agent_archive
   ('sheriff',  'SHERIFF',  'H', 'GEAR',  'SIDEARM',  'A', '#FF4655', '高伤害左轮，一发入魂，是翻盘局最廉价的希望。',            '/agents/sheriff.png', 86, 50, 34, 30, 87, 0, 26),
   ('odin',     'ODIN',     'D', 'GEAR',  'RIFLE',    'A', '#00E0C6', '弹链供弹的重机枪，穿墙压制能力冠绝全场。',                 '/agents/odin.png', 94, 24, 58, 48, 80, 0, 27),
 -- 作战任务
-  ('ascent',   'ASCENT',   'A', 'MISSION','RANKED',   'A', '#4DA6FF', '双点位地图，中路可开闭的闸门决定了整局的攻防节奏。',      '', 62, 70, 66, 58, 92, 1, 30),
-  ('bind',     'BIND',     'B', 'MISSION','RANKED',   'S', '#A66CFF', '无中路的双点图，两处单向传送门让绕后变得随心所欲。',      '', 66, 78, 70, 54, 90, 0, 31),
-  ('haven',    'HAVEN',    'H', 'MISSION','RANKED',   'A', '#FFB443', '罕见的三点位地图，战线被拉长，信息收集比枪法更重要。',    '', 60, 64, 74, 62, 86, 0, 32),
-  ('range',    'RANGE',    'R', 'MISSION','TRAINING', 'B', '#3DDC97', '训练场，靶机与 bots 全开放，压枪与急停的日常修行地。',    '', 30, 40, 20, 20, 74, 0, 33),
-  ('nightfall','NIGHTFALL','N', 'MISSION','EVENT',    'S', '#FF4655', '限时行动：夜幕下的据点争夺，视野受限，投掷物价值翻倍。',  '', 78, 72, 80, 60, 89, 1, 34),
-  ('breakout', 'BREAKOUT', 'K', 'MISSION','EVENT',    'B', '#FF6B4A', '限时行动：护送与突围交替，节奏快到没有喘息窗口。',        '', 74, 80, 56, 46, 70, 0, 35);
+  ('ascent',   'ASCENT',   'A', 'MISSION','RANKED',   'A', '#4DA6FF', '双点位地图，中路可开闭的闸门决定了整局的攻防节奏。',      '/missions/ascent.png', 62, 70, 66, 58, 92, 1, 30),
+  ('bind',     'BIND',     'B', 'MISSION','RANKED',   'S', '#A66CFF', '无中路的双点图，两处单向传送门让绕后变得随心所欲。',      '/missions/bind.png', 66, 78, 70, 54, 90, 0, 31),
+  ('haven',    'HAVEN',    'H', 'MISSION','RANKED',   'A', '#FFB443', '罕见的三点位地图，战线被拉长，信息收集比枪法更重要。',    '/missions/haven.png', 60, 64, 74, 62, 86, 0, 32),
+  ('range',    'RANGE',    'R', 'MISSION','TRAINING', 'B', '#3DDC97', '训练场，靶机与 bots 全开放，压枪与急停的日常修行地。',    '/missions/range.png', 30, 40, 20, 20, 74, 0, 33),
+  ('nightfall','NIGHTFALL','N', 'MISSION','EVENT',    'S', '#FF4655', '限时行动：夜幕下的据点争夺，视野受限，投掷物价值翻倍。',  '/missions/nightfall.png', 78, 72, 80, 60, 89, 1, 34),
+  ('breakout', 'BREAKOUT', 'K', 'MISSION','EVENT',    'B', '#FF6B4A', '限时行动：护送与突围交替，节奏快到没有喘息窗口。',        '/missions/breakout.png', 74, 80, 56, 46, 70, 0, 35);
 
 -- ---------- 3. 首页动态流 ----------
 CREATE TABLE IF NOT EXISTS home_feed (
