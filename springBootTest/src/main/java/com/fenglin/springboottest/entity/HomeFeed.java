@@ -22,16 +22,25 @@ public class HomeFeed {
 
     private String summary;
 
+    /** 正文（\n 分段），情报详情页展示 */
+    private String body;
+
     /** 关联的一级分类编码，可为空 */
     private String categoryCode;
 
     /** 角标文案 */
     private String tag;
 
+    /** 情报来源机构 */
+    private String source;
+
     private LocalDateTime publishedAt;
 
     /** 热度 */
     private Integer heat;
+
+    /** 重要度：1 常规 / 2 重要 / 3 紧急 */
+    private Integer importance;
 
     private Integer status;
 
@@ -72,6 +81,14 @@ public class HomeFeed {
         this.summary = summary;
     }
 
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
     public String getCategoryCode() {
         return categoryCode;
     }
@@ -88,12 +105,28 @@ public class HomeFeed {
         this.tag = tag;
     }
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
     public LocalDateTime getPublishedAt() {
         return publishedAt;
     }
 
     public void setPublishedAt(LocalDateTime publishedAt) {
         this.publishedAt = publishedAt;
+    }
+
+    public Integer getImportance() {
+        return importance;
+    }
+
+    public void setImportance(Integer importance) {
+        this.importance = importance;
     }
 
     public Integer getHeat() {

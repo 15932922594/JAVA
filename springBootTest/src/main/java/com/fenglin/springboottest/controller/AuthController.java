@@ -2,6 +2,7 @@ package com.fenglin.springboottest.controller;
 
 import com.fenglin.springboottest.common.Result;
 import com.fenglin.springboottest.entity.AgentUser;
+import com.fenglin.springboottest.service.AccountAuthService;
 import com.fenglin.springboottest.service.AgentUserService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,9 +21,11 @@ import java.util.Map;
 public class AuthController {
 
     private final AgentUserService userService;
+    private final AccountAuthService accountAuthService;
 
-    public AuthController(AgentUserService userService) {
+    public AuthController(AgentUserService userService, AccountAuthService accountAuthService) {
         this.userService = userService;
+        this.accountAuthService = accountAuthService;
     }
 
     @PostMapping("/register")
@@ -134,6 +137,68 @@ public class AuthController {
         }
         boolean removed = userService.revokeSession(user.getId(), sessionId);
         return removed ? Result.ok() : Result.fail(404, "notfound");
+    }
+
+    /* ================= 找回密码 ================= */
+
+    /** 请求验证码：{ email } → { email, code, expiresIn, name } */
+    @PostMapping("/reset/request")
+    public Result<Object> resetRequest(@RequestBody Map<String, Object> body) {
+        String email = str(body.get("email"));
+        if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$")) {
+            return Result.fail(400, "邮箱格式不正确");
+        }
+        return wrap(accountAuthService.requestReset(email));
+    }
+
+    /** 用验证码重置密码：{ email, code, newPass } */
+    @PostMapping("/reset/confirm")
+    public Result<Object> resetConfirm(@RequestBody Map<String, Object> body) {
+        String email = str(body.get("email"));
+        String code = str(body.get("code"));
+        String newPass = str(body.get("newPass"));
+        if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$")) {
+            return Result.fail(400, "邮箱格式不正确");
+        }
+        if (code.isEmpty()) {
+            return Result.fail(400, "请输入验证码");
+        }
+        if (newPass.length() < 6) {
+            return Result.fail(400, "新密码至少 6 位");
+        }
+        return wrap(accountAuthService.confirmReset(email, code, newPass));
+    }
+
+    /* ================= RIOT 第三方登录 ================= */
+
+    /** 发起授权：{ uid? } → { ticket, riotId, uid, region, bound }；uid 用于复用同一个 Riot 身份 */
+    @PostMapping("/riot/authorize")
+    public Result<Object> riotAuthorize(@RequestBody(required = false) Map<String, Object> body) {
+        return wrap(accountAuthService.riotAuthorize(body == null ? "" : str(body.get("uid"))));
+    }
+
+    /** 授权回调：{ ticket } → 已绑定直接返回账号 + token；未绑定返回 bound:false */
+    @PostMapping("/riot/callback")
+    public Result<Object> riotCallback(@RequestBody Map<String, Object> body) {
+        return wrap(accountAuthService.riotCallback(str(body.get("ticket"))));
+    }
+
+    /** 首次授权建档并绑定：{ ticket, name, email, agentIndex } → 账号 + token */
+    @PostMapping("/riot/bind")
+    public Result<Object> riotBind(@RequestBody Map<String, Object> body) {
+        return wrap(accountAuthService.riotBind(
+                str(body.get("ticket")),
+                str(body.get("name")),
+                str(body.get("email")),
+                toInt(body.get("agentIndex")),
+                str(body.get("pass"))));
+    }
+
+    private Result<Object> wrap(AccountAuthService.Outcome o) {
+        if (o.isOk()) {
+            return new Result<>(0, o.getMsg(), o.getData());
+        }
+        return Result.fail(o.getCode(), o.getMsg());
     }
 
     private static String str(Object o) {
