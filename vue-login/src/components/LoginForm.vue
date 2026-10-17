@@ -4,6 +4,8 @@
    ============================================================ */
 import { reactive, ref, watch } from 'vue'
 import FieldInput from './FieldInput.vue'
+import ForgotPasswordModal from './ForgotPasswordModal.vue'
+import RiotAuthModal from './RiotAuthModal.vue'
 import { state, EMAIL, authLogin, useSession } from '../store/session'
 import { beep } from '../composables/useSound'
 import { useEffects } from '../composables/useEffects'
@@ -74,10 +76,34 @@ function goRegister() {
   switchMode('register')
 }
 
-/** 第三方快捷登录（原页面仅作演示反馈） */
-function connect(provider) {
-  beep(600, 0.07)
-  showToast(`正在连接 ${provider} 授权网关...`, false)
+/* ---------- 弹窗：找回密码 / RIOT 授权 ---------- */
+const showForgot = ref(false)
+const showRiot = ref(false)
+
+function openForgot() {
+  beep(600, 0.06)
+  showForgot.value = true
+}
+
+/** 重置完成后把邮箱带回登录框，省得再输一遍 */
+function onForgotDone(mail) {
+  showForgot.value = false
+  if (mail) form.id = mail
+  form.pass = ''
+  showToast('密码已重置 · 请使用新密码登录', true)
+}
+
+function openRiot() {
+  beep(600, 0.06)
+  showRiot.value = true
+}
+
+/** Riot 授权成功：登录态已写入（applyLogin 自动跳转首页），这里只收掉弹窗 */
+function onRiotDone(data) {
+  showRiot.value = false
+  if (data?.riotId) {
+    showToast(`已通过 ${data.riotId} 接入`, true)
+  }
 }
 </script>
 
@@ -125,7 +151,7 @@ function connect(provider) {
           </svg>
         </span>保持登录
       </label>
-      <a class="lnk" href="#" @click.prevent>忘记密码?</a>
+      <a class="lnk" href="#" @click.prevent="openForgot">忘记密码?</a>
     </div>
 
     <button class="btn" type="submit" :class="{ loading }" :disabled="loading">
@@ -137,7 +163,11 @@ function connect(provider) {
 
     <div class="socials">
       <button class="soc" type="button" @click="goRegister">创建新特工</button>
-      <button class="soc" type="button" @click="connect('Riot')">RIOT 账号</button>
+      <button class="soc" type="button" @click="openRiot">RIOT 账号</button>
     </div>
+
+    <!-- 找回密码 / RIOT 授权（Teleport 到 body，避免被父级层叠上下文裁切） -->
+    <ForgotPasswordModal v-if="showForgot" @close="showForgot = false" @done="onForgotDone" />
+    <RiotAuthModal v-if="showRiot" @close="showRiot = false" @done="onRiotDone" />
   </form>
 </template>

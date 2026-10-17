@@ -84,3 +84,89 @@ export const homeOverview = (token) => post('/api/home/overview', { token })
 /** 首页动态流（分页，kind 可选 NEWS | PATCH | MISSION） */
 export const homeFeed = (token, page = 1, size = 5, kind = '') =>
   post('/api/home/feed', { token, page, size, kind })
+
+/* ============================================================
+   作战任务接口 —— 后端 MissionController
+   ------------------------------------------------------------
+   状态流转：IDLE（未接取）→ ACTIVE（进行中）→ READY（待结算）→ DONE（已结算）
+   表：mission_brief（简报 / 目标 / 奖励）/ mission_progress（个人进度）
+   建表脚本：springBootTest/sql/mission.sql
+   ============================================================ */
+
+/**
+ * 任务列表 + 个人统计
+ * @param {string} token
+ * @param {object} params  status（IDLE|ACTIVE|READY|DONE）/ q / sub / tier
+ */
+export const missionList = (token, params = {}) => post('/api/mission/list', { token, ...params })
+
+/** 接取任务 */
+export const missionAccept = (token, code) => post('/api/mission/accept', { token, code })
+
+/** 勾选 / 取消勾选某个目标，index 为目标下标 */
+export const missionToggle = (token, code, index) =>
+  post('/api/mission/objective', { token, code, index })
+
+/** 放弃任务（进度记录删除，回到未接取） */
+export const missionAbandon = (token, code) => post('/api/mission/abandon', { token, code })
+
+/** 结算任务（目标全部完成后发放积分） */
+export const missionClaim = (token, code) => post('/api/mission/claim', { token, code })
+
+/* ============================================================
+   情报中心接口 —— 后端 IntelController
+   ------------------------------------------------------------
+   表：home_feed（情报本体，新增 source / body / importance）
+       feed_mark（个人已读 / 收藏 / 点赞）
+   建表脚本：springBootTest/sql/intel.sql
+   ============================================================ */
+
+/**
+ * 情报列表 + 统计
+ * @param {string} token
+ * @param {object} params kind（NEWS|PATCH|MISSION）/ status（UNREAD|READ|STARRED）
+ *                        / q / sort（newest|heat）/ page / size
+ */
+export const intelList = (token, params = {}) => post('/api/intel/list', { token, ...params })
+
+/** 情报详情（含正文；打开即自动标记已读） */
+export const intelDetail = (token, id) => post('/api/intel/detail', { token, id })
+
+/** 标记已读 / 未读 */
+export const intelRead = (token, id, read) => post('/api/intel/read', { token, id, read })
+
+/** 收藏 / 取消收藏 */
+export const intelStar = (token, id) => post('/api/intel/star', { token, id })
+
+/** 点赞 / 取消点赞 */
+export const intelLike = (token, id) => post('/api/intel/like', { token, id })
+
+/** 全部标记已读 */
+export const intelMarkAll = (token) => post('/api/intel/mark-all', { token })
+
+/** 统计（未读 / 已读 / 收藏 / 点赞） */
+export const intelStats = (token) => post('/api/intel/stats', { token })
+
+/* ============================================================
+   找回密码 + RIOT 第三方登录 —— 后端 AuthController
+   ------------------------------------------------------------
+   表：agent_reset_code（验证码）/ agent_oauth（绑定与授权票据）
+   建表脚本：springBootTest/sql/auth_extra.sql
+   ============================================================ */
+
+/** 请求找回密码验证码（演示环境直接返回 code） */
+export const resetRequest = (email) => post('/api/auth/reset/request', { email })
+
+/** 用验证码重置密码 */
+export const resetConfirm = (email, code, newPass) =>
+  post('/api/auth/reset/confirm', { email, code, newPass })
+
+/** 发起 Riot 授权：uid 为本地记住的 Riot 身份（复用同一个账号），返回一次性票据 */
+export const riotAuthorize = (uid = '') => post('/api/auth/riot/authorize', { uid })
+
+/** 授权回调：已绑定直接返回账号 + token；未绑定返回 bound:false */
+export const riotCallback = (ticket) => post('/api/auth/riot/callback', { ticket })
+
+/** 首次授权：绑定新建特工档案并登录 */
+export const riotBind = (ticket, name, email, agentIndex) =>
+  post('/api/auth/riot/bind', { ticket, name, email, agentIndex })

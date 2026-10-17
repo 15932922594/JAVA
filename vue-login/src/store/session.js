@@ -157,6 +157,65 @@ export async function authLogout() {
   state.login.pass = ''
 }
 
+/* ---------------- 找回密码 ---------------- */
+
+/** 请求验证码。成功返回 { ok:true, code, expiresIn, name } */
+export async function authResetRequest(email) {
+  const r = await api.resetRequest(email.trim())
+  return r.code === 0
+    ? { ok: true, data: r.data }
+    : { ok: false, reason: r.msg }
+}
+
+/** 用验证码重置密码：{ email, code, newPass } */
+export async function authResetConfirm(email, code, newPass) {
+  const r = await api.resetConfirm(email.trim(), code.trim(), newPass)
+  return r.code === 0 ? { ok: true, data: r.data } : { ok: false, reason: r.msg }
+}
+
+/* ---------------- RIOT 第三方登录 ---------------- */
+
+/** localStorage 中记住的 Riot 身份（相当于 Riot 侧的登录态，用于复用同一个账号） */
+const RIOT_UID_KEY = 'agent_riot_uid'
+
+/** 第一步：发起授权 → { ticket, riotId, uid, region, bound } */
+export async function authRiotAuthorize() {
+  const uid = localStorage.getItem(RIOT_UID_KEY) || ''
+  const r = await api.riotAuthorize(uid)
+  return r.code === 0 ? { ok: true, data: r.data } : { ok: false, reason: r.msg }
+}
+
+/** 记住本次授权的 Riot 身份，下次授权就能走「已绑定 → 直接登录」 */
+function rememberRiot(data) {
+  if (data && data.uid) localStorage.setItem(RIOT_UID_KEY, data.uid)
+}
+
+/**
+ * 第二步：授权回调
+ * 已绑定 → 直接写入登录态并返回 { ok:true, bound:true, data }
+ * 未绑定 → 返回 { ok:true, bound:false, data:{ riotId, ticket, suggestName } }
+ */
+export async function authRiotCallback(ticket, remember = true) {
+  const r = await api.riotCallback(ticket)
+  if (r.code !== 0) return { ok: false, reason: r.msg }
+  if (r.data.bound === false) {
+    rememberRiot(r.data)
+    return { ok: true, bound: false, data: r.data }
+  }
+  rememberRiot(r.data)
+  applyLogin(r.data, remember)
+  return { ok: true, bound: true, data: r.data }
+}
+
+/** 第三步：首次授权建档并绑定，成功后直接进入登录态 */
+export async function authRiotBind(ticket, name, email, agentIndex, remember = true) {
+  const r = await api.riotBind(ticket, name.trim(), email.trim(), agentIndex)
+  if (r.code !== 0) return { ok: false, reason: r.msg }
+  rememberRiot(r.data)
+  applyLogin(r.data, remember)
+  return { ok: true, data: r.data }
+}
+
 /** 自动登录：用 localStorage 里的 token 换账号信息（页面刷新时调用） */
 export async function authRestore() {
   const token = localStorage.getItem(TOKEN_KEY)
@@ -276,6 +335,11 @@ export function useSession() {
     authRegister,
     authLogout,
     authRestore,
+    authResetRequest,
+    authResetConfirm,
+    authRiotAuthorize,
+    authRiotCallback,
+    authRiotBind,
     authChangePass,
     switchView,
     switchDashTab,

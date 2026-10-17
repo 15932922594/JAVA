@@ -17,6 +17,7 @@ import AppToast from './components/AppToast.vue'
 import HomePage from './components/home/HomePage.vue'
 import ArchivePage from './components/home/ArchivePage.vue'
 import IntelPage from './components/home/IntelPage.vue'
+import MissionsPage from './components/home/MissionsPage.vue'
 
 const { showToast } = useSession()
 
@@ -134,12 +135,8 @@ onBeforeUnmount(() => clearTimeout(flashTimer))
     title="武器库"
     name-en="ARSENAL"
   />
-  <ArchivePage
-    v-else-if="view === 'missions'"
-    category="MISSION"
-    title="作战任务"
-    name-en="OPERATIONS"
-  />
+  <!-- 作战任务：独立的可交互任务作战台（接取 / 勾选目标 / 结算） -->
+  <MissionsPage v-else-if="view === 'missions'" />
 
   <!-- ---------- 情报中心 ---------- -->
   <IntelPage v-else-if="view === 'intel'" />
