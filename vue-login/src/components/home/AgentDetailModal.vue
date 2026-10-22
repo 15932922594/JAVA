@@ -42,6 +42,11 @@ function paragraphs(text) {
   return String(text).split('\n').map((s) => s.trim()).filter(Boolean)
 }
 
+/** 能力/特性列表：后端返回数组，缺省时降级为空 */
+function abilityList(v) {
+  return Array.isArray(v) ? v : []
+}
+
 function onKey(e) {
   if (e.key === 'Escape') emit('close')
 }
@@ -98,7 +103,7 @@ watch(() => props.code, load)
             <span class="dot"></span>
             <span class="cid">NO.{{ data.code }}</span>
           </p>
-          <h2>{{ data.name }}</h2>
+          <h2>{{ data.name }}<span v-if="data.nameCn" class="namecn">{{ data.nameCn }}</span></h2>
           <p class="roleline">{{ data.role }}</p>
 
           <p class="bio">{{ data.bio }}</p>
@@ -111,6 +116,24 @@ watch(() => props.code, load)
               <span class="val">{{ v }}</span>
             </li>
           </ul>
+
+          <!-- 能力 / 特性 -->
+          <div v-if="abilityList(data.abilities).length" class="abbox">
+            <div class="shead">
+              <span class="bar"></span>
+              <h3>{{ data.category === 'GEAR' ? '枪械特性' : '能力解析' }}</h3>
+              <span class="sen">ABILITIES</span>
+            </div>
+            <ul class="abil">
+              <li v-for="(ab, i) in abilityList(data.abilities)" :key="i">
+                <span class="slot" :class="{ 'is-cost': ab.slot === '代价' }">{{ ab.slot }}</span>
+                <div class="abtxt">
+                  <p class="abname">{{ ab.name }}</p>
+                  <p class="abdesc">{{ ab.desc }}</p>
+                </div>
+              </li>
+            </ul>
+          </div>
 
           <!-- 人物故事 -->
           <div class="storybox">
@@ -288,6 +311,9 @@ watch(() => props.code, load)
 .eyebrow .cid { color: var(--muted); }
 .right h2 {
   margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
   font-family: var(--disp);
   font-weight: 700;
   font-size: 40px;
@@ -295,6 +321,14 @@ watch(() => props.code, load)
   letter-spacing: 3.4px;
   text-transform: uppercase;
   color: var(--cream);
+}
+/* 英文代号旁并排的中文名 */
+.namecn {
+  font-family: var(--mono);
+  font-size: 15px;
+  letter-spacing: 2px;
+  text-transform: none;
+  color: var(--c);
 }
 .roleline {
   margin: 6px 0 14px;
@@ -329,6 +363,28 @@ watch(() => props.code, load)
   from { width: 0 !important; }
 }
 .val { font-family: var(--mono); font-size: 11px; color: var(--cream); text-align: right; }
+
+/* 能力 / 特性 */
+.abbox {
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  background: rgba(10, 17, 25, .55);
+  border: 1px solid var(--line);
+}
+.abil { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
+.abil li { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: start; }
+.slot {
+  padding: 4px 0;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #0b1017;
+  background: var(--c);
+}
+.slot.is-cost { background: var(--red); color: #fff0f0; }
+.abname { margin: 0 0 3px; font-size: 13.5px; font-weight: 600; color: var(--cream); }
+.abdesc { margin: 0; font-size: 12.5px; line-height: 1.75; color: var(--muted); }
 
 /* 人物故事 */
 .storybox {

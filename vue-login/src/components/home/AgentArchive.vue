@@ -20,6 +20,12 @@ defineProps({
 })
 
 const emit = defineEmits(['open'])
+
+/** 能力/特性名称，卡片上做一句「能干什么」的速览 */
+function abilityNames(a) {
+  const list = Array.isArray(a && a.abilities) ? a.abilities : []
+  return list.map((x) => x && x.name).filter(Boolean)
+}
 </script>
 
 <template>
@@ -66,12 +72,17 @@ const emit = defineEmits(['open'])
         </div>
 
         <div class="body">
-          <h3>{{ a.name }}</h3>
+          <h3>{{ a.name }}<span v-if="a.nameCn" class="cn">{{ a.nameCn }}</span></h3>
           <p class="roleline">
             {{ a.role }}
             <span v-if="a.categoryName" class="cat">{{ a.categoryName }}</span>
           </p>
           <p class="bio">{{ a.bio }}</p>
+
+          <!-- 能力速览：不看详情也能知道它有哪几招 -->
+          <p v-if="abilityNames(a).length" class="abs">
+            <span v-for="(n, i) in abilityNames(a)" :key="i">{{ n }}</span>
+          </p>
 
           <ul class="stats">
             <li v-for="(v, i) in a.stats" :key="i">
@@ -273,12 +284,39 @@ const emit = defineEmits(['open'])
 .body { padding: 16px 18px 18px; }
 .body h3 {
   margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
   font-family: var(--disp);
   font-weight: 700;
   font-size: 25px;
   letter-spacing: 2.5px;
   text-transform: uppercase;
   color: var(--cream);
+}
+/* 英文代号旁并排的中文名 */
+.cn {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 1.4px;
+  text-transform: none;
+  color: var(--c);
+}
+
+/* 能力速览标签 */
+.abs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+.abs span {
+  padding: 3px 7px;
+  font-size: 10.5px;
+  letter-spacing: .6px;
+  color: var(--cream);
+  border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+  background: color-mix(in srgb, var(--c) 12%, transparent);
 }
 .roleline {
   display: flex;

@@ -32,6 +32,9 @@ public class AgentArchive {
     /** 档案名称（展示用大写） */
     private String name;
 
+    /** 中文名（name_cn），用于和英文代号并列展示，便于理解 */
+    private String nameCn;
+
     /** 单字符缩写 */
     private String mono;
 
@@ -43,6 +46,9 @@ public class AgentArchive {
 
     /** 人物故事 / 背景档案（详情页展示，\n\n 分段） */
     private String story;
+
+    /** 能力 / 特性：JSON 字符串，形如 [{slot,name,desc}]，可为空 */
+    private String abilities;
 
     /** 立绘地址，可为空 */
     private String img;
@@ -117,6 +123,14 @@ public class AgentArchive {
         this.name = name;
     }
 
+    public String getNameCn() {
+        return nameCn;
+    }
+
+    public void setNameCn(String nameCn) {
+        this.nameCn = nameCn;
+    }
+
     public String getMono() {
         return mono;
     }
@@ -147,6 +161,14 @@ public class AgentArchive {
 
     public void setStory(String story) {
         this.story = story;
+    }
+
+    public String getAbilities() {
+        return abilities;
+    }
+
+    public void setAbilities(String abilities) {
+        this.abilities = abilities;
     }
 
     public String getImg() {

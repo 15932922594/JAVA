@@ -10,10 +10,13 @@ import com.fenglin.springboottest.entity.HomeFeed;
 import com.fenglin.springboottest.mapper.AgentArchiveMapper;
 import com.fenglin.springboottest.mapper.ArchiveCategoryMapper;
 import com.fenglin.springboottest.mapper.HomeFeedMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +34,9 @@ public class HomeService extends ServiceImpl<AgentArchiveMapper, AgentArchive> {
 
     /** 分级档位，前端筛选器与统计都按这个顺序 */
     private static final String[] TIERS = {"S", "A", "B"};
+
+    /** 解析 abilities 列里的 JSON；Jackson 在项目里已随 Spring Web 引入 */
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final ArchiveCategoryMapper categoryMapper;
     private final HomeFeedMapper feedMapper;
@@ -262,6 +268,7 @@ public class HomeService extends ServiceImpl<AgentArchiveMapper, AgentArchive> {
         m.put("id", a.getId());
         m.put("code", a.getCode());
         m.put("name", a.getName());
+        m.put("nameCn", a.getNameCn() == null ? "" : a.getNameCn());
         m.put("mono", a.getMono());
         m.put("role", roleText(a));
         m.put("roleEn", a.getSubCode());
@@ -280,7 +287,21 @@ public class HomeService extends ServiceImpl<AgentArchiveMapper, AgentArchive> {
         m.put("stats", stats);
         m.put("heat", nz(a.getHeat()));
         m.put("featured", nz(a.getFeatured()) == 1);
+        m.put("abilities", parseAbilities(a.getAbilities()));
         return m;
+    }
+
+    /** abilities 列(JSON) → 前端列表；内容为空或格式异常时降级为空数组，不影响主流程 */
+    private List<Map<String, Object>> parseAbilities(String json) {
+        if (json == null || json.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+        try {
+            List<Map<String, Object>> list = MAPPER.readValue(json, new TypeReference<List<Map<String, Object>>>() {});
+            return list == null ? Collections.emptyList() : list;
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     private Map<String, Object> toFeedMap(HomeFeed f) {
