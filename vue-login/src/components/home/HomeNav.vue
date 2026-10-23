@@ -4,7 +4,7 @@
    沿用登录页的 HUD 语言：斜切色块、多边形裁角、红辉光、等宽小标签。
    ============================================================ */
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { state, agentLevel, accent, switchView, useSession } from '../../store/session'
+import { state, agentLevel, accent, switchView, enterAdmin, useSession } from '../../store/session'
 import { beep, toggleSound } from '../../composables/useSound'
 
 const { showToast, authLogout } = useSession()
@@ -48,6 +48,12 @@ function onNav(n) {
   if (state.view === n.key) return
   beep(640, 0.07)
   switchView(n.key)
+}
+
+/* ---------- 后台管理系统（独立登录） ---------- */
+function goAdmin() {
+  beep(680, 0.07)
+  enterAdmin()
 }
 
 /* ---------- 作战终端 ---------- */
@@ -97,6 +103,20 @@ const mono = computed(() => (state.user?.name || '?').trim().charAt(0).toUpperCa
       </nav>
 
       <span class="sp"></span>
+
+      <!-- 后台管理入口 -->
+      <button class="admin-btn" type="button" title="进入后台管理系统" @click="goAdmin">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="1.7" />
+          <path
+            d="M19.4 13a7.7 7.7 0 0 0 0-2l2-1.5-2-3.4-2.4 1a7.6 7.6 0 0 0-1.7-1l-.4-2.6h-4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.7 7.7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7.6 7.6 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5Z"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linejoin="round"
+          />
+        </svg>
+        后台管理
+      </button>
 
       <!-- 右侧：音效 + 用户 -->
       <button class="icon-btn" :class="{ muted: !state.soundOn }" title="音效" aria-label="音效开关" @click.stop="toggleSound">
@@ -211,6 +231,32 @@ const mono = computed(() => (state.user?.name || '?').trim().charAt(0).toUpperCa
   box-shadow: 0 0 26px -8px var(--ac);
 }
 .sp { flex: 1; }
+
+/* ---------- 后台管理按钮 ---------- */
+.admin-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  flex-shrink: 0;
+  padding: 0 14px;
+  background: rgba(17, 26, 36, .7);
+  border: 1px solid var(--line);
+  color: var(--cream);
+  cursor: pointer;
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 2px;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  transition: .2s;
+}
+.admin-btn:hover {
+  color: #fff;
+  border-color: var(--red);
+  background: rgba(255, 70, 85, .14);
+  box-shadow: 0 0 20px -6px var(--red);
+}
 
 /* ---------- 图标按钮 ---------- */
 .icon-btn {

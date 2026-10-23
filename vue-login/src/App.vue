@@ -1,6 +1,6 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref, computed, watch, nextTick, provide } from 'vue'
-import { state, accent, authRestore, switchView, useSession } from './store/session'
+import { state, accent, authRestore, adminRestore, switchView, useSession } from './store/session'
 import { useParallax } from './composables/useParallax'
 import { FX_KEY } from './composables/useEffects'
 import { beep } from './composables/useSound'
@@ -18,6 +18,8 @@ import HomePage from './components/home/HomePage.vue'
 import ArchivePage from './components/home/ArchivePage.vue'
 import IntelPage from './components/home/IntelPage.vue'
 import MissionsPage from './components/home/MissionsPage.vue'
+import AdminLogin from './components/admin/AdminLogin.vue'
+import AdminDashboard from './components/admin/AdminDashboard.vue'
 
 const { showToast } = useSession()
 
@@ -67,6 +69,8 @@ function enterTerminal() {
 
 /* ---------- 自动登录：开机页期间用保存的 token 换账号信息 ---------- */
 onMounted(() => {
+  // 后台：用本地保存的管理员令牌恢复登录态（与前台互不影响）
+  adminRestore()
   authRestore().then((ok) => {
     if (ok && state.booted) {
       // 开机页已经结束的情况（快速刷新）也要提示
@@ -140,6 +144,10 @@ onBeforeUnmount(() => clearTimeout(flashTimer))
 
   <!-- ---------- 情报中心 ---------- -->
   <IntelPage v-else-if="view === 'intel'" />
+
+  <!-- ---------- 后台管理系统（独立登录态，先登录再进管理台） ---------- -->
+  <AdminLogin v-else-if="view === 'admin' && !state.admin" />
+  <AdminDashboard v-else-if="view === 'admin'" />
 
   <!-- ---------- 作战终端（从首页用户菜单进入） ---------- -->
   <div v-else class="wrap dashwrap">

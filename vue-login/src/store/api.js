@@ -170,3 +170,71 @@ export const riotCallback = (ticket) => post('/api/auth/riot/callback', { ticket
 /** 首次授权：绑定新建特工档案并登录 */
 export const riotBind = (ticket, name, email, agentIndex) =>
   post('/api/auth/riot/bind', { ticket, name, email, agentIndex })
+
+/* ============================================================
+   后台管理接口 —— 后端 AdminController
+   ------------------------------------------------------------
+   管理员账号与前台特工账号隔离（表 admin_user），后台只登录不注册。
+   管理的对象即首页展示的数据：档案 / 分类 / 动态（情报）/ 任务简报 / 用户。
+   建表脚本：springBootTest/sql/admin.sql
+   ============================================================ */
+
+/** 后台登录：{ username, pass } → { id, username, displayName, token } */
+export const adminLogin = (username, pass) => post('/api/admin/login', { username, pass })
+
+/** 校验令牌（刷新页面保持登录） */
+export const adminVerify = (token) => post('/api/admin/verify', { token })
+
+/** 退出后台 */
+export const adminLogout = (token) => post('/api/admin/logout', { token })
+
+/** 修改管理员密码 */
+export const adminChangePass = (token, oldPass, newPass) =>
+  post('/api/admin/change-pass', { token, oldPass, newPass })
+
+/** 后台统计：各表记录数 */
+export const adminStats = (token) => post('/api/admin/stats', { token })
+
+/** 档案列表 */
+export const adminArchiveList = (token, params = {}) =>
+  post('/api/admin/archive/list', { token, ...params })
+
+/** 档案新增 / 修改（data.id 为空即新增） */
+export const adminArchiveSave = (token, data) => post('/api/admin/archive/save', { token, data })
+
+/** 档案删除 */
+export const adminArchiveDelete = (token, id) => post('/api/admin/archive/delete', { token, id })
+
+/** 分类列表 */
+export const adminCategoryList = (token) => post('/api/admin/category/list', { token })
+
+/** 分类新增 / 修改 */
+export const adminCategorySave = (token, data) => post('/api/admin/category/save', { token, data })
+
+/** 分类删除（一级分类不可删） */
+export const adminCategoryDelete = (token, id) => post('/api/admin/category/delete', { token, id })
+
+/** 动态 / 情报列表 */
+export const adminFeedList = (token, params = {}) => post('/api/admin/feed/list', { token, ...params })
+
+/** 动态新增 / 修改 */
+export const adminFeedSave = (token, data) => post('/api/admin/feed/save', { token, data })
+
+/** 动态删除 */
+export const adminFeedDelete = (token, id) => post('/api/admin/feed/delete', { token, id })
+
+/** 任务简报列表 */
+export const adminMissionList = (token, params = {}) =>
+  post('/api/admin/mission/list', { token, ...params })
+
+/** 任务简报新增 / 修改 */
+export const adminMissionSave = (token, data) => post('/api/admin/mission/save', { token, data })
+
+/** 任务简报删除 */
+export const adminMissionDelete = (token, id) => post('/api/admin/mission/delete', { token, id })
+
+/** 前台用户列表（只读） */
+export const adminUserList = (token, params = {}) => post('/api/admin/user/list', { token, ...params })
+
+/** 操作日志（target: archive/category/feed/mission/admin，action: CREATE/UPDATE/DELETE/LOGIN/PASSWORD） */
+export const adminLogList = (token, params = {}) => post('/api/admin/log/list', { token, ...params })

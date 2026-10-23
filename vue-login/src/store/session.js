@@ -13,6 +13,9 @@ export const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 /** localStorage 中保存会话 token 的键 */
 const TOKEN_KEY = 'agent_token'
 
+/** localStorage 中保存后台管理员 token 的键（与前台账号互不影响） */
+const ADMIN_TOKEN_KEY = 'admin_token'
+
 export const state = reactive({
   /** 当前选中的特工下标 */
   agentIndex: 0,
@@ -35,6 +38,10 @@ export const state = reactive({
   /** 登录态：user = { id, name, email, agentIndex } | null */
   user: null,
   token: null,
+
+  /** 后台管理登录态：admin = { id, username, displayName } | null */
+  admin: null,
+  adminToken: null,
 
   /** 登录后的主页（作战终端） */
   dashTab: 'overview',            // overview | sessions | security
@@ -244,10 +251,65 @@ export async function authRestore() {
  * 后续若引入 vue-router，把这里改成 router.push 即可，调用方不用动。
  */
 export function switchView(view) {
-  if (!['auth', 'home', 'agents', 'arsenal', 'missions', 'intel', 'dash'].includes(view)) return
+  if (!['auth', 'home', 'agents', 'arsenal', 'missions', 'intel', 'dash', 'admin'].includes(view)) {
+    return
+  }
   state.view = view
   if (view === 'dash') loadSessions()
 }
+
+/* ---------------- 后台管理（AdminController） ---------------- */
+
+/**
+ * 进入后台：已登录直接进管理台，否则先进后台登录页
+ * 后台与前台是两个独立登录态，互不影响。
+ */
+export function enterAdmin() {
+  state.view = 'admin'
+}
+
+/** 后台登录。成功返回 { ok:true }，失败返回 { ok:false, reason } */
+export async function adminLogin(username, pass) {
+  const r = await api.adminLogin(username.trim(), pass)
+  if (r.code !== 0) return { ok: false, reason: r.msg }
+  state.admin = {
+    id: r.data.id,
+    username: r.data.username,
+    displayName: r.data.displayName
+  }
+  state.adminToken = r.data.token
+  localStorage.setItem(ADMIN_TOKEN_KEY, r.data.token)
+  return { ok: true }
+}
+
+/** 后台自动登录：用本地 token 校验（刷新页面时调用） */
+export async function adminRestore() {
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY)
+  if (!token) return false
+  const r = await api.adminVerify(token)
+  if (r.code === 0) {
+    state.admin = {
+      id: r.data.id,
+      username: r.data.username,
+      displayName: r.data.displayName
+    }
+    state.adminToken = token
+    return true
+  }
+  localStorage.removeItem(ADMIN_TOKEN_KEY)
+  return false
+}
+
+/** 退出后台 */
+export async function adminSignOut() {
+  if (state.adminToken) await api.adminLogout(state.adminToken)
+  state.admin = null
+  state.adminToken = null
+  localStorage.removeItem(ADMIN_TOKEN_KEY)
+}
+
+/** 后台管理员是否登录 */
+export const isAdmin = computed(() => !!state.admin)
 
 /* ---------------- 登录后主页（作战终端） ---------------- */
 
@@ -331,6 +393,11 @@ export function useSession() {
     agentLevel,
     securityLevel,
     isLoggedIn,
+    isAdmin,
+    enterAdmin,
+    adminLogin,
+    adminRestore,
+    adminSignOut,
     authLogin,
     authRegister,
     authLogout,
