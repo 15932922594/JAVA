@@ -8,7 +8,6 @@ import com.fenglin.springboottest.entity.AgentUser;
 import com.fenglin.springboottest.mapper.AgentOauthMapper;
 import com.fenglin.springboottest.mapper.AgentResetCodeMapper;
 import com.fenglin.springboottest.mapper.AgentSessionMapper;
-import com.fenglin.springboottest.util.PasswordUtil;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -103,11 +102,8 @@ public class AccountAuthService {
             return Outcome.fail(400, "验证码错误或已过期");
         }
 
-        // 换盐 + 重算摘要
-        String salt = PasswordUtil.randomSalt();
-        user.setSalt(salt);
-        user.setPasswordHash(PasswordUtil.sha256(salt, newPass));
-        userService.updateById(user);
+        // 密码明文存储
+        userService.savePlainPassword(user, newPass.trim());
 
         rc.setUsed(1);
         resetMapper.updateById(rc);

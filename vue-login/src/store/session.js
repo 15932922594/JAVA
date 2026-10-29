@@ -16,6 +16,14 @@ const TOKEN_KEY = 'agent_token'
 /** localStorage 中保存后台管理员 token 的键（与前台账号互不影响） */
 const ADMIN_TOKEN_KEY = 'admin_token'
 
+/**
+ * 权限取值（与后端 agent_user.permission 一致）
+ *   1 = 默认权限（注册用户默认）：看不到后台入口，也登录不了后台
+ *   0 = 管理员权限：首页显示「后台管理」按钮，可用本人账号登录后台
+ */
+export const PERMISSION_USER = 1
+export const PERMISSION_ADMIN = 0
+
 export const state = reactive({
   /** 当前选中的特工下标 */
   agentIndex: 0,
@@ -35,11 +43,11 @@ export const state = reactive({
   /** Toast */
   toast: { visible: false, text: '', ok: false },
 
-  /** 登录态：user = { id, name, email, agentIndex } | null */
+  /** 登录态：user = { id, name, email, agentIndex, permission } | null */
   user: null,
   token: null,
 
-  /** 后台管理登录态：admin = { id, username, displayName } | null */
+  /** 后台管理登录态：admin = { id, username, displayName, permission, source } | null */
   admin: null,
   adminToken: null,
 
@@ -113,9 +121,23 @@ export const securityLevel = computed(() => {
 /** 登录态派生 */
 export const isLoggedIn = computed(() => !!state.user)
 
+/**
+ * 当前登录账号是否为管理员权限（permission === 0）。
+ * 决定首页「后台管理」按钮是否显示、以及能否进入 / 登录后台管理系统。
+ */
+export const canAdmin = computed(
+  () => !!state.user && state.user.permission === PERMISSION_ADMIN
+)
+
 /** 登录成功后写入本地状态；remember 为 true 时持久化 token */
 function applyLogin(data, remember) {
-  state.user = { id: data.id, name: data.name, email: data.email, agentIndex: data.agentIndex }
+  state.user = {
+    id: data.id,
+    name: data.name,
+    email: data.email,
+    agentIndex: data.agentIndex,
+    permission: data.permission ?? PERMISSION_USER
+  }
   state.token = data.token || null
   // 后端记录了注册时选择的特工，登录后切回该特工
   if (typeof data.agentIndex === 'number' && AGENTS[data.agentIndex]) {
@@ -150,6 +172,11 @@ export async function authRegister(name, email, pass, agentIndex) {
 
 /** 退出登录：注销后端会话 + 清理本地状态 */
 export async function authLogout() {
+  // 后台管理登录态一并退掉：避免管理员退出后，同一台机器上的下一个用户
+  // 还能从 localStorage 里拿到上一个管理员的 admin_token 直接调后台接口。
+  if (state.admin || localStorage.getItem(ADMIN_TOKEN_KEY)) {
+    await adminSignOut()
+  }
   const token = state.token || localStorage.getItem(TOKEN_KEY)
   if (token) {
     await api.logout(token)
@@ -254,6 +281,12 @@ export function switchView(view) {
   if (!['auth', 'home', 'agents', 'arsenal', 'missions', 'intel', 'dash', 'admin'].includes(view)) {
     return
   }
+  // 后台管理系统：仅管理员权限（permission = 0）可进入，默认权限一律拦下
+  if (view === 'admin' && !canAdmin.value) {
+    showToast('无后台管理权限 · 仅管理员可进入', false)
+    state.view = state.user ? 'home' : 'auth'
+    return
+  }
   state.view = view
   if (view === 'dash') loadSessions()
 }
@@ -261,25 +294,35 @@ export function switchView(view) {
 /* ---------------- 后台管理（AdminController） ---------------- */
 
 /**
- * 进入后台：已登录直接进管理台，否则先进后台登录页
- * 后台与前台是两个独立登录态，互不影响。
+ * 进入后台：仅 permission = 0（管理员权限）可进入，进到后台登录页后用本人账号登录。
+ * 默认权限（permission = 1）直接拦截并提示。
  */
 export function enterAdmin() {
+  if (!canAdmin.value) {
+    showToast('无后台管理权限 · 仅管理员可进入', false)
+    return false
+  }
   state.view = 'admin'
+  return true
 }
 
-/** 后台登录。成功返回 { ok:true }，失败返回 { ok:false, reason } */
+/**
+ * 后台登录：使用前台账号（代号或邮箱）+ 密码。
+ * 后端只放行 permission = 0 的账号，默认权限会返回「该账号无后台管理权限」。
+ */
 export async function adminLogin(username, pass) {
   const r = await api.adminLogin(username.trim(), pass)
   if (r.code !== 0) return { ok: false, reason: r.msg }
   state.admin = {
     id: r.data.id,
     username: r.data.username,
-    displayName: r.data.displayName
+    displayName: r.data.displayName,
+    permission: r.data.permission ?? PERMISSION_ADMIN,
+    source: r.data.source || 'ADMIN'
   }
   state.adminToken = r.data.token
   localStorage.setItem(ADMIN_TOKEN_KEY, r.data.token)
-  return { ok: true }
+  return { ok: true, data: r.data }
 }
 
 /** 后台自动登录：用本地 token 校验（刷新页面时调用） */
@@ -291,13 +334,21 @@ export async function adminRestore() {
     state.admin = {
       id: r.data.id,
       username: r.data.username,
-      displayName: r.data.displayName
+      displayName: r.data.displayName,
+      permission: r.data.permission ?? PERMISSION_ADMIN,
+      source: r.data.source || 'ADMIN'
     }
     state.adminToken = token
     return true
   }
   localStorage.removeItem(ADMIN_TOKEN_KEY)
   return false
+}
+
+/** 后台授权：把某个前台账号设为管理员（0）或恢复默认权限（1） */
+export async function adminSetPermission(userId, permission) {
+  const r = await api.adminUserPermission(state.adminToken, userId, permission)
+  return r.code === 0 ? { ok: true } : { ok: false, reason: r.msg }
 }
 
 /** 退出后台 */
@@ -394,10 +445,12 @@ export function useSession() {
     securityLevel,
     isLoggedIn,
     isAdmin,
+    canAdmin,
     enterAdmin,
     adminLogin,
     adminRestore,
     adminSignOut,
+    adminSetPermission,
     authLogin,
     authRegister,
     authLogout,

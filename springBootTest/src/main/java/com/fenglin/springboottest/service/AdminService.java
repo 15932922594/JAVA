@@ -12,6 +12,7 @@ import com.fenglin.springboottest.entity.ArchiveCategory;
 import com.fenglin.springboottest.entity.HomeFeed;
 import com.fenglin.springboottest.entity.MissionBrief;
 import com.fenglin.springboottest.mapper.AdminLogMapper;
+import com.fenglin.springboottest.service.AgentUserService;
 import com.fenglin.springboottest.mapper.AdminUserMapper;
 import com.fenglin.springboottest.mapper.AgentArchiveMapper;
 import com.fenglin.springboottest.mapper.AgentUserMapper;
@@ -54,27 +55,89 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
     private final HomeFeedMapper feedMapper;
     private final MissionBriefMapper missionMapper;
     private final AgentUserMapper userMapper;
+    private final AgentUserService userService;
 
     public AdminService(AdminLogMapper logMapper,
                         AgentArchiveMapper archiveMapper,
                         ArchiveCategoryMapper categoryMapper,
                         HomeFeedMapper feedMapper,
                         MissionBriefMapper missionMapper,
-                        AgentUserMapper userMapper) {
+                        AgentUserMapper userMapper,
+                        AgentUserService userService) {
         this.logMapper = logMapper;
         this.archiveMapper = archiveMapper;
         this.categoryMapper = categoryMapper;
         this.feedMapper = feedMapper;
         this.missionMapper = missionMapper;
         this.userMapper = userMapper;
+        this.userService = userService;
     }
 
     /* ================= 管理员登录态 ================= */
 
-    /** 登录：成功返回账号 map（含 token），失败返回错误码字符串 */
+    /**
+     * 当前后台操作者。
+     * 后台不再只能用 admin_user 登录：agent_user 中 permission = 0（管理员权限）的账号
+     * 同样可以登录后台；permission = 1（默认权限）的账号一律拒绝。
+     */
+    public static class Actor {
+        /** 操作者 id（agent_user.id 或 admin_user.id） */
+        public final Long id;
+        /** 操作者账号（日志用） */
+        public final String username;
+        /** 显示名 */
+        public final String displayName;
+        /** 来源：USER = 前台账号(permission=0)，ADMIN = 旧 admin_user */
+        public final String source;
+        /** source = USER 时非空 */
+        public final AgentUser user;
+        /** source = ADMIN 时非空 */
+        public final AdminUser admin;
+
+        public Actor(Long id, String username, String displayName, String source,
+                     AgentUser user, AdminUser admin) {
+            this.id = id;
+            this.username = username;
+            this.displayName = displayName;
+            this.source = source;
+            this.user = user;
+            this.admin = admin;
+        }
+    }
+
+    /**
+     * 登录：成功返回账号 map（含 token），失败返回错误码字符串。
+     * 错误码：notfound / disabled / wrongpass / noperm（账号存在但没有管理员权限）
+     */
     public Object login(String username, String password) {
-        AdminUser admin = getOne(new QueryWrapper<AdminUser>()
-                .eq("username", username == null ? "" : username.trim()));
+        String key = username == null ? "" : username.trim();
+        String mail = key.toLowerCase();
+
+        // 1) 前台账号：允许代号或邮箱登录，但必须是管理员权限（permission = 0）
+        if (!key.isEmpty()) {
+            AgentUser u = userService.getOne(new QueryWrapper<AgentUser>()
+                    .and(w -> w.eq("email", mail).or().eq("name", key))
+                    .eq("permission", AgentUserService.PERMISSION_ADMIN));
+            if (u == null) {
+                // 账号存在但权限是默认权限 → 明确提示，拒绝登录后台
+                AgentUser any = userService.getOne(new QueryWrapper<AgentUser>()
+                        .and(w -> w.eq("email", mail).or().eq("name", key)));
+                if (any != null) {
+                    return "noperm";
+                }
+            } else {
+                if (!userService.matchPassword(u, password)) {
+                    return "wrongpass";
+                }
+                String token = userService.issueToken(u.getId());
+                Actor actor = new Actor(u.getId(), u.getName(), u.getName(), "USER", u, null);
+                record(actor, "admin", "LOGIN", "管理员登录：" + u.getName());
+                return toSafeMap(actor, token);
+            }
+        }
+
+        // 2) 兼容旧的独立管理员账号（admin_user）
+        AdminUser admin = getOne(new QueryWrapper<AdminUser>().eq("username", key));
         if (admin == null) {
             return "notfound";
         }
@@ -90,15 +153,30 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
         admin.setTokenExpiresAt(LocalDateTime.now().plusDays(SESSION_DAYS));
         updateById(admin);
 
-        record(admin, "admin", "LOGIN", "管理员登录");
-        return toSafeMap(admin, token);
+        Actor actor = new Actor(admin.getId(), admin.getUsername(), admin.getDisplayName(),
+                "ADMIN", null, admin);
+        record(actor, "admin", "LOGIN", "管理员登录");
+        return toSafeMap(actor, token);
     }
 
-    /** 用 token 换管理员信息（刷新页面保持登录）；无效 / 过期返回 null */
-    public AdminUser resolveToken(String token) {
+    /**
+     * 用 token 换操作者身份（刷新页面保持登录）；无效 / 过期 / 权限被降级返回 null。
+     * 先按前台账号会话（agent_session）解析，再按旧 admin_user 解析。
+     */
+    public Actor resolveToken(String token) {
         if (token == null || token.isBlank()) {
             return null;
         }
+        // 1) 前台账号的后台会话：实时校验 permission，被降级立刻失效
+        AgentUser u = userService.resolveToken(token);
+        if (u != null) {
+            if (!AgentUserService.isAdmin(u)) {
+                return null;
+            }
+            return new Actor(u.getId(), u.getName(), u.getName(), "USER", u, null);
+        }
+
+        // 2) 旧的 admin_user 单会话
         AdminUser admin = getOne(new QueryWrapper<AdminUser>().eq("token", token));
         if (admin == null) {
             return null;
@@ -110,46 +188,100 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
             updateById(admin);
             return null;
         }
-        return admin;
+        return new Actor(admin.getId(), admin.getUsername(), admin.getDisplayName(),
+                "ADMIN", null, admin);
     }
 
-    /** 退出后台：清空 token */
+    /** 退出后台：注销会话（前台账号走 agent_session，旧管理员清空 token 列） */
     public boolean logout(String token) {
-        AdminUser admin = resolveToken(token);
-        if (admin == null) {
+        Actor actor = resolveToken(token);
+        if (actor == null) {
             return false;
         }
+        if (actor.user != null) {
+            return userService.deleteToken(token);
+        }
+        AdminUser admin = actor.admin;
         admin.setToken(null);
         admin.setTokenExpiresAt(null);
         return updateById(admin);
     }
 
-    /** 修改管理员密码 */
-    public String changePassword(Long adminId, String oldPass, String newPass) {
-        AdminUser admin = getById(adminId);
+    /** 修改密码：前台账号改 agent_user（明文），旧管理员改 admin_user */
+    public String changePassword(Actor actor, String oldPass, String newPass) {
+        if (newPass == null || newPass.length() < 6) {
+            return "weakpass";
+        }
+        if (actor.user != null) {
+            String reason = userService.changePassword(actor.user.getId(), oldPass, newPass);
+            if ("ok".equals(reason)) {
+                record(actor, "admin", "PASSWORD", "修改账号密码");
+            }
+            return reason;
+        }
+        AdminUser admin = getById(actor.id);
         if (admin == null) {
             return "notfound";
         }
         if (!PasswordUtil.matches(admin.getSalt(), oldPass, admin.getPasswordHash())) {
             return "wrongpass";
         }
-        if (newPass == null || newPass.length() < 6) {
-            return "weakpass";
-        }
         String salt = PasswordUtil.randomSalt();
         admin.setSalt(salt);
         admin.setPasswordHash(PasswordUtil.sha256(salt, newPass));
         updateById(admin);
-        record(admin, "admin", "PASSWORD", "修改管理员密码");
+        record(actor, "admin", "PASSWORD", "修改管理员密码");
         return "ok";
     }
 
+    /**
+     * 设置前台账号权限：0 管理员权限 / 1 默认权限。
+     * 返回 ok / notfound / badperm / self（不能取消自己的管理员）/ lastadmin（不能降级最后一个管理员）
+     */
+    public String setPermission(Actor actor, Long userId, int permission) {
+        if (userId == null) {
+            return "notfound";
+        }
+        if (permission != AgentUserService.PERMISSION_ADMIN
+                && permission != AgentUserService.PERMISSION_USER) {
+            return "badperm";
+        }
+        AgentUser target = userService.getById(userId);
+        if (target == null) {
+            return "notfound";
+        }
+        // 不允许把自己降级，否则会被自己锁在后台外面
+        if (permission == AgentUserService.PERMISSION_USER
+                && actor.user != null && userId.equals(actor.id)) {
+            return "self";
+        }
+        // 至少保留一个管理员
+        if (permission == AgentUserService.PERMISSION_USER
+                && AgentUserService.isAdmin(target)
+                && userService.count(new QueryWrapper<AgentUser>()
+                        .eq("permission", AgentUserService.PERMISSION_ADMIN)) <= 1) {
+            return "lastadmin";
+        }
+        String reason = userService.updatePermission(userId, permission);
+        if ("ok".equals(reason)) {
+            record(actor, "user", "PERMISSION",
+                    target.getName() + " → " + (permission == AgentUserService.PERMISSION_ADMIN ? "管理员" : "默认"));
+        }
+        return reason;
+    }
+
     /** 脱敏账号信息（含 token，仅登录 / verify 时返回） */
-    public Map<String, Object> toSafeMap(AdminUser admin, String token) {
+    public Map<String, Object> toSafeMap(Actor actor, String token) {
         Map<String, Object> m = new LinkedHashMap<>();
-        m.put("id", admin.getId());
-        m.put("username", admin.getUsername());
-        m.put("displayName", admin.getDisplayName());
+        m.put("id", actor.id);
+        m.put("username", actor.username);
+        m.put("displayName", actor.displayName);
+        m.put("source", actor.source);
+        // 前台管理员账号带上 permission，前端据此判断后台入口
+        m.put("permission", actor.user != null
+                ? (actor.user.getPermission() == null
+                    ? AgentUserService.PERMISSION_USER : actor.user.getPermission())
+                : AgentUserService.PERMISSION_ADMIN);
         if (token != null) {
             m.put("token", token);
         }
@@ -157,10 +289,10 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
     }
 
     /** 写操作日志 */
-    public void record(AdminUser admin, String target, String action, String detail) {
+    public void record(Actor actor, String target, String action, String detail) {
         AdminLog log = new AdminLog();
-        log.setAdminId(admin.getId());
-        log.setAdminName(admin.getUsername());
+        log.setAdminId(actor.id);
+        log.setAdminName(actor.username);
         log.setTarget(target);
         log.setAction(action);
         log.setDetail(detail == null ? "" : detail);
@@ -176,6 +308,8 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
         m.put("动态情报", feedMapper.selectCount(null));
         m.put("任务简报", missionMapper.selectCount(null));
         m.put("前台用户", userMapper.selectCount(null));
+        m.put("管理员数", userMapper.selectCount(new QueryWrapper<AgentUser>()
+                .eq("permission", AgentUserService.PERMISSION_ADMIN)));
         m.put("操作日志", logMapper.selectCount(null));
         return m;
     }
@@ -507,6 +641,11 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
             m.put("name", u.getName());
             m.put("email", u.getEmail());
             m.put("agent_index", u.getAgentIndex());
+            // permission：1 默认权限 / 0 管理员权限
+            m.put("permission", u.getPermission() == null
+                    ? AgentUserService.PERMISSION_USER : u.getPermission());
+            // 密码为明文存储，后台可见（旧账号若未转明文则显示为空）
+            m.put("password", u.getPassword() == null ? "" : u.getPassword());
             m.put("create_time", u.getCreateTime() == null ? "" : u.getCreateTime().format(FMT));
             list.add(m);
         }

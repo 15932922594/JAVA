@@ -4,7 +4,15 @@
    沿用登录页的 HUD 语言：斜切色块、多边形裁角、红辉光、等宽小标签。
    ============================================================ */
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { state, agentLevel, accent, switchView, enterAdmin, useSession } from '../../store/session'
+import {
+  state,
+  agentLevel,
+  accent,
+  switchView,
+  enterAdmin,
+  canAdmin,
+  useSession
+} from '../../store/session'
 import { beep, toggleSound } from '../../composables/useSound'
 
 const { showToast, authLogout } = useSession()
@@ -104,8 +112,14 @@ const mono = computed(() => (state.user?.name || '?').trim().charAt(0).toUpperCa
 
       <span class="sp"></span>
 
-      <!-- 后台管理入口 -->
-      <button class="admin-btn" type="button" title="进入后台管理系统" @click="goAdmin">
+      <!-- 后台管理入口：仅管理员权限（permission = 0）可见 -->
+      <button
+        v-if="canAdmin"
+        class="admin-btn"
+        type="button"
+        title="进入后台管理系统"
+        @click="goAdmin"
+      >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
           <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="1.7" />
           <path
@@ -131,7 +145,7 @@ const mono = computed(() => (state.user?.name || '?').trim().charAt(0).toUpperCa
           <span class="ava">{{ mono }}</span>
           <span class="meta">
             <b>{{ state.user?.name || '未接入' }}</b>
-            <i>LV.{{ agentLevel }}</i>
+            <i>LV.{{ agentLevel }}<em v-if="canAdmin" class="adm">管理员</em></i>
           </span>
           <svg class="caret" width="11" height="11" viewBox="0 0 24 24" fill="none">
             <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
@@ -312,6 +326,13 @@ const mono = computed(() => (state.user?.name || '?').trim().charAt(0).toUpperCa
   font-size: 9.5px;
   letter-spacing: 1.4px;
   color: var(--muted);
+}
+.meta .adm {
+  font-style: normal;
+  margin-left: 5px;
+  padding: 1px 4px;
+  color: #fff;
+  background: var(--red);
 }
 .caret { color: var(--muted); transition: .2s; }
 .chip.open .caret { transform: rotate(180deg); color: var(--ac); }

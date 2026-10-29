@@ -2,6 +2,8 @@
 /* ============================================================
    后台管理员登录页
    后台与前台是两个独立登录态（admin_token / agent_token），互不影响。
+   登录资格：只有 agent_user.permission = 0（管理员权限）的账号能通过校验，
+   默认权限（permission = 1）的账号后端会直接拒绝登录。
    登录成功 -> state.admin 有值 -> App.vue 自动切换到 AdminDashboard。
    数据来源：/api/admin/login（AdminController）
    ============================================================ */
@@ -41,17 +43,17 @@ async function submit() {
       <div class="al-head">
         <div class="al-tag">ADMIN TERMINAL</div>
         <h1 class="al-title">后台管理系统</h1>
-        <p class="al-sub">仅限管理员接入 · 与前台特工账号相互独立</p>
+        <p class="al-sub">仅限管理员权限账号接入 · 默认权限账号无法登录</p>
       </div>
 
       <form class="al-form" @submit.prevent="submit">
         <label class="field">
-          <span class="lab">账号 / USERNAME</span>
+          <span class="lab">代号 / 邮箱 / USERNAME</span>
           <input
             v-model="form.username"
             type="text"
             autocomplete="username"
-            placeholder="admin"
+            placeholder="你的特工代号或邮箱"
             spellcheck="false"
           />
         </label>

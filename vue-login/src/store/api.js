@@ -233,8 +233,12 @@ export const adminMissionSave = (token, data) => post('/api/admin/mission/save',
 /** 任务简报删除 */
 export const adminMissionDelete = (token, id) => post('/api/admin/mission/delete', { token, id })
 
-/** 前台用户列表（只读） */
+/** 前台用户列表（只读，含 permission：0 管理员 / 1 默认） */
 export const adminUserList = (token, params = {}) => post('/api/admin/user/list', { token, ...params })
+
+/** 设置前台账号权限：permission 0 管理员 / 1 默认 */
+export const adminUserPermission = (token, id, permission) =>
+  post('/api/admin/user/permission', { token, id, permission })
 
 /** 操作日志（target: archive/category/feed/mission/admin，action: CREATE/UPDATE/DELETE/LOGIN/PASSWORD） */
 export const adminLogList = (token, params = {}) => post('/api/admin/log/list', { token, ...params })

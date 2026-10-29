@@ -10,7 +10,7 @@ import { state, switchView, useSession } from '../../store/session'
 import * as api from '../../store/api'
 import { beep } from '../../composables/useSound'
 
-const { showToast, adminSignOut } = useSession()
+const { showToast, adminSignOut, adminSetPermission } = useSession()
 
 const token = computed(() => state.adminToken || '')
 
@@ -210,6 +210,26 @@ async function removeRow(type, row) {
   load()
 }
 
+/* ---------------- 用户权限（0 管理员 / 1 默认） ---------------- */
+const permBusy = ref(null)
+
+async function togglePermission(row) {
+  if (permBusy.value !== null) return
+  const next = row.permission === 0 ? 1 : 0
+  const tip = next === 0 ? '设为管理员？该账号将可登录后台管理系统。' : '取消管理员权限？该账号将无法再登录后台。'
+  if (!confirm(tip)) return
+  permBusy.value = row.id
+  const r = await adminSetPermission(row.id, next)
+  permBusy.value = null
+  if (!r.ok) {
+    showToast(r.reason || '操作失败', false)
+    return
+  }
+  beep(660, 0.08)
+  showToast(next === 0 ? '已授予管理员权限' : '已恢复默认权限', true)
+  load(false)
+}
+
 /* ---------------- 退出后台 ---------------- */
 async function signOut() {
   await adminSignOut()
@@ -330,8 +350,11 @@ onMounted(load)
               <template v-else-if="tab === 'user'">
                 <td>
                   <b>{{ row.name }}</b>
+                  <span class="pill" :class="{ 'perm-admin': row.permission === 0 }">
+                    {{ row.permission === 0 ? '管理员' : '默认权限' }}
+                  </span>
                   <span class="mono sub">{{ row.email }}</span>
-                  <span class="sub">注册于 {{ row.create_time }}</span>
+                  <span class="sub">密码 {{ row.password || '—' }} · 注册于 {{ row.create_time }}</span>
                 </td>
               </template>
               <template v-else-if="tab === 'log'">
@@ -347,6 +370,19 @@ onMounted(load)
                 <template v-if="['archive', 'category', 'feed', 'mission'].includes(tab)">
                   <button class="op" type="button" @click="openEdit(tab, row)">编辑</button>
                   <button class="op danger" type="button" @click="removeRow(tab, row)">删除</button>
+                </template>
+                <template v-else-if="tab === 'user'">
+                  <button
+                    class="op"
+                    :class="{ danger: row.permission === 0 }"
+                    type="button"
+                    :disabled="permBusy === row.id"
+                    @click="togglePermission(row)"
+                  >
+                    {{ permBusy === row.id
+                      ? '处理中…'
+                      : (row.permission === 0 ? '取消管理员' : '设为管理员') }}
+                  </button>
                 </template>
                 <span v-else class="sub">—</span>
               </td>
@@ -588,6 +624,12 @@ onMounted(load)
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 1px;
+}
+/* 注意：不要用 .admin 做修饰类，会和本组件根节点 .admin 的 scoped 样式撞车 */
+.pill.perm-admin {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
 }
 .ops { white-space: nowrap; }
 .op {

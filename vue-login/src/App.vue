@@ -1,6 +1,6 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref, computed, watch, nextTick, provide } from 'vue'
-import { state, accent, authRestore, adminRestore, switchView, useSession } from './store/session'
+import { state, accent, authRestore, adminRestore, switchView, canAdmin, useSession } from './store/session'
 import { useParallax } from './composables/useParallax'
 import { FX_KEY } from './composables/useEffects'
 import { beep } from './composables/useSound'
@@ -66,6 +66,15 @@ function enterTerminal() {
     )
   }, 780)
 }
+
+/* ---------- 后台视图守卫 ----------
+   只有管理员权限（permission = 0）能停在后台；权限被降级或退出前台登录时立即离开。 */
+watch(canAdmin, (ok) => {
+  if (!ok && state.view === 'admin') {
+    showToast('无后台管理权限 · 已返回前台', false)
+    switchView(state.user ? 'home' : 'auth')
+  }
+})
 
 /* ---------- 自动登录：开机页期间用保存的 token 换账号信息 ---------- */
 onMounted(() => {
@@ -145,9 +154,9 @@ onBeforeUnmount(() => clearTimeout(flashTimer))
   <!-- ---------- 情报中心 ---------- -->
   <IntelPage v-else-if="view === 'intel'" />
 
-  <!-- ---------- 后台管理系统（独立登录态，先登录再进管理台） ---------- -->
-  <AdminLogin v-else-if="view === 'admin' && !state.admin" />
-  <AdminDashboard v-else-if="view === 'admin'" />
+  <!-- ---------- 后台管理系统（独立登录态，先登录再进管理台；仅管理员权限可停留） ---------- -->
+  <AdminLogin v-else-if="view === 'admin' && canAdmin && !state.admin" />
+  <AdminDashboard v-else-if="view === 'admin' && canAdmin" />
 
   <!-- ---------- 作战终端（从首页用户菜单进入） ---------- -->
   <div v-else class="wrap dashwrap">

@@ -1,17 +1,17 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : localhost_3306
+ Source Server         : java
  Source Server Type    : MySQL
- Source Server Version : 80046 (8.0.46)
+ Source Server Version : 80039 (8.0.39)
  Source Host           : localhost:3306
  Source Schema         : agent_access
 
  Target Server Type    : MySQL
- Target Server Version : 80046 (8.0.46)
+ Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 28/10/2026 16:57:32
+ Date: 29/10/2026 15:05:40
 */
 
 SET NAMES utf8mb4;
@@ -32,12 +32,25 @@ CREATE TABLE `admin_log`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_admin`(`admin_id` ASC) USING BTREE,
   INDEX `idx_time`(`create_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '后台操作日志' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '后台操作日志' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of admin_log
 -- ----------------------------
 INSERT INTO `admin_log` VALUES (1, 1, 'admin', 'admin', 'LOGIN', '管理员登录', '2026-10-28 16:38:19');
+INSERT INTO `admin_log` VALUES (2, 1, 'admin', 'admin', 'LOGIN', '管理员登录', '2026-10-29 14:02:18');
+INSERT INTO `admin_log` VALUES (3, 4, 'TESTADMIN', 'admin', 'LOGIN', '管理员登录：TESTADMIN', '2026-10-29 14:36:40');
+INSERT INTO `admin_log` VALUES (4, 4, 'TESTADMIN', 'user', 'PERMISSION', 'TESTPERM → 管理员', '2026-10-29 14:37:06');
+INSERT INTO `admin_log` VALUES (5, 3, 'TESTPERM', 'admin', 'LOGIN', '管理员登录：TESTPERM', '2026-10-29 14:37:06');
+INSERT INTO `admin_log` VALUES (6, 4, 'TESTADMIN', 'user', 'PERMISSION', 'TESTPERM → 默认', '2026-10-29 14:37:17');
+INSERT INTO `admin_log` VALUES (7, 1, 'admin', 'admin', 'LOGIN', '管理员登录', '2026-10-29 14:37:18');
+INSERT INTO `admin_log` VALUES (8, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-10-29 14:45:54');
+INSERT INTO `admin_log` VALUES (9, 1, '爱打球的T', 'user', 'PERMISSION', 'UIADMIN → 默认', '2026-10-29 14:46:39');
+INSERT INTO `admin_log` VALUES (10, 6, 'UIADMIN', 'admin', 'LOGIN', '管理员登录：UIADMIN', '2026-10-29 14:52:19');
+INSERT INTO `admin_log` VALUES (11, 6, 'UIADMIN', 'admin', 'LOGIN', '管理员登录：UIADMIN', '2026-10-29 14:53:49');
+INSERT INTO `admin_log` VALUES (12, 6, 'UIADMIN', 'admin', 'LOGIN', '管理员登录：UIADMIN', '2026-10-29 14:54:49');
+INSERT INTO `admin_log` VALUES (13, 8, 'UICHK', 'admin', 'LOGIN', '管理员登录：UICHK', '2026-10-29 15:00:05');
+INSERT INTO `admin_log` VALUES (14, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-10-29 15:03:10');
 
 -- ----------------------------
 -- Table structure for admin_user
@@ -56,12 +69,12 @@ CREATE TABLE `admin_user`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_username`(`username` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '后台管理员' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '后台管理员' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of admin_user
 -- ----------------------------
-INSERT INTO `admin_user` VALUES (1, 'admin', '超级管理员', 'b0b168d92e122cca122586f50d2e1d05af219d8eed3d79945d51cabef6de5bd3', '5f8a9b3c1d2e4f60718293a4b5c6d7e8', '782b411bdd174ce1898f887e613fb428', '2026-10-30 16:38:20', 1, '2026-10-28 16:35:51', '2026-10-28 16:35:51');
+INSERT INTO `admin_user` VALUES (1, 'admin', '超级管理员', 'b0b168d92e122cca122586f50d2e1d05af219d8eed3d79945d51cabef6de5bd3', '5f8a9b3c1d2e4f60718293a4b5c6d7e8', '576ddbed09fe4cb69c6a70c51c1b8822', '2026-10-31 14:37:18', 1, '2026-10-28 16:35:51', '2026-10-28 16:35:51');
 
 -- ----------------------------
 -- Table structure for agent_archive
@@ -97,17 +110,17 @@ CREATE TABLE `agent_archive`  (
   INDEX `idx_sub`(`sub_code` ASC) USING BTREE,
   INDEX `idx_tier`(`tier` ASC) USING BTREE,
   INDEX `idx_heat`(`heat` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '首页档案主表（特工/装备/任务）' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '首页档案主表（特工/装备/任务）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_archive
 -- ----------------------------
-INSERT INTO `agent_archive` VALUES (1, 'AGENT', 'ASSAULT', 'S', 'vector', 'VECTOR', '捷风', 'V', '#FF4655', '以极高机动性撕裂防线的突进型特工，擅长在瞬间改写交火态势。', '档案解密等级：Ω。\n\n VECTOR 原是环城竞速联盟最年轻的冠军车手，一场针对护送车队的伏击改变了她的轨迹——她以 217km/h 的极速连穿三道封锁线，把十二名伤员从火线上完整带回。战后审查官问她凭什么敢那样开，她只回了一句：「速度就是我的掩体。」\n\n 入队三年，她的突入记录无人打破：从破墙到占点，平均用时 1.7 秒。教官在评语栏里写：她不是在冲锋，是在瞬移。', '[\n    {\"slot\":\"Q\",\"name\":\"相位突进\",\"desc\":\"向准星方向瞬间位移一小段，用来抢点、拉枪线或脱离交叉火力。\"},\n    {\"slot\":\"E\",\"name\":\"破障射线\",\"desc\":\"放出一道穿透射线，短暂削弱命中敌人的护甲，正面硬刚更占便宜。\"},\n    {\"slot\":\"X\",\"name\":\"矢量过载\",\"desc\":\"短时疾行且移动射击精度不下降，适合一口气撕开一道防线。\"}\n  ]', '/agents/vector.png', 92, 76, 44, 38, 98, 1, 10, 1, '2026-10-28 16:35:52', '2026-10-28 16:50:13');
-INSERT INTO `agent_archive` VALUES (2, 'AGENT', 'RECON', 'A', 'arclight', 'ARCLIGHT', '蝰蛇', 'A', '#00E0C6', '用电弧脉冲扫描战场，为队伍点亮迷雾中的每一个目标。', '档案解密等级：Ω。\n\n ARCLIGHT 曾是深空监听站的值守员，在长达四年的孤站生活里，他练就了从宇宙噪声中分辨一句耳语的耐心。一次例行检修中，他从一段被判定为背景辐射的信号里，还原出敌方跳频通讯的完整频率表，整个战区的预警时间因此提前了十一分钟。\n\n 如今他把监听天线换成了电弧脉冲，战场在他眼中是一张不断刷新的点云图。队友的说法更直接：「他开枪之前，地图早就打完了。」', '[\n    {\"slot\":\"Q\",\"name\":\"电弧脉冲\",\"desc\":\"向身前扇区释放脉冲，被命中的敌人轮廓会被标记，隔着墙也能看见。\"},\n    {\"slot\":\"E\",\"name\":\"全域扫描\",\"desc\":\"一次性点亮附近区域的敌人位置，持续时间短，进点前摸站位最好用。\"},\n    {\"slot\":\"X\",\"name\":\"电网陷阱\",\"desc\":\"布下电网，敌人经过会被减速并暴露位置，兼顾封锁与预警。\"}\n  ]', '/agents/arclight.png', 58, 86, 72, 46, 91, 1, 11, 1, '2026-10-28 16:35:52', '2026-10-28 16:50:19');
-INSERT INTO `agent_archive` VALUES (3, 'AGENT', 'CONTROL', 'S', 'phantom', 'PHANTOM', '幽影', 'P', '#A66CFF', '制造幻象与烟幕，掌控每一次交火的节奏与视野。', '档案解密等级：Ω。\n\n 关于 PHANTOM 的入职档案只有一页，且一半被涂黑。已知信息：他曾在敌后情报部门服役九年，执行过十七次任务，无一次留下影像记录；他的上一任搭档坚称自己从未见过他的正脸。\n\n 他从不解释能力原理，只留下一句被全体队员记住的话：「你们看到的，是我想让你们看到的。」第一次和他在训练场对枪的人，最后都在朝空气开火。', '[\n    {\"slot\":\"Q\",\"name\":\"幻影分身\",\"desc\":\"生成一个向前走的分身诱饵，用来骗第一枪、确认敌人架在哪。\"},\n    {\"slot\":\"E\",\"name\":\"遮断烟幕\",\"desc\":\"在指定位置落下烟幕切断视野，进点、拆包、撤退都靠它。\"},\n    {\"slot\":\"X\",\"name\":\"错觉领域\",\"desc\":\"大范围幻象区，敌人视野受阻且分不清真假身，能强行改写交火节奏。\"}\n  ]', '/agents/phantom.png', 52, 74, 93, 50, 95, 1, 12, 1, '2026-10-28 16:35:52', '2026-10-28 16:49:25');
-INSERT INTO `agent_archive` VALUES (4, 'AGENT', 'SENTINEL', 'A', 'onyx', 'ONYX', '壹决', 'O', '#FFB443', '以坚固壁垒庇护队友，是阵地攻防中不可撼动的支点。', '档案解密等级：Ω。\n\n ONYX 是全队唯一拒绝佩枪的特工。他曾是一支山地救援队的队长，在一次雪崩中用身体撑住坍塌的冰缝整整四十分钟，让七名被困者全部脱险——他的左肩里至今留着三枚钢钉，阴雨天会替他记住那天的气温。\n\n 入队后，他把「守住」变成了战术：他站的防线没有后退这个词。指挥部对他的评估只有一行字：把任何交火地点，变成我方主场。', '[\n    {\"slot\":\"Q\",\"name\":\"岩壁屏障\",\"desc\":\"竖起一道可再生的墙体，封住通路或专门挡对面狙击的枪线。\"},\n    {\"slot\":\"E\",\"name\":\"哨位陷阱\",\"desc\":\"布置自动预警装置，敌人靠近就减速并暴露位置。\"},\n    {\"slot\":\"X\",\"name\":\"壁垒成型\",\"desc\":\"短时间展开加固防线，站在后面的队友受到的伤害明显减少。\"}\n  ]', '/agents/onyx.png', 46, 52, 64, 96, 88, 1, 13, 1, '2026-10-28 16:35:52', '2026-10-28 16:51:13');
-INSERT INTO `agent_archive` VALUES (5, 'AGENT', 'CONTROL', 'A', 'tempest', 'TEMPEST', '海神', 'T', '#4DA6FF', '召唤风暴封锁通路，让敌人在自己的领地寸步难行。', '档案解密等级：Ω。\n\n TEMPEST 出生在气旋观测船「信风号」上，整个童年在风暴眼里度过。十六岁那年，她用自己的气象模型提前六小时预报了一场被官方判定「不可能生成」的台风，救下了一整座港口。\n\n 现在她召唤的风暴只封锁一件东西：敌人的退路。被她控住过通道的对手给出了一致评价：宁可绕路三公里。', '[\n    {\"slot\":\"Q\",\"name\":\"强风幕墙\",\"desc\":\"生成一堵风墙，敌人穿行时视野受损、移速下降。\"},\n    {\"slot\":\"E\",\"name\":\"乱流推挤\",\"desc\":\"用气流把敌人推向一侧，强行打乱他站位，为队友拉出击杀窗口。\"},\n    {\"slot\":\"X\",\"name\":\"风暴中心\",\"desc\":\"在一片区域降下持续风暴，长时间封锁通路，拖延或守点时极强。\"}\n  ]', '/agents/tempest.png', 54, 70, 90, 62, 84, 0, 14, 1, '2026-10-28 16:35:52', '2026-10-28 16:51:31');
-INSERT INTO `agent_archive` VALUES (6, 'AGENT', 'ASSAULT', 'B', 'ember', 'EMBER', '尚博乐', 'E', '#FF6B4A', '以烈焰灼烧前线的爆发型特工，高风险，也高回报。', '档案解密等级：Ω。\n\n EMBER 的档案从一个失败开始：爆破课程三次不及格，理由都是「当量超出教学大纲上限」。教官最后在评语里写：这不是学不会，是不甘心只炸那么大。\n\n 他是全队公认的疯子，也是公认的幸运儿——七次被判定「阵亡」的战报，七次都活着回来了。他的战前动员只有一句话：「烧完这把，就赢了。」', '[\n    {\"slot\":\"Q\",\"name\":\"燃焰喷发\",\"desc\":\"近距离喷射火焰，专门清理两个人就得挤过去的窄通道。\"},\n    {\"slot\":\"E\",\"name\":\"火墙封路\",\"desc\":\"在地面拉出一段火墙，穿过的敌人持续掉血，逼他们改路线。\"},\n    {\"slot\":\"X\",\"name\":\"燃尽冲刺\",\"desc\":\"自身短暂燃烧，移速和换弹大幅加快，代价是血量持续下降。\"}\n  ]', '/agents/ember.png', 90, 64, 52, 54, 79, 0, 15, 1, '2026-10-28 16:35:52', '2026-10-28 16:52:49');
+INSERT INTO `agent_archive` VALUES (1, 'AGENT', 'ASSAULT', 'S', 'vector', 'VECTOR', '捷风', 'V', '#FF4655', '以极高机动性撕裂防线的突进型特工，擅长在瞬间改写交火态势。', '档案解密等级：S。\n\n VECTOR 原是环城竞速联盟最年轻的冠军车手，一场针对护送车队的伏击改变了她的轨迹——她以 217km/h 的极速连穿三道封锁线，把十二名伤员从火线上完整带回。战后审查官问她凭什么敢那样开，她只回了一句：「速度就是我的掩体。」\n\n 入队三年，她的突入记录无人打破：从破墙到占点，平均用时 1.7 秒。教官在评语栏里写：她不是在冲锋，是在瞬移。', '[\n    {\"slot\":\"Q\",\"name\":\"相位突进\",\"desc\":\"向准星方向瞬间位移一小段，用来抢点、拉枪线或脱离交叉火力。\"},\n    {\"slot\":\"E\",\"name\":\"破障射线\",\"desc\":\"放出一道穿透射线，短暂削弱命中敌人的护甲，正面硬刚更占便宜。\"},\n    {\"slot\":\"X\",\"name\":\"矢量过载\",\"desc\":\"短时疾行且移动射击精度不下降，适合一口气撕开一道防线。\"}\n  ]', '/agents/vector.png', 92, 76, 44, 38, 98, 1, 10, 1, '2026-10-28 16:35:52', '2026-10-29 14:20:26');
+INSERT INTO `agent_archive` VALUES (2, 'AGENT', 'RECON', 'A', 'arclight', 'ARCLIGHT', '蝰蛇', 'A', '#00E0C6', '用电弧脉冲扫描战场，为队伍点亮迷雾中的每一个目标。', '档案解密等级：A。\n\n ARCLIGHT 曾是深空监听站的值守员，在长达四年的孤站生活里，他练就了从宇宙噪声中分辨一句耳语的耐心。一次例行检修中，他从一段被判定为背景辐射的信号里，还原出敌方跳频通讯的完整频率表，整个战区的预警时间因此提前了十一分钟。\n\n 如今他把监听天线换成了电弧脉冲，战场在他眼中是一张不断刷新的点云图。队友的说法更直接：「他开枪之前，地图早就打完了。」', '[\n    {\"slot\":\"Q\",\"name\":\"电弧脉冲\",\"desc\":\"向身前扇区释放脉冲，被命中的敌人轮廓会被标记，隔着墙也能看见。\"},\n    {\"slot\":\"E\",\"name\":\"全域扫描\",\"desc\":\"一次性点亮附近区域的敌人位置，持续时间短，进点前摸站位最好用。\"},\n    {\"slot\":\"X\",\"name\":\"电网陷阱\",\"desc\":\"布下电网，敌人经过会被减速并暴露位置，兼顾封锁与预警。\"}\n  ]', '/agents/arclight.png', 58, 86, 72, 46, 91, 1, 11, 1, '2026-10-28 16:35:52', '2026-10-29 14:21:08');
+INSERT INTO `agent_archive` VALUES (3, 'AGENT', 'CONTROL', 'S', 'phantom', 'PHANTOM', '幽影', 'P', '#A66CFF', '制造幻象与烟幕，掌控每一次交火的节奏与视野。', '档案解密等级：S。\n\n 关于 PHANTOM 的入职档案只有一页，且一半被涂黑。已知信息：他曾在敌后情报部门服役九年，执行过十七次任务，无一次留下影像记录；他的上一任搭档坚称自己从未见过他的正脸。\n\n 他从不解释能力原理，只留下一句被全体队员记住的话：「你们看到的，是我想让你们看到的。」第一次和他在训练场对枪的人，最后都在朝空气开火。', '[\n    {\"slot\":\"Q\",\"name\":\"幻影分身\",\"desc\":\"生成一个向前走的分身诱饵，用来骗第一枪、确认敌人架在哪。\"},\n    {\"slot\":\"E\",\"name\":\"遮断烟幕\",\"desc\":\"在指定位置落下烟幕切断视野，进点、拆包、撤退都靠它。\"},\n    {\"slot\":\"X\",\"name\":\"错觉领域\",\"desc\":\"大范围幻象区，敌人视野受阻且分不清真假身，能强行改写交火节奏。\"}\n  ]', '/agents/phantom.png', 52, 74, 93, 50, 95, 1, 12, 1, '2026-10-28 16:35:52', '2026-10-29 14:20:54');
+INSERT INTO `agent_archive` VALUES (4, 'AGENT', 'SENTINEL', 'A', 'onyx', 'ONYX', '壹决', 'O', '#FFB443', '以坚固壁垒庇护队友，是阵地攻防中不可撼动的支点。', '档案解密等级：B。\n\n ONYX 是全队唯一拒绝佩枪的特工。他曾是一支山地救援队的队长，在一次雪崩中用身体撑住坍塌的冰缝整整四十分钟，让七名被困者全部脱险——他的左肩里至今留着三枚钢钉，阴雨天会替他记住那天的气温。\n\n 入队后，他把「守住」变成了战术：他站的防线没有后退这个词。指挥部对他的评估只有一行字：把任何交火地点，变成我方主场。', '[\n    {\"slot\":\"Q\",\"name\":\"岩壁屏障\",\"desc\":\"竖起一道可再生的墙体，封住通路或专门挡对面狙击的枪线。\"},\n    {\"slot\":\"E\",\"name\":\"哨位陷阱\",\"desc\":\"布置自动预警装置，敌人靠近就减速并暴露位置。\"},\n    {\"slot\":\"X\",\"name\":\"壁垒成型\",\"desc\":\"短时间展开加固防线，站在后面的队友受到的伤害明显减少。\"}\n  ]', '/agents/onyx.png', 46, 52, 64, 96, 88, 1, 13, 1, '2026-10-28 16:35:52', '2026-10-29 14:21:20');
+INSERT INTO `agent_archive` VALUES (5, 'AGENT', 'CONTROL', 'A', 'tempest', 'TEMPEST', '海神', 'T', '#4DA6FF', '召唤风暴封锁通路，让敌人在自己的领地寸步难行。', '档案解密等级：A。\n\n TEMPEST 出生在气旋观测船「信风号」上，整个童年在风暴眼里度过。十六岁那年，她用自己的气象模型提前六小时预报了一场被官方判定「不可能生成」的台风，救下了一整座港口。\n\n 现在她召唤的风暴只封锁一件东西：敌人的退路。被她控住过通道的对手给出了一致评价：宁可绕路三公里。', '[\n    {\"slot\":\"Q\",\"name\":\"强风幕墙\",\"desc\":\"生成一堵风墙，敌人穿行时视野受损、移速下降。\"},\n    {\"slot\":\"E\",\"name\":\"乱流推挤\",\"desc\":\"用气流把敌人推向一侧，强行打乱他站位，为队友拉出击杀窗口。\"},\n    {\"slot\":\"X\",\"name\":\"风暴中心\",\"desc\":\"在一片区域降下持续风暴，长时间封锁通路，拖延或守点时极强。\"}\n  ]', '/agents/tempest.png', 54, 70, 90, 62, 84, 0, 14, 1, '2026-10-28 16:35:52', '2026-10-29 14:21:34');
+INSERT INTO `agent_archive` VALUES (6, 'AGENT', 'ASSAULT', 'B', 'ember', 'EMBER', '尚博乐', 'E', '#FF6B4A', '以烈焰灼烧前线的爆发型特工，高风险，也高回报。', '档案解密等级：S。\n\n EMBER 的档案从一个失败开始：爆破课程三次不及格，理由都是「当量超出教学大纲上限」。教官最后在评语里写：这不是学不会，是不甘心只炸那么大。\n\n 他是全队公认的疯子，也是公认的幸运儿——七次被判定「阵亡」的战报，七次都活着回来了。他的战前动员只有一句话：「烧完这把，就赢了。」', '[\n    {\"slot\":\"Q\",\"name\":\"燃焰喷发\",\"desc\":\"近距离喷射火焰，专门清理两个人就得挤过去的窄通道。\"},\n    {\"slot\":\"E\",\"name\":\"火墙封路\",\"desc\":\"在地面拉出一段火墙，穿过的敌人持续掉血，逼他们改路线。\"},\n    {\"slot\":\"X\",\"name\":\"燃尽冲刺\",\"desc\":\"自身短暂燃烧，移速和换弹大幅加快，代价是血量持续下降。\"}\n  ]', '/agents/ember.png', 90, 64, 52, 54, 79, 0, 15, 1, '2026-10-28 16:35:52', '2026-10-29 14:21:45');
 INSERT INTO `agent_archive` VALUES (7, 'GEAR', 'RIFLE', 'S', 'vandal', 'VANDAL', '姝蕊', 'V', '#FF4655', '高伤害全自动步枪，远距离头部一枪致命，正面交火的标杆。', '流水线上的第一支 VANDAL 编号 V-0001，至今仍在一线服役，其命中率常年霸榜军械库。', '[\n    {\"slot\":\"优势\",\"name\":\"任意距离一枪爆头\",\"desc\":\"不管多远，打中头就是秒杀，远距离对枪的标杆。\"},\n    {\"slot\":\"优势\",\"name\":\"伤害不衰减\",\"desc\":\"远距离伤害没有距离惩罚，架点可以完全不考虑站位深度。\"},\n    {\"slot\":\"代价\",\"name\":\"后坐大\",\"desc\":\"连射很飘，要点射、要压枪，不适合闭着眼泼。\"}\n  ]', '/agents/vandal.png', 88, 52, 40, 30, 96, 1, 20, 1, '2026-10-28 16:35:52', '2026-10-28 16:55:36');
 INSERT INTO `agent_archive` VALUES (8, 'GEAR', 'RIFLE', 'A', 'phantom-w', 'PHANTOM-W', '狂徒', 'P', '#A66CFF', '消音步枪，后坐可控，适合中距离压制与隐蔽推进。', '消音组件让它被称作「听不见的死神」，每一支出厂前都要在静音舱里过最后一道检测。', '[\n    {\"slot\":\"优势\",\"name\":\"消音\",\"desc\":\"开枪不会暴露自己的位置提示，隔着烟打人对方很难反查。\"},\n    {\"slot\":\"优势\",\"name\":\"后坐可控\",\"desc\":\"连发比劫掠者柔和得多，中距离压枪一串很稳。\"},\n    {\"slot\":\"代价\",\"name\":\"远距离衰减\",\"desc\":\"超过中远距离伤害明显下降，远点不如劫掠者。\"}\n  ]', '/agents/phantom-w.png', 76, 66, 52, 34, 90, 0, 21, 1, '2026-10-28 16:35:52', '2026-10-28 16:56:23');
 INSERT INTO `agent_archive` VALUES (9, 'GEAR', 'SMG', 'A', 'spectre', 'SPECTRE', '幻影', 'S', '#00E0C6', '高射速冲锋枪，近距离泼洒压制，经济局的性价比之选。', '经济局之王。老队员的说法：手头紧的时候，SPECTRE 比勇气可靠。', '[\n    {\"slot\":\"优势\",\"name\":\"高射速泼洒\",\"desc\":\"近距离短时间叠出成吨伤害，贴上脸几乎必胜。\"},\n    {\"slot\":\"优势\",\"name\":\"跑打稳定\",\"desc\":\"移动射击散布小，边走边输出也不至于全飘。\"},\n    {\"slot\":\"代价\",\"name\":\"距离衰减\",\"desc\":\"稍微远一点伤害就掉，中远距离基本打不动。\"}\n  ]', '/agents/spectre.png', 70, 74, 44, 28, 82, 0, 22, 1, '2026-10-28 16:35:52', '2026-10-28 16:53:17');
@@ -141,7 +154,7 @@ CREATE TABLE `agent_oauth`  (
   UNIQUE INDEX `uk_provider_uid`(`provider` ASC, `provider_uid` ASC) USING BTREE,
   UNIQUE INDEX `uk_ticket`(`ticket` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '第三方账号绑定与授权票据' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '第三方账号绑定与授权票据' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_oauth
@@ -160,7 +173,7 @@ CREATE TABLE `agent_reset_code`  (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_email_code`(`email` ASC, `code` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '找回密码验证码' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '找回密码验证码' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_reset_code
@@ -179,12 +192,12 @@ CREATE TABLE `agent_session`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_token`(`token` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '登录会话表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '登录会话表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_session
 -- ----------------------------
-INSERT INTO `agent_session` VALUES (1, 'e010db86453a4b2ba49698c8aa41eb21', 1, '2026-11-04 16:36:16', '2026-10-28 16:36:15');
+INSERT INTO `agent_session` VALUES (25, '98976df13b4b4b2bb4a3108d825de04f', 1, '2026-11-05 15:05:04', '2026-10-29 15:05:03');
 
 -- ----------------------------
 -- Table structure for agent_user
@@ -194,20 +207,23 @@ CREATE TABLE `agent_user`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '特工代号',
   `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '邮箱',
-  `password_hash` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '密码摘要 SHA-256(salt::password)',
-  `salt` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '随机盐',
+  `password` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '登录密码（明文，不做加密）',
+  `password_hash` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '（已废弃）旧版密码摘要',
+  `salt` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '（已废弃）旧版随机盐',
   `agent_index` int NOT NULL DEFAULT 0 COMMENT '注册时选择的特工下标',
+  `permission` tinyint NOT NULL DEFAULT 1 COMMENT '权限：1 默认权限，0 管理员权限',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_email`(`email` ASC) USING BTREE,
   UNIQUE INDEX `uk_name`(`name` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工账号表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工账号表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_user
 -- ----------------------------
-INSERT INTO `agent_user` VALUES (1, '爱打球的T', '264132801@qq.com', '3cb9bb890b91efdd310c935089eb3935b82ce46640a4b68bb0c5a2b72d28d2b5', '9e1431e9dbdaa424328eda90965d4ea6', 0, '2026-10-28 16:36:07', '2026-10-28 16:36:07');
+INSERT INTO `agent_user` VALUES (1, '爱打球的T', '264132801@qq.com', NULL, '3cb9bb890b91efdd310c935089eb3935b82ce46640a4b68bb0c5a2b72d28d2b5', '9e1431e9dbdaa424328eda90965d4ea6', 0, 0, '2026-10-28 16:36:07', '2026-10-29 14:26:51');
+INSERT INTO `agent_user` VALUES (9, 'gay', '3376460573@qq.com', 'tmz258412', NULL, NULL, 0, 1, '2026-10-29 15:04:01', '2026-10-29 15:04:01');
 
 -- ----------------------------
 -- Table structure for archive_category
@@ -226,7 +242,7 @@ CREATE TABLE `archive_category`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_code`(`code` ASC) USING BTREE,
   INDEX `idx_parent`(`parent_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '档案分级分类目录' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '档案分级分类目录' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of archive_category
@@ -262,7 +278,7 @@ CREATE TABLE `feed_mark`  (
   UNIQUE INDEX `uk_user_feed`(`user_id` ASC, `feed_id` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE,
   INDEX `idx_feed`(`feed_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工情报交互（已读/收藏/点赞）' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工情报交互（已读/收藏/点赞）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of feed_mark
@@ -289,7 +305,7 @@ CREATE TABLE `home_feed`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_kind`(`kind` ASC) USING BTREE,
   INDEX `idx_pub`(`published_at` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '首页动态流' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '首页动态流' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of home_feed
@@ -321,7 +337,7 @@ CREATE TABLE `mission_brief`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_mission_code`(`mission_code` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '作战任务简报' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '作战任务简报' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of mission_brief
@@ -350,7 +366,7 @@ CREATE TABLE `mission_progress`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_mission`(`user_id` ASC, `mission_code` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工任务进度' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工任务进度' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of mission_progress

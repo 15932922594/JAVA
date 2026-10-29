@@ -40,6 +40,12 @@ public class AgentUserService extends ServiceImpl<AgentUserMapper, AgentUser> {
     /** 注册成功 / 失败原因（失败为上述错误码，成功为 "ok"） */
     public static final String OK = "ok";
 
+    /** 权限：默认权限（普通用户），看不到后台入口、不能登录后台 */
+    public static final int PERMISSION_USER = 1;
+
+    /** 权限：管理员权限，可以看到后台入口并登录后台管理系统 */
+    public static final int PERMISSION_ADMIN = 0;
+
     public String register(String name, String email, String password, Integer agentIndex) {
         String mail = email == null ? "" : email.trim().toLowerCase();
 
@@ -53,12 +59,42 @@ public class AgentUserService extends ServiceImpl<AgentUserMapper, AgentUser> {
         AgentUser user = new AgentUser();
         user.setName(name.trim());
         user.setEmail(mail);
-        String salt = PasswordUtil.randomSalt();
-        user.setSalt(salt);
-        user.setPasswordHash(PasswordUtil.sha256(salt, password));
+        // 密码明文存储（需求要求不加密）
+        user.setPassword(password);
+        // 注册用户一律为默认权限；管理员权限只能由后台授权或直接改库
+        user.setPermission(PERMISSION_USER);
         user.setAgentIndex(agentIndex == null ? 0 : agentIndex);
         save(user);
         return OK;
+    }
+
+    /** 是否为管理员权限账号 */
+    public static boolean isAdmin(AgentUser user) {
+        return user != null && user.getPermission() != null && user.getPermission() == PERMISSION_ADMIN;
+    }
+
+    /**
+     * 密码校验：明文优先（新账号 / 改过密码的账号），
+     * 明文列为空时才回退到旧的 SHA-256(salt::password) 摘要，避免历史账号直接失效。
+     */
+    public boolean matchPassword(AgentUser user, String rawPassword) {
+        if (user == null || rawPassword == null) {
+            return false;
+        }
+        if (user.getPassword() != null) {
+            return user.getPassword().equals(rawPassword);
+        }
+        return user.getSalt() != null
+                && user.getPasswordHash() != null
+                && PasswordUtil.matches(user.getSalt(), rawPassword, user.getPasswordHash());
+    }
+
+    /** 写入明文密码，同时清掉旧摘要（改为明文后不再需要盐） */
+    public void savePlainPassword(AgentUser user, String rawPassword) {
+        user.setPassword(rawPassword);
+        user.setSalt("");
+        user.setPasswordHash("");
+        updateById(user);
     }
 
     /** 登录校验：账号不存在 / 密码错误 / 成功（返回脱敏后的账号信息） */
@@ -72,7 +108,7 @@ public class AgentUserService extends ServiceImpl<AgentUserMapper, AgentUser> {
         if (user == null) {
             return "notfound";
         }
-        if (!PasswordUtil.matches(user.getSalt(), password, user.getPasswordHash())) {
+        if (!matchPassword(user, password)) {
             return "wrongpass";
         }
 
@@ -121,18 +157,33 @@ public class AgentUserService extends ServiceImpl<AgentUserMapper, AgentUser> {
 
     /* ================= 登录后的账号管理 ================= */
 
-    /** 修改密码：校验旧密码，成功后重置盐并重新计算摘要 */
+    /** 修改密码：校验旧密码，成功后以明文写入新密码 */
     public String changePassword(Long userId, String oldPassword, String newPassword) {
         AgentUser user = getById(userId);
         if (user == null) {
             return "notfound";
         }
-        if (!PasswordUtil.matches(user.getSalt(), oldPassword, user.getPasswordHash())) {
+        if (!matchPassword(user, oldPassword)) {
             return "wrongpass";
         }
-        String salt = PasswordUtil.randomSalt();
-        user.setSalt(salt);
-        user.setPasswordHash(PasswordUtil.sha256(salt, newPassword));
+        savePlainPassword(user, newPassword);
+        return OK;
+    }
+
+    /**
+     * 修改权限：0 管理员权限 / 1 默认权限。
+     * 权限变更后该账号所有会话仍在，但后台会实时校验 permission，
+     * 被降级的账号立刻无法继续访问后台接口。
+     */
+    public String updatePermission(Long userId, int permission) {
+        AgentUser user = getById(userId);
+        if (user == null) {
+            return "notfound";
+        }
+        if (permission != PERMISSION_ADMIN && permission != PERMISSION_USER) {
+            return "badperm";
+        }
+        user.setPermission(permission);
         updateById(user);
         return OK;
     }
@@ -176,6 +227,7 @@ public class AgentUserService extends ServiceImpl<AgentUserMapper, AgentUser> {
         info.put("name", user.getName());
         info.put("email", user.getEmail());
         info.put("agentIndex", user.getAgentIndex());
+        info.put("permission", user.getPermission() == null ? PERMISSION_USER : user.getPermission());
         return info;
     }
 }

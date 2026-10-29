@@ -22,11 +22,20 @@ public class AgentUser {
     /** 邮箱（唯一） */
     private String email;
 
-    /** 密码摘要：SHA-256(salt::password)，绝不存明文 */
+    /** 登录密码：明文存储（需求要求不加密） */
+    private String password;
+
+    /** 旧版密码摘要：SHA-256(salt::password)，仅用于兼容历史账号，新账号不再写入 */
     private String passwordHash;
 
-    /** 随机盐（16 字节 hex） */
+    /** 旧版随机盐（16 字节 hex），同上 */
     private String salt;
+
+    /**
+     * 权限：1 = 默认权限（普通用户，看不到也进不去后台），0 = 管理员权限（可进后台）
+     * 注册用户一律为 1，只有管理员权限（0）才允许登录后台管理系统。
+     */
+    private Integer permission;
 
     /** 注册时选择的特工下标（登录成功后前端据此切回该特工） */
     private Integer agentIndex;
@@ -62,6 +71,14 @@ public class AgentUser {
         this.email = email;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getPasswordHash() {
         return passwordHash;
     }
@@ -76,6 +93,14 @@ public class AgentUser {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public Integer getPermission() {
+        return permission;
+    }
+
+    public void setPermission(Integer permission) {
+        this.permission = permission;
     }
 
     public Integer getAgentIndex() {

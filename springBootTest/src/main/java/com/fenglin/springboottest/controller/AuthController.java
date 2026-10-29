@@ -45,6 +45,9 @@ public class AuthController {
         if (pass.length() < 6) {
             return Result.fail(400, "密码至少 6 位");
         }
+        if (pass.length() > 64) {
+            return Result.fail(400, "密码最多 64 位");
+        }
 
         String reason = userService.register(name, email, pass, agentIndex);
         if (!AgentUserService.OK.equals(reason)) {
@@ -55,6 +58,8 @@ public class AuthController {
         account.put("name", name.trim());
         account.put("email", email.trim().toLowerCase());
         account.put("agentIndex", agentIndex);
+        // 注册用户一律为默认权限（1）
+        account.put("permission", AgentUserService.PERMISSION_USER);
         return Result.ok(account);
     }
 
