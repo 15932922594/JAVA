@@ -148,6 +148,27 @@ export const intelMarkAll = (token) => post('/api/intel/mark-all', { token })
 export const intelStats = (token) => post('/api/intel/stats', { token })
 
 /* ============================================================
+   RANGE 训练场接口 —— 后端 GameController
+   ------------------------------------------------------------
+   表：game_record（每局训练成绩，累计 units 自动推进任务目标）
+   建表脚本：springBootTest/sql/game.sql
+   ============================================================ */
+
+/**
+ * 上报一局训练成绩
+ * @param {string} token
+ * @param {object} payload  mode（TARGET|RECOIL|REACTION）/ score / units
+ *                          / shots / hits / avgMs
+ */
+export const gameReport = (token, payload) => post('/api/game/report', { token, ...payload })
+
+/** 个人各模式统计（局数 / 累计 units / 最高分 / 最快反应） */
+export const gameStats = (token) => post('/api/game/stats', { token })
+
+/** 最近训练记录 */
+export const gameRecords = (token, limit = 10) => post('/api/game/records', { token, limit })
+
+/* ============================================================
    找回密码 + RIOT 第三方登录 —— 后端 AuthController
    ------------------------------------------------------------
    表：agent_reset_code（验证码）/ agent_oauth（绑定与授权票据）

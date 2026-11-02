@@ -84,6 +84,27 @@ RIOT 登录：`/api/auth/riot/authorize`（可选传 `uid` 复用同一个 Riot 
 
 前端页面：`vue-login/src/components/home/IntelPage.vue`（+ `IntelDetailModal`）。
 
+## 训练场（可玩小游戏）
+
+前端可玩的训练小游戏，成绩落库并自动推进作战任务目标。
+建表：`mysql -uroot -p123456 < sql/game.sql`（game_record 成绩表）
+
+三个模式（mode）：
+- `TARGET` 靶场点击：30 秒限时打靶，units = 本局命中数（累计对应「靶机命中 N 次」）
+- `RECOIL` 压枪练习：按住鼠标对抗枪口上抬，在圈率 ≥60% 记 1 组（对应「压枪练习 N 组」）
+- `REACTION` 反应测试：5 次随机出靶，平均反应 ≤400ms 记 1 次达标（对应「急停射击达标 N 次」）
+
+成绩上报后，服务端按模式累计 units，自动勾选进行中任务里
+包含对应关键词（命中 / 压枪 / 急停）且数量达标的目标，全部完成转 READY。
+
+| 方法 | 路径 | 入参 (JSON) | 返回 |
+| --- | --- | --- | --- |
+| POST | /api/game/report | `{ token, mode, score, units, shots, hits, avgMs }` | `{code:0, data:{record, stats, missionCompleted:[自动完成的目标文案]}}` |
+| POST | /api/game/stats | `{ token }` | 各模式局数 / 累计 units / 最高分 / 最快反应 |
+| POST | /api/game/records | `{ token, limit? }` | 最近成绩记录 |
+
+前端页面：`vue-login/src/components/home/RangeGamePage.vue`（导航「训练场」）。
+
 ## 登录态（会话）
 
 - 登录成功签发 32 位 token，存入 `agent_session` 表，有效期 **7 天**
@@ -99,6 +120,7 @@ mysql -uroot -p123456 < sql/schema.sql   # 账号 + 会话
 mysql -uroot -p123456 < sql/home.sql     # 档案 / 分类 / 动态流
 mysql -uroot -p123456 < sql/mission.sql  # 作战任务（简报 + 进度）
 mysql -uroot -p123456 < sql/intel.sql    # 情报中心（正文 + 交互记录）
+mysql -uroot -p123456 < sql/game.sql    # 训练场（小游戏成绩）
 # 2. 启动（端口 8081，配置在 application-dev.properties）
 mvnw.cmd spring-boot:run
 ```

@@ -278,7 +278,7 @@ export async function authRestore() {
  * 后续若引入 vue-router，把这里改成 router.push 即可，调用方不用动。
  */
 export function switchView(view) {
-  if (!['auth', 'home', 'agents', 'arsenal', 'missions', 'intel', 'dash', 'admin'].includes(view)) {
+  if (!['auth', 'home', 'agents', 'arsenal', 'missions', 'intel', 'range', 'dash', 'admin'].includes(view)) {
     return
   }
   // 后台管理系统：仅管理员权限（permission = 0）可进入，默认权限一律拦下

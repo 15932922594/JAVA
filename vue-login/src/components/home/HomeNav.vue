@@ -27,7 +27,8 @@ const NAVS = [
   { key: 'agents', label: '特工档案' },
   { key: 'arsenal', label: '武器库' },
   { key: 'missions', label: '作战任务' },
-  { key: 'intel', label: '情报中心' }
+  { key: 'intel', label: '情报中心' },
+  { key: 'range', label: '训练场' }
 ]
 
 const active = computed(() => state.view)
