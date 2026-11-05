@@ -1,11 +1,16 @@
 package com.fenglin.springboottest.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fenglin.springboottest.common.HeroLevel;
+import com.fenglin.springboottest.common.WeaponCatalog;
 import com.fenglin.springboottest.entity.AgentSession;
 import com.fenglin.springboottest.entity.AgentUser;
+import com.fenglin.springboottest.entity.AgentWeapon;
 import com.fenglin.springboottest.mapper.AgentSessionMapper;
 import com.fenglin.springboottest.mapper.AgentUserMapper;
+import com.fenglin.springboottest.mapper.AgentWeaponMapper;
 import com.fenglin.springboottest.util.PasswordUtil;
 import org.springframework.stereotype.Service;
 
@@ -29,12 +34,17 @@ import java.util.UUID;
 public class AgentUserService extends ServiceImpl<AgentUserMapper, AgentUser> {
 
     private final AgentSessionMapper sessionMapper;
+    private final AgentWeaponMapper weaponMapper;
+    private final HeroLevelService levelService;
 
     /** 会话有效期：7 天 */
     private static final int SESSION_DAYS = 7;
 
-    public AgentUserService(AgentSessionMapper sessionMapper) {
+    public AgentUserService(AgentSessionMapper sessionMapper, AgentWeaponMapper weaponMapper,
+                            HeroLevelService levelService) {
         this.sessionMapper = sessionMapper;
+        this.weaponMapper = weaponMapper;
+        this.levelService = levelService;
     }
 
     /** 注册成功 / 失败原因（失败为上述错误码，成功为 "ok"） */
@@ -64,7 +74,11 @@ public class AgentUserService extends ServiceImpl<AgentUserMapper, AgentUser> {
         // 注册用户一律为默认权限；管理员权限只能由后台授权或直接改库
         user.setPermission(PERMISSION_USER);
         user.setAgentIndex(agentIndex == null ? 0 : agentIndex);
+        // 新特工：英雄从 1 级开始 + 起始信用点；标配免费人手一把，注册即拥有
+        user.setHeroLevel(1);
+        user.setCredits(WeaponCatalog.START_CREDITS);
         save(user);
+        weaponMapper.insert(new AgentWeapon(user.getId(), user.getName(), "classic", "标配"));
         return OK;
     }
 
@@ -116,7 +130,22 @@ public class AgentUserService extends ServiceImpl<AgentUserMapper, AgentUser> {
         sessionMapper.delete(new QueryWrapper<AgentSession>()
                 .lt("expires_at", LocalDateTime.now()));
 
+        // 每日首次登录 +20 EXP（同一天重复登录不重复发）
+        java.time.LocalDate today = java.time.LocalDate.now();
+        if (user.getLastLoginDate() == null || !today.equals(user.getLastLoginDate())) {
+            userMapper0().update(null, new UpdateWrapper<AgentUser>()
+                    .eq("id", user.getId())
+                    .set("last_login_date", today));
+            user.setLastLoginDate(today);
+            levelService.gain(user.getId(), HeroLevel.DAILY_LOGIN_EXP, user);
+        }
+
         return toSafeMap(user);
+    }
+
+    /** 本服务的 BaseMapper（MyBatis-Plus 自带 getBaseMapper 的别名，便于阅读） */
+    private com.fenglin.springboottest.mapper.AgentUserMapper userMapper0() {
+        return getBaseMapper();
     }
 
     /** 登录成功后签发会话 token（有效期 7 天） */
@@ -228,6 +257,35 @@ public class AgentUserService extends ServiceImpl<AgentUserMapper, AgentUser> {
         info.put("email", user.getEmail());
         info.put("agentIndex", user.getAgentIndex());
         info.put("permission", user.getPermission() == null ? PERMISSION_USER : user.getPermission());
+        info.put("credits", user.getCredits() == null ? WeaponCatalog.START_CREDITS : user.getCredits());
+
+        // 经验与等级：**以 exp 为唯一真相**，等级由公式实时推导（避免手动改库造成等级/经验冲突）
+        int exp = user.getExp() == null ? 0 : user.getExp();
+        int level = HeroLevel.levelOf(exp);
+        info.put("heroLevel", level);
+        info.put("exp", exp);
+        info.put("expInLevel", HeroLevel.expInLevel(exp));
+        info.put("expForNext", HeroLevel.expForNext(level));
+        // 头像框：已解锁的可在图鉴里自选佩戴；0 = 跟随最新解锁
+        int frameMaxTier = HeroLevel.frameMaxTier(level);
+        int frameShown = HeroLevel.shownFrameTier(level, user.getEquippedFrame());
+        Integer eqFrame = user.getEquippedFrame();
+        info.put("frameTier", frameShown);
+        info.put("frameMaxTier", frameMaxTier);
+        info.put("frameAuto", eqFrame == null || eqFrame == 0 || eqFrame >= frameMaxTier);
+        info.put("frameName", HeroLevel.frameNameOfTier(frameShown));
+        info.put("frameEn", HeroLevel.frameEnOfTier(frameShown));
+        info.put("nextFrameLevel", HeroLevel.nextFrameLevel(level));
+        info.put("nextFrameName", HeroLevel.nextFrameName(level));
+        // 等级无上限，不再有 maxLevel 字段（前端按 exp / expForNext 画进度条即可）
+
+        // 战力与装备：竞技场 / 排行榜展示用
+        String weapon = user.getEquippedWeapon() == null || user.getEquippedWeapon().isBlank()
+                ? "classic" : user.getEquippedWeapon();
+        info.put("equippedWeapon", weapon);
+        info.put("power", com.fenglin.springboottest.common.HeroStats.power(user.getAgentIndex(), level, weapon));
+        info.put("pkWin", user.getPkWin() == null ? 0 : user.getPkWin());
+        info.put("pkLose", user.getPkLose() == null ? 0 : user.getPkLose());
         return info;
     }
 }

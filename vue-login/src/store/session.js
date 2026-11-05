@@ -5,6 +5,7 @@
    ============================================================ */
 import { reactive, computed } from 'vue'
 import { AGENTS } from '../data/agents'
+import { frameOf, frameTierOf, nextFrameOf } from '../data/frames'
 import * as api from './api'
 
 /** 与原页面完全一致的邮箱校验正则 */
@@ -31,7 +32,7 @@ export const state = reactive({
   mode: 'login',
   /**
    * 当前视图：auth（登录页） | home（首页） | agents / arsenal / missions（分类浏览页）
-   * | intel（情报中心） | dash（作战终端）
+   * | armory（军械商店） | intel（情报中心） | range（训练场） | dash（作战终端）
    * 项目暂未引入 vue-router，用这一份状态做页面切换；
    * 后续接路由时把 switchView 换成 router.push 即可。
    */
@@ -43,7 +44,7 @@ export const state = reactive({
   /** Toast */
   toast: { visible: false, text: '', ok: false },
 
-  /** 登录态：user = { id, name, email, agentIndex, permission } | null */
+  /** 登录态：user = { id, name, email, agentIndex, permission, heroLevel, credits } | null */
   user: null,
   token: null,
 
@@ -96,10 +97,59 @@ export const progress = computed(() => {
   return (n + e + s + c + t + g) / 6
 })
 
-/** 特工等级：随填写进度与所选特工变化（原 setXp 逻辑） */
-export const agentLevel = computed(() =>
-  String(1 + Math.floor(progress.value * 9) + state.agentIndex * 3).padStart(2, '0')
-)
+/** 特工等级：已登录用后端真实英雄等级（注册后从 1 级开始）；
+ *  未登录（注册页演示）沿用表单进度公式 */
+export const agentLevel = computed(() => {
+  if (state.user && Number.isFinite(state.user.heroLevel)) return state.user.heroLevel
+  return String(1 + Math.floor(progress.value * 9) + state.agentIndex * 3).padStart(2, '0')
+})
+
+/** 英雄经验进度（顶栏进度条 / 首页等级卡共用）。等级无上限，进度条只反映当前级内经验 */
+export const heroExp = computed(() => {
+  const u = state.user
+  if (!u) return { inLevel: 0, need: 100, pct: 0 }
+  const need = u.expForNext || 100
+  const inLevel = Math.min(u.expInLevel || 0, need)
+  return {
+    inLevel,
+    need,
+    pct: need > 0 ? inLevel / need : 0
+  }
+})
+
+/** 头像框档位（后端返回佩戴结果；未拿到时按等级推导） */
+export const frameTier = computed(() => state.user?.frameTier || frameTierOf(state.user?.heroLevel || 1))
+
+/** 当前头像框 & 下一档（星穹系列无限延伸，永远有下一档） */
+export const frameInfo = computed(() => {
+  const lv = state.user?.heroLevel || 1
+  return { current: frameOf(lv), next: nextFrameOf(lv) }
+})
+
+/** 训练 / 任务返回的等级信息写回账号状态（升级后顶栏即时更新） */
+export function applyLevelInfo(lv) {
+  if (!lv || !state.user) return
+  if (typeof lv.exp === 'number') state.user.exp = lv.exp
+  if (typeof lv.level === 'number') state.user.heroLevel = lv.level
+  if (typeof lv.expInLevel === 'number') state.user.expInLevel = lv.expInLevel
+  if (typeof lv.expForNext === 'number') state.user.expForNext = lv.expForNext
+  if (typeof lv.credits === 'number') state.user.credits = lv.credits
+  if (typeof lv.level === 'number') {
+    // 后端返回的是「佩戴中」的档位与「当前等级最高档」，直接采用
+    const f = frameOf(lv.level)
+    const nf = nextFrameOf(lv.level)
+    state.user.frameTier = lv.frameTier ?? f.tier
+    state.user.frameMaxTier = lv.frameMaxTier ?? f.tier
+    state.user.frameAuto = lv.frameAuto ?? lv.frameTier === f.tier
+    state.user.frameName = lv.frameName || f.name
+    state.user.frameEn = lv.frameEn || f.en
+    state.user.nextFrameLevel = lv.nextFrameLevel ?? nf.level
+    state.user.nextFrameName = lv.nextFrameName ?? nf.name
+  }
+}
+
+/** 等级 → 头像框档位（与后端 HeroLevel.frameTier 一致） */
+export { frameTierOf }
 
 /** 注册页密码加密等级 0~4（原 #segs 逻辑） */
 export const SEC_COLORS = ['#FF4655', '#FFB443', '#3ddc97', '#00E0C6']
@@ -136,7 +186,23 @@ function applyLogin(data, remember) {
     name: data.name,
     email: data.email,
     agentIndex: data.agentIndex,
-    permission: data.permission ?? PERMISSION_USER
+    permission: data.permission ?? PERMISSION_USER,
+    heroLevel: data.heroLevel ?? 1,
+    credits: data.credits ?? 0,
+    exp: data.exp ?? 0,
+    expInLevel: data.expInLevel ?? 0,
+    expForNext: data.expForNext ?? 100,
+    frameTier: data.frameTier ?? 1,
+    frameMaxTier: data.frameMaxTier ?? 1,
+    frameAuto: data.frameAuto ?? true,
+    frameName: data.frameName ?? '新兵',
+    frameEn: data.frameEn ?? 'RECRUIT',
+    nextFrameLevel: data.nextFrameLevel ?? 3,
+    nextFrameName: data.nextFrameName ?? '银翼',
+    power: data.power ?? 0,
+    equippedWeapon: data.equippedWeapon ?? 'classic',
+    pkWin: data.pkWin ?? 0,
+    pkLose: data.pkLose ?? 0
   }
   state.token = data.token || null
   // 后端记录了注册时选择的特工，登录后切回该特工
@@ -264,6 +330,37 @@ export async function authRestore() {
   return false
 }
 
+/**
+ * 重新拉取当前账号（PK / 升级 / 买枪后调用）。
+ * 后端返回的是权威数据（经验、等级、信用点、战力、装备），前端只做覆盖写入，
+ * 避免各处手动加加减减导致等级与经验对不上。
+ */
+export async function refreshAccount() {
+  const token = state.token || localStorage.getItem(TOKEN_KEY)
+  if (!token) return false
+  const r = await api.me(token)
+  if (r.code !== 0 || !state.user) return false
+  const d = r.data || {}
+  const u = state.user
+  if (typeof d.heroLevel === 'number') u.heroLevel = d.heroLevel
+  if (typeof d.credits === 'number') u.credits = d.credits
+  if (typeof d.exp === 'number') u.exp = d.exp
+  if (typeof d.expInLevel === 'number') u.expInLevel = d.expInLevel
+  if (typeof d.expForNext === 'number') u.expForNext = d.expForNext
+  if (typeof d.frameTier === 'number') u.frameTier = d.frameTier
+  if (typeof d.frameMaxTier === 'number') u.frameMaxTier = d.frameMaxTier
+  if (typeof d.frameAuto === 'boolean') u.frameAuto = d.frameAuto
+  if (typeof d.frameName === 'string') u.frameName = d.frameName
+  if (typeof d.frameEn === 'string') u.frameEn = d.frameEn
+  if (typeof d.nextFrameLevel === 'number') u.nextFrameLevel = d.nextFrameLevel
+  if (typeof d.nextFrameName === 'string') u.nextFrameName = d.nextFrameName
+  if (typeof d.power === 'number') u.power = d.power
+  if (typeof d.equippedWeapon === 'string') u.equippedWeapon = d.equippedWeapon
+  if (typeof d.pkWin === 'number') u.pkWin = d.pkWin
+  if (typeof d.pkLose === 'number') u.pkLose = d.pkLose
+  return true
+}
+
 /* ---------------- 页面视图切换 ---------------- */
 
 /**
@@ -278,7 +375,7 @@ export async function authRestore() {
  * 后续若引入 vue-router，把这里改成 router.push 即可，调用方不用动。
  */
 export function switchView(view) {
-  if (!['auth', 'home', 'agents', 'arsenal', 'missions', 'intel', 'range', 'dash', 'admin'].includes(view)) {
+  if (!['auth', 'home', 'agents', 'arsenal', 'armory', 'missions', 'intel', 'range', 'arena', 'dash', 'admin'].includes(view)) {
     return
   }
   // 后台管理系统：仅管理员权限（permission = 0）可进入，默认权限一律拦下
@@ -442,6 +539,11 @@ export function useSession() {
     accent,
     progress,
     agentLevel,
+    heroExp,
+    frameTier,
+    frameInfo,
+    frameTierOf,
+    applyLevelInfo,
     securityLevel,
     isLoggedIn,
     isAdmin,
@@ -455,6 +557,7 @@ export function useSession() {
     authRegister,
     authLogout,
     authRestore,
+    refreshAccount,
     authResetRequest,
     authResetConfirm,
     authRiotAuthorize,

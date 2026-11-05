@@ -44,10 +44,11 @@ public class AgentArchive {
     /** 简介 */
     private String bio;
 
-    /** 人物故事 / 背景档案（详情页展示，\n\n 分段） */
+    /** 故事正文：特工=人物故事 / 枪械=枪械故事 / 地图=地图故事（详情页展示，\n 分段） */
     private String story;
 
-    /** 能力 / 特性：JSON 字符串，形如 [{slot,name,desc}]，可为空 */
+    /** 能力 / 特性 / 地图介绍：JSON 字符串，形如 [{slot,name,desc}]，可为空<br>
+     *  AGENT=技能 / GEAR=枪械特性（优势·代价）/ MISSION=地图介绍（适合枪械·进攻·防守·节奏） */
     private String abilities;
 
     /** 立绘地址，可为空 */

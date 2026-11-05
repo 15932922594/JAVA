@@ -9,12 +9,14 @@
    后端累计成绩自动完成作战任务里的对应目标（如「靶机命中 30 次」）。
    ============================================================ */
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { state, switchView, useSession } from '../../store/session'
+import { state, switchView, useSession, applyLevelInfo } from '../../store/session'
 import { gameReport, gameStats, gameRecords } from '../../store/api'
 import { beep } from '../../composables/useSound'
+import { useEffects } from '../../composables/useEffects'
 import HomeNav from './HomeNav.vue'
 
 const { showToast } = useSession()
+const { flash } = useEffects()
 
 /** 返回首页（与其他页面一致） */
 function backHome() {
@@ -46,7 +48,7 @@ onMounted(loadAll)
 /* ---------- 对局状态 ---------- */
 const phase = ref('idle') // idle（未开始）| playing | done
 const mode = ref('TARGET')
-const result = reactive({ score: 0, units: 0, detail: '', completed: [] })
+const result = reactive({ score: 0, units: 0, detail: '', completed: [], creditsEarned: 0, expEarned: 0 })
 const recordsEl = ref(null)
 
 /** 结算后自动滚动到「最近训练记录」，让新记录直接可见 */
@@ -66,6 +68,40 @@ async function report(payload) {
   if (res.code === 0) {
     result.completed = res.data.missionCompleted || []
     stats.value = res.data.stats
+    // 训练奖励：信用点入账（军械商店消费用）
+    if (typeof res.data.creditsEarned === 'number') {
+      result.creditsEarned = res.data.creditsEarned
+      if (state.user) state.user.credits = res.data.credits ?? state.user.credits
+    }
+    // 训练奖励：经验值 + 升级判定
+    const lv = res.data.level
+    if (lv && typeof lv.expGained === 'number') {
+      result.expEarned = lv.expGained
+      applyLevelInfo(lv)
+      if (lv.levelUp) {
+        // 升级：全屏闪光 + 上扬音效 + 升级弹窗提示
+        flash()
+        beep(660, 0.08)
+        setTimeout(() => beep(880, 0.1), 100)
+        setTimeout(() => beep(1320, 0.18), 210)
+        // 边框里程碑：额外 +300 信用点 + 解锁新头像框
+        const frameMsg =
+          lv.frameUnlocked && lv.unlockedFrames?.length
+            ? ` · 解锁边框 ${lv.unlockedFrames.join('、')}`
+            : ''
+        showToast(
+          `LV.UP · 英雄升至 ${lv.level} 级 · 奖励 ${lv.creditsGained} 信用点${frameMsg}`,
+          true
+        )
+      } else if (lv.expGained > 0) {
+        showToast(
+          `训练完成 · 经验 +${lv.expGained} EXP · 信用点 +${res.data.creditsEarned || 0}`,
+          true
+        )
+      }
+    } else if (typeof res.data.creditsEarned === 'number') {
+      showToast(`训练津贴 +${res.data.creditsEarned} 信用点 · 可在军械商店购买武器`, true)
+    }
     const rr = await gameRecords(state.token, 8)
     if (rr.code === 0) records.value = rr.data
   }

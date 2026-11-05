@@ -40,6 +40,34 @@ public class AgentUser {
     /** 注册时选择的特工下标（登录成功后前端据此切回该特工） */
     private Integer agentIndex;
 
+    /** 英雄等级：注册后一律从 1 级开始 */
+    private Integer heroLevel;
+
+    /** 信用点余额：军械商店购买武器消耗，训练场对战赚取 */
+    private Integer credits;
+
+    /** 累计经验值：决定英雄等级（见 HeroLevel） */
+    private Integer exp;
+
+    /** 当前主武器 code（影响战力，必须已拥有且等级达标） */
+    private String equippedWeapon;
+
+    /**
+     * 当前佩戴的头像框档位（边框图鉴里自选）。
+     * 0 = 跟随最新解锁（默认，等级升到哪档就戴哪档）；
+     * N = 手动佩戴第 N 档（必须 ≤ 当前等级可解锁的最高档）。
+     */
+    private Integer equippedFrame;
+
+    /** PK 胜场 */
+    private Integer pkWin;
+
+    /** PK 负场 */
+    private Integer pkLose;
+
+    /** 最近一次登录日期：每日首次登录发经验用 */
+    private java.time.LocalDate lastLoginDate;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
@@ -109,6 +137,70 @@ public class AgentUser {
 
     public void setAgentIndex(Integer agentIndex) {
         this.agentIndex = agentIndex;
+    }
+
+    public Integer getHeroLevel() {
+        return heroLevel;
+    }
+
+    public void setHeroLevel(Integer heroLevel) {
+        this.heroLevel = heroLevel;
+    }
+
+    public Integer getCredits() {
+        return credits;
+    }
+
+    public void setCredits(Integer credits) {
+        this.credits = credits;
+    }
+
+    public Integer getExp() {
+        return exp;
+    }
+
+    public void setExp(Integer exp) {
+        this.exp = exp;
+    }
+
+    public String getEquippedWeapon() {
+        return equippedWeapon;
+    }
+
+    public void setEquippedWeapon(String equippedWeapon) {
+        this.equippedWeapon = equippedWeapon;
+    }
+
+    public Integer getEquippedFrame() {
+        return equippedFrame;
+    }
+
+    public void setEquippedFrame(Integer equippedFrame) {
+        this.equippedFrame = equippedFrame;
+    }
+
+    public Integer getPkWin() {
+        return pkWin;
+    }
+
+    public void setPkWin(Integer pkWin) {
+        this.pkWin = pkWin;
+    }
+
+    public Integer getPkLose() {
+        return pkLose;
+    }
+
+    public void setPkLose(Integer pkLose) {
+        this.pkLose = pkLose;
+    }
+
+    public java.time.LocalDate getLastLoginDate() {
+        return lastLoginDate;
+    }
+
+    public void setLastLoginDate(java.time.LocalDate lastLoginDate) {
+        this.lastLoginDate = lastLoginDate;
     }
 
     public LocalDateTime getCreateTime() {

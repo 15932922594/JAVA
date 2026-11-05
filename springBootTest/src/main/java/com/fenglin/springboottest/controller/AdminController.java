@@ -112,6 +112,17 @@ public class AdminController {
         return Result.ok(adminService.stats());
     }
 
+    /* ================= 军械经济统计 ================= */
+
+    @PostMapping("/armory/stats")
+    public Result<Object> armoryStats(@RequestBody Map<String, Object> body) {
+        AdminService.Actor actor = requireAdmin(body);
+        if (actor == null) {
+            return Result.fail(401, "notfound");
+        }
+        return Result.ok(adminService.armoryStats());
+    }
+
     /* ================= 档案 ================= */
 
     @PostMapping("/archive/list")

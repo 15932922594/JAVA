@@ -17,6 +17,7 @@ const token = computed(() => state.adminToken || '')
 /* ---------------- 标签页 ---------------- */
 const TABS = [
   { code: 'stats', label: '概览', en: 'OVERVIEW' },
+  { code: 'armory', label: '军械', en: 'ARMORY' },
   { code: 'archive', label: '档案', en: 'ARCHIVE' },
   { code: 'category', label: '分类', en: 'CATEGORY' },
   { code: 'feed', label: '动态', en: 'FEED' },
@@ -38,6 +39,9 @@ async function call(fn, ...args) {
 
 /* ---------------- 概览统计 ---------------- */
 const stats = ref(null)
+
+/* ---------------- 军械经济统计 ---------------- */
+const armory = ref(null)
 
 /* ---------------- 通用列表状态 ---------------- */
 const list = reactive({ rows: [], total: 0, pages: 0, page: 1, loading: false, q: '' })
@@ -91,8 +95,8 @@ const FORM_FIELDS = {
     { k: 'sort', lab: '排序', type: 'num' },
     { k: 'featured', lab: '首页精选', type: 'select', options: [1, 0] },
     { k: 'status', lab: '状态', type: 'select', options: [1, 0] },
-    { k: 'abilities', lab: '能力JSON [{slot,name,desc}]', type: 'area' },
-    { k: 'story', lab: '人物故事(空行分段)', type: 'area' }
+    { k: 'abilities', lab: '特性/地图介绍JSON [{slot,name,desc}]', type: 'area' },
+    { k: 'story', lab: '故事(人物/枪械/地图 · 空行分段)', type: 'area' }
   ],
   category: [
     { k: 'parent_id', lab: '父分类(0=一级)', type: 'select', options: [0, 1, 2, 3] },
@@ -139,6 +143,10 @@ const LIST_LOADERS = {
 async function load(reset = true) {
   if (tab.value === 'stats') {
     stats.value = await call(api.adminStats)
+    return
+  }
+  if (tab.value === 'armory') {
+    armory.value = await call(api.adminArmoryStats)
     return
   }
   if (reset) list.page = 1
@@ -277,6 +285,64 @@ onMounted(load)
         </div>
       </div>
       <div v-else class="empty">正在加载统计 ...</div>
+    </section>
+
+    <!-- 军械经济 -->
+    <section v-else-if="tab === 'armory'" class="ad-body">
+      <div v-if="armory">
+        <div class="stat-grid">
+          <div v-for="(v, k) in armory.summary" :key="k" class="stat-card">
+            <div class="sv">{{ v }}</div>
+            <div class="sk">{{ k }}</div>
+          </div>
+        </div>
+
+        <h3 class="blk-title">武器销量 <i>SALES</i></h3>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>武器</th><th>类别</th><th>单价</th><th>需等级</th><th>销量</th><th>营收</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="w in armory.weapons" :key="w.code">
+                <td>
+                  <b>{{ w.name }}</b>
+                  <span class="mono sub">{{ w.code }}</span>
+                </td>
+                <td>{{ w.category }}</td>
+                <td class="mono">{{ w.price === 0 ? '免费' : w.price }}</td>
+                <td class="mono">LV.{{ w.req_level }}</td>
+                <td class="mono">{{ w.count }}</td>
+                <td class="mono">{{ w.revenue }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="blk-title">最近购买 <i>RECENT</i></h3>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>特工</th><th>武器</th><th>价格</th><th>时间</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="r in armory.recent" :key="r.id">
+                <td>
+                  <b>{{ r.user_name }}</b>
+                  <span class="mono sub">#{{ r.user_id }}</span>
+                </td>
+                <td>
+                  {{ r.weapon_name }}
+                  <span class="mono sub">{{ r.weapon_code }}</span>
+                </td>
+                <td class="mono">{{ r.price === 0 ? '免费' : r.price }}</td>
+                <td class="mono">{{ r.time }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div v-else class="empty">正在加载军械数据 ...</div>
     </section>
 
     <!-- 列表页 -->
@@ -549,6 +615,26 @@ onMounted(load)
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
   gap: 14px;
+}
+
+/* 军械页分块标题 */
+.blk-title {
+  margin: 26px 0 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 2px;
+  color: var(--cream);
+}
+.blk-title i {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 9.5px;
+  letter-spacing: 2.4px;
+  color: var(--muted);
 }
 .stat-card {
   background: rgba(17, 26, 36, .86);

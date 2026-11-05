@@ -2,11 +2,20 @@
 /* ============================================================
    特工选择条：6 张卡片，点击切换当前特工
    ============================================================ */
+import { computed } from 'vue'
 import { AGENTS, roleShort } from '../data/agents'
 import { state, selectAgent } from '../store/session'
 import { beep } from '../composables/useSound'
 
+/** 已登录：英雄与账号绑定，不可再切换（展示用） */
+const locked = computed(() => !!state.user)
+
 function onSelect(i) {
+  if (locked.value) {
+    // 已接入的特工不能改角色：只给一声否定音
+    beep(170, 0.12, 'sawtooth')
+    return
+  }
   // 点击已选中的特工只给一声反馈，不重播动画
   if (i === state.agentIndex) {
     beep(520, 0.06)
@@ -18,12 +27,12 @@ function onSelect(i) {
 </script>
 
 <template>
-  <div class="strip">
+  <div class="strip" :class="{ locked }">
     <div
       v-for="(a, i) in AGENTS"
       :key="a.id"
       class="card"
-      :class="{ sel: i === state.agentIndex }"
+      :class="{ sel: i === state.agentIndex, off: locked && i !== state.agentIndex }"
       :style="{ '--ac': a.color }"
       @click="onSelect(i)"
     >
@@ -32,6 +41,7 @@ function onSelect(i) {
       <span class="cr">{{ roleShort(a.role) }}</span>
       <span class="cm">{{ a.mono }}</span>
       <span class="cn">{{ a.name }}</span>
+      <span v-if="locked && i === state.agentIndex" class="cbound">已绑定</span>
     </div>
   </div>
 </template>
@@ -140,6 +150,28 @@ function onSelect(i) {
   width: 100%;
   height: 3px;
   background: var(--ac);
+}
+
+/* 已登录锁定：其余英雄压暗，只有绑定英雄可亮 */
+.strip.locked .card { cursor: default; }
+.strip.locked .card.off { opacity: .32; filter: grayscale(.7); }
+.strip.locked .card.off:hover { transform: none; border-color: var(--line); }
+.strip.locked .card.off:hover .ci { transform: none; opacity: .92; }
+.strip.locked .card.off:hover .cm { opacity: .7; transform: none; }
+
+.cbound {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  z-index: 3;
+  padding: 2px 6px;
+  background: var(--ac);
+  color: #0a1119;
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
 }
 
 @media (max-width: 1020px) {

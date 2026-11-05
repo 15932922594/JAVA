@@ -29,12 +29,12 @@ function syncAgentHint() {
 function onSwitch(mode) {
   if (state.mode === mode) {
     // 与原实现一致：点击当前标签也会重播提示与音效
-    hint.value = mode === 'login' ? '↑ 从下方选择你的特工' : '↑ 选择一位特工作为你的角色'
+    hint.value = mode === 'login' ? '↑ 从下方选择你的特工' : '在表单中锁定你的英雄，创建账号即可出战'
     beep(mode === 'login' ? 640 : 500, 0.07)
     return
   }
   switchMode(mode)
-  hint.value = mode === 'login' ? '↑ 从下方选择你的特工' : '↑ 选择一位特工作为你的角色'
+  hint.value = mode === 'login' ? '↑ 从下方选择你的特工' : '在表单中锁定你的英雄，创建账号即可出战'
   beep(mode === 'login' ? 640 : 500, 0.07)
 }
 

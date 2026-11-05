@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "lan": "node scripts/lan.mjs",
     "ssr:build": "vite build --ssr src/ssr-entry.js --outDir dist-ssr",
     "verify:styles": "node scripts/verify-styles.mjs --original ../valorant-login.html --dist dist",
     "verify:dom": "npm run ssr:build && node scripts/verify-dom.mjs --original ../valorant-login.html --ssr-entry dist-ssr/ssr-entry.js --allow \"SELECTED AGENT\" --allow \"↑ 从下方选择你的特工\"",

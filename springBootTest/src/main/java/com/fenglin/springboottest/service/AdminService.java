@@ -8,14 +8,18 @@ import com.fenglin.springboottest.entity.AdminLog;
 import com.fenglin.springboottest.entity.AdminUser;
 import com.fenglin.springboottest.entity.AgentArchive;
 import com.fenglin.springboottest.entity.AgentUser;
+import com.fenglin.springboottest.entity.AgentWeapon;
 import com.fenglin.springboottest.entity.ArchiveCategory;
 import com.fenglin.springboottest.entity.HomeFeed;
 import com.fenglin.springboottest.entity.MissionBrief;
+import com.fenglin.springboottest.common.HeroLevel;
+import com.fenglin.springboottest.common.WeaponCatalog;
 import com.fenglin.springboottest.mapper.AdminLogMapper;
 import com.fenglin.springboottest.service.AgentUserService;
 import com.fenglin.springboottest.mapper.AdminUserMapper;
 import com.fenglin.springboottest.mapper.AgentArchiveMapper;
 import com.fenglin.springboottest.mapper.AgentUserMapper;
+import com.fenglin.springboottest.mapper.AgentWeaponMapper;
 import com.fenglin.springboottest.mapper.ArchiveCategoryMapper;
 import com.fenglin.springboottest.mapper.HomeFeedMapper;
 import com.fenglin.springboottest.mapper.MissionBriefMapper;
@@ -55,6 +59,7 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
     private final HomeFeedMapper feedMapper;
     private final MissionBriefMapper missionMapper;
     private final AgentUserMapper userMapper;
+    private final AgentWeaponMapper weaponMapper;
     private final AgentUserService userService;
 
     public AdminService(AdminLogMapper logMapper,
@@ -63,6 +68,7 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
                         HomeFeedMapper feedMapper,
                         MissionBriefMapper missionMapper,
                         AgentUserMapper userMapper,
+                        AgentWeaponMapper weaponMapper,
                         AgentUserService userService) {
         this.logMapper = logMapper;
         this.archiveMapper = archiveMapper;
@@ -70,6 +76,7 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
         this.feedMapper = feedMapper;
         this.missionMapper = missionMapper;
         this.userMapper = userMapper;
+        this.weaponMapper = weaponMapper;
         this.userService = userService;
     }
 
@@ -311,7 +318,98 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
         m.put("管理员数", userMapper.selectCount(new QueryWrapper<AgentUser>()
                 .eq("permission", AgentUserService.PERMISSION_ADMIN)));
         m.put("操作日志", logMapper.selectCount(null));
+        m.put("军械销量", weaponMapper.selectCount(null));
         return m;
+    }
+
+    /* ================= 军械经济统计 ================= */
+
+    /**
+     * 后台「军械」页数据：
+     *   summary  累计购枪数 / 累计消费 / 人均持有 / 人均等级 / 最高等级 / 信用点总量
+     *   weapons  各武器销量与营收（按销量降序，0 销量的也列出）
+     *   recent   最近 12 笔购买（特工 / 武器 / 价格 / 时间）
+     */
+    public Map<String, Object> armoryStats() {
+        List<AgentWeapon> all = weaponMapper.selectList(
+                new QueryWrapper<AgentWeapon>().orderByDesc("id"));
+        List<AgentUser> users = userMapper.selectList(null);
+
+        // 账户侧统计（等级无上限，所以统计「最高等级」而不是「满级人数」）
+        long creditSum = 0;
+        int levelSum = 0;
+        int topLevel = 0;
+        for (AgentUser u : users) {
+            creditSum += u.getCredits() == null ? 0 : u.getCredits();
+            int exp = u.getExp() == null ? 0 : u.getExp();
+            int lv = HeroLevel.levelOf(exp);
+            levelSum += lv;
+            topLevel = Math.max(topLevel, lv);
+        }
+        int userCount = users.size();
+
+        // 武器侧统计
+        Map<String, Integer> countByCode = new LinkedHashMap<>();
+        Map<String, Long> revenueByCode = new LinkedHashMap<>();
+        for (WeaponCatalog.Weapon w : WeaponCatalog.all()) {
+            countByCode.put(w.code, 0);
+            revenueByCode.put(w.code, 0L);
+        }
+        long revenue = 0;
+        for (AgentWeapon aw : all) {
+            String code = aw.getWeaponCode();
+            WeaponCatalog.Weapon w = WeaponCatalog.find(code);
+            int price = w == null ? 0 : w.price;
+            revenue += price;
+            countByCode.merge(code, 1, Integer::sum);
+            revenueByCode.merge(code, (long) price, Long::sum);
+        }
+
+        List<Map<String, Object>> weapons = new ArrayList<>();
+        for (WeaponCatalog.Weapon w : WeaponCatalog.all()) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("code", w.code);
+            m.put("name", w.name);
+            m.put("category", w.category);
+            m.put("price", w.price);
+            m.put("req_level", w.level);
+            m.put("count", countByCode.getOrDefault(w.code, 0));
+            m.put("revenue", revenueByCode.getOrDefault(w.code, 0L));
+            weapons.add(m);
+        }
+        weapons.sort((a, b) -> Integer.compare((int) b.get("count"), (int) a.get("count")));
+
+        List<Map<String, Object>> recent = new ArrayList<>();
+        for (int i = 0; i < Math.min(12, all.size()); i++) {
+            AgentWeapon aw = all.get(i);
+            WeaponCatalog.Weapon w = WeaponCatalog.find(aw.getWeaponCode());
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", aw.getId());
+            m.put("user_id", aw.getUserId());
+            m.put("user_name", aw.getUserName() == null || aw.getUserName().isBlank()
+                    ? ("#" + aw.getUserId()) : aw.getUserName());
+            m.put("weapon_code", aw.getWeaponCode());
+            m.put("weapon_name", aw.getWeaponName() == null || aw.getWeaponName().isBlank()
+                    ? (w == null ? aw.getWeaponCode() : w.name) : aw.getWeaponName());
+            m.put("price", w == null ? 0 : w.price);
+            m.put("time", aw.getCreateTime() == null ? "" : aw.getCreateTime().format(FMT));
+            recent.add(m);
+        }
+
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("累计购枪", all.size());
+        summary.put("累计消费", revenue);
+        summary.put("信用点总量", creditSum);
+        summary.put("人均持有", userCount == 0 ? "0" : String.format("%.1f", all.size() * 1.0 / userCount));
+        summary.put("人均等级", userCount == 0 ? "0" : String.format("%.1f", levelSum * 1.0 / userCount));
+        summary.put("最高等级", topLevel);
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("summary", summary);
+        data.put("weapons", weapons);
+        data.put("recent", recent);
+        data.put("userCount", userCount);
+        return data;
     }
 
     /* ================= 档案（agent_archive） ================= */

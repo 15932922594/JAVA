@@ -16,6 +16,8 @@ import AuthPanel from './components/AuthPanel.vue'
 import AppToast from './components/AppToast.vue'
 import HomePage from './components/home/HomePage.vue'
 import ArchivePage from './components/home/ArchivePage.vue'
+import ArmoryPage from './components/home/ArmoryPage.vue'
+import ArenaPage from './components/home/ArenaPage.vue'
 import IntelPage from './components/home/IntelPage.vue'
 import MissionsPage from './components/home/MissionsPage.vue'
 import RangeGamePage from './components/home/RangeGamePage.vue'
@@ -149,6 +151,13 @@ onBeforeUnmount(() => clearTimeout(flashTimer))
     title="武器库"
     name-en="ARSENAL"
   />
+
+  <!-- ---------- 军械商店（信用点购买武器） ---------- -->
+  <ArmoryPage v-else-if="view === 'armory'" />
+
+  <!-- ---------- 竞技场（好友 / 排行榜 / 装备 / 切磋） ---------- -->
+  <ArenaPage v-else-if="view === 'arena'" />
+
   <!-- 作战任务：独立的可交互任务作战台（接取 / 勾选目标 / 结算） -->
   <MissionsPage v-else-if="view === 'missions'" />
 

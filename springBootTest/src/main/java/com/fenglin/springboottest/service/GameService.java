@@ -1,12 +1,17 @@
 package com.fenglin.springboottest.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fenglin.springboottest.common.HeroLevel;
+import com.fenglin.springboottest.common.WeaponCatalog;
+import com.fenglin.springboottest.entity.AgentUser;
 import com.fenglin.springboottest.entity.GameRecord;
 import com.fenglin.springboottest.entity.MissionBrief;
 import com.fenglin.springboottest.entity.MissionProgress;
+import com.fenglin.springboottest.mapper.AgentUserMapper;
 import com.fenglin.springboottest.mapper.GameRecordMapper;
 import com.fenglin.springboottest.mapper.MissionBriefMapper;
 import com.fenglin.springboottest.mapper.MissionProgressMapper;
@@ -49,10 +54,15 @@ public class GameService extends ServiceImpl<GameRecordMapper, GameRecord> {
 
     private final MissionBriefMapper briefMapper;
     private final MissionProgressMapper progressMapper;
+    private final AgentUserMapper userMapper;
+    private final HeroLevelService levelService;
 
-    public GameService(MissionBriefMapper briefMapper, MissionProgressMapper progressMapper) {
+    public GameService(MissionBriefMapper briefMapper, MissionProgressMapper progressMapper,
+                       AgentUserMapper userMapper, HeroLevelService levelService) {
         this.briefMapper = briefMapper;
         this.progressMapper = progressMapper;
+        this.userMapper = userMapper;
+        this.levelService = levelService;
     }
 
     /* ==========================================================
@@ -83,6 +93,19 @@ public class GameService extends ServiceImpl<GameRecordMapper, GameRecord> {
         r.setCreateTime(LocalDateTime.now());
         save(r);
 
+        // 训练奖励一：信用点（得分 ÷ 10，区间 [1, 200]）
+        int reward = Math.max(WeaponCatalog.CREDIT_REWARD_MIN,
+                Math.min(WeaponCatalog.CREDIT_REWARD_MAX, r.getScore() / 10));
+        AgentUser u = userMapper.selectById(userId);
+        int credits = (u == null || u.getCredits() == null ? 0 : u.getCredits()) + reward;
+        userMapper.update(null, new UpdateWrapper<AgentUser>()
+                .eq("id", userId)
+                .set("credits", credits));
+
+        // 训练奖励二：经验值（得分 ÷ 20，单局上限 100），升级时额外发信用点
+        Map<String, Object> levelInfo = levelService.gain(userId,
+                HeroLevel.expFromScore(r.getScore()), null);
+
         // 自动完成匹配的作战任务目标
         List<String> completed = autoCompleteMissions(userId, m, totalUnits(userId, m));
 
@@ -90,6 +113,11 @@ public class GameService extends ServiceImpl<GameRecordMapper, GameRecord> {
         data.put("record", toItem(r, true));
         data.put("stats", stats(userId));
         data.put("missionCompleted", completed);
+        data.put("creditsEarned", reward);
+        // 升级奖励会再追加信用点：有升级就以 gain() 返回的最终余额为准
+        Object afterLevel = levelInfo.get("credits");
+        data.put("credits", afterLevel instanceof Number n ? n.intValue() : credits);
+        data.put("level", levelInfo);
         return data;
     }
 

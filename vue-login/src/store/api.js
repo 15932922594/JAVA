@@ -74,7 +74,7 @@ export const homeCategories = (token) => post('/api/home/categories', { token })
 
 /**
  * 档案详情（点击卡片展开）
- * 比检索列表多返回 story（人物故事，长文本）
+ * 比检索列表多返回 story（故事长文本：人物故事 / 枪械故事 / 地图故事）
  */
 export const homeDetail = (token, code) => post('/api/home/detail', { token, code })
 
@@ -169,6 +169,60 @@ export const gameStats = (token) => post('/api/game/stats', { token })
 export const gameRecords = (token, limit = 10) => post('/api/game/records', { token, limit })
 
 /* ============================================================
+   军械商店 —— 后端 ArmoryController
+   ------------------------------------------------------------
+   表：agent_user（credits/hero_level 字段）+ agent_weapon（已购武器）
+   建表脚本：springBootTest/sql/armory.sql
+   ============================================================ */
+
+/** 商店页数据：余额 / 英雄等级 / 武器目录（含已拥有标记） */
+export const armory = (token) => post('/api/game/armory', { token })
+
+/** 购买武器（扣信用点）。失败码：unknown-weapon / already-owned / not-enough-credits */
+export const armoryBuy = (token, code) => post('/api/game/armory/buy', { token, code })
+
+/** 装备主武器（影响战力）。失败码：unknown-weapon / not-owned / level-too-low */
+export const armoryEquip = (token, code) => post('/api/game/armory/equip', { token, code })
+
+/* ============================================================
+   社交 / 竞技 —— 后端 SocialController
+   ------------------------------------------------------------
+   表：agent_friend（好友关系，PENDING / ACCEPTED）/ agent_pk（PK 战绩）
+       agent_user（equipped_weapon / pk_win / pk_lose）
+   建表脚本：springBootTest/sql/social.sql
+   ============================================================ */
+
+/** 好友面板：好友列表 / 收到的申请 / 我发出的申请 / 我的资料卡 */
+export const socialFriends = (token) => post('/api/social/friends', { token })
+
+/** 按代号搜索玩家（结果带 relation：friend / out / in / none） */
+export const socialSearch = (token, q) => post('/api/social/search', { token, q })
+
+/** 发送好友申请。失败码：self / notfound / already-friend / already-sent / already-received */
+export const socialRequest = (token, targetId) => post('/api/social/request', { token, targetId })
+
+/** 同意好友申请（rowId 为申请行 id） */
+export const socialAccept = (token, rowId) => post('/api/social/accept', { token, rowId })
+
+/** 拒绝好友申请 */
+export const socialReject = (token, rowId) => post('/api/social/reject', { token, rowId })
+
+/** 删除好友（双向） */
+export const socialRemove = (token, friendId) => post('/api/social/remove', { token, friendId })
+
+/** 战力排行榜（前 50 + 我的名次） */
+export const socialRank = (token) => post('/api/social/rank', { token })
+
+/** 与任意特工自动 PK（排行榜上的任何人都可以挑战）。失败码：self / notfound / daily-limit */
+export const socialPk = (token, targetId) => post('/api/social/pk', { token, targetId })
+
+/** 佩戴头像框（tier = 0 跟随最新解锁；未解锁的档位返回 frame-locked） */
+export const socialFrame = (token, tier) => post('/api/social/frame', { token, tier })
+
+/** 我的 PK 战绩（最近 N 条） */
+export const socialLogs = (token, limit = 20) => post('/api/social/logs', { token, limit })
+
+/* ============================================================
    找回密码 + RIOT 第三方登录 —— 后端 AuthController
    ------------------------------------------------------------
    表：agent_reset_code（验证码）/ agent_oauth（绑定与授权票据）
@@ -215,6 +269,9 @@ export const adminChangePass = (token, oldPass, newPass) =>
 
 /** 后台统计：各表记录数 */
 export const adminStats = (token) => post('/api/admin/stats', { token })
+
+/** 军械经济统计：累计购枪 / 消费 / 武器销量 / 最近购买 */
+export const adminArmoryStats = (token) => post('/api/admin/armory/stats', { token })
 
 /** 档案列表 */
 export const adminArchiveList = (token, params = {}) =>

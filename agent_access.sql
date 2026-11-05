@@ -1,17 +1,17 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : localhost_3306
+ Source Server         : 数据库
  Source Server Type    : MySQL
- Source Server Version : 80039 (8.0.39)
+ Source Server Version : 80409 (8.4.9)
  Source Host           : localhost:3306
  Source Schema         : agent_access
 
  Target Server Type    : MySQL
- Target Server Version : 80039 (8.0.39)
+ Target Server Version : 80409 (8.4.9)
  File Encoding         : 65001
 
- Date: 02/11/2026 09:56:40
+ Date: 05/11/2026 22:28:34
 */
 
 SET NAMES utf8mb4;
@@ -32,7 +32,7 @@ CREATE TABLE `admin_log`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_admin`(`admin_id` ASC) USING BTREE,
   INDEX `idx_time`(`create_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '后台操作日志' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '后台操作日志' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of admin_log
@@ -52,6 +52,9 @@ INSERT INTO `admin_log` VALUES (12, 6, 'UIADMIN', 'admin', 'LOGIN', '管理员�
 INSERT INTO `admin_log` VALUES (13, 8, 'UICHK', 'admin', 'LOGIN', '管理员登录：UICHK', '2026-10-29 15:00:05');
 INSERT INTO `admin_log` VALUES (14, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-10-29 15:03:10');
 INSERT INTO `admin_log` VALUES (15, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-02 08:58:33');
+INSERT INTO `admin_log` VALUES (16, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-05 13:58:46');
+INSERT INTO `admin_log` VALUES (17, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-05 18:50:37');
+INSERT INTO `admin_log` VALUES (18, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-05 21:58:10');
 
 -- ----------------------------
 -- Table structure for admin_user
@@ -116,26 +119,49 @@ CREATE TABLE `agent_archive`  (
 -- ----------------------------
 -- Records of agent_archive
 -- ----------------------------
-INSERT INTO `agent_archive` VALUES (1, 'AGENT', 'ASSAULT', 'S', 'vector', 'VECTOR', '捷风', 'V', '#FF4655', '以极高机动性撕裂防线的突进型特工，擅长在瞬间改写交火态势。', '档案解密等级：S。\n\n VECTOR 原是环城竞速联盟最年轻的冠军车手，一场针对护送车队的伏击改变了她的轨迹——她以 217km/h 的极速连穿三道封锁线，把十二名伤员从火线上完整带回。战后审查官问她凭什么敢那样开，她只回了一句：「速度就是我的掩体。」\n\n 入队三年，她的突入记录无人打破：从破墙到占点，平均用时 1.7 秒。教官在评语栏里写：她不是在冲锋，是在瞬移。', '[\n    {\"slot\":\"Q\",\"name\":\"相位突进\",\"desc\":\"向准星方向瞬间位移一小段，用来抢点、拉枪线或脱离交叉火力。\"},\n    {\"slot\":\"E\",\"name\":\"破障射线\",\"desc\":\"放出一道穿透射线，短暂削弱命中敌人的护甲，正面硬刚更占便宜。\"},\n    {\"slot\":\"X\",\"name\":\"矢量过载\",\"desc\":\"短时疾行且移动射击精度不下降，适合一口气撕开一道防线。\"}\n  ]', '/agents/vector.png', 92, 76, 44, 38, 98, 1, 10, 1, '2026-10-28 16:35:52', '2026-10-29 14:20:26');
-INSERT INTO `agent_archive` VALUES (2, 'AGENT', 'RECON', 'A', 'arclight', 'ARCLIGHT', '蝰蛇', 'A', '#00E0C6', '用电弧脉冲扫描战场，为队伍点亮迷雾中的每一个目标。', '档案解密等级：A。\n\n ARCLIGHT 曾是深空监听站的值守员，在长达四年的孤站生活里，他练就了从宇宙噪声中分辨一句耳语的耐心。一次例行检修中，他从一段被判定为背景辐射的信号里，还原出敌方跳频通讯的完整频率表，整个战区的预警时间因此提前了十一分钟。\n\n 如今他把监听天线换成了电弧脉冲，战场在他眼中是一张不断刷新的点云图。队友的说法更直接：「他开枪之前，地图早就打完了。」', '[\n    {\"slot\":\"Q\",\"name\":\"电弧脉冲\",\"desc\":\"向身前扇区释放脉冲，被命中的敌人轮廓会被标记，隔着墙也能看见。\"},\n    {\"slot\":\"E\",\"name\":\"全域扫描\",\"desc\":\"一次性点亮附近区域的敌人位置，持续时间短，进点前摸站位最好用。\"},\n    {\"slot\":\"X\",\"name\":\"电网陷阱\",\"desc\":\"布下电网，敌人经过会被减速并暴露位置，兼顾封锁与预警。\"}\n  ]', '/agents/arclight.png', 58, 86, 72, 46, 91, 1, 11, 1, '2026-10-28 16:35:52', '2026-10-29 14:21:08');
-INSERT INTO `agent_archive` VALUES (3, 'AGENT', 'CONTROL', 'S', 'phantom', 'PHANTOM', '幽影', 'P', '#A66CFF', '制造幻象与烟幕，掌控每一次交火的节奏与视野。', '档案解密等级：S。\n\n 关于 PHANTOM 的入职档案只有一页，且一半被涂黑。已知信息：他曾在敌后情报部门服役九年，执行过十七次任务，无一次留下影像记录；他的上一任搭档坚称自己从未见过他的正脸。\n\n 他从不解释能力原理，只留下一句被全体队员记住的话：「你们看到的，是我想让你们看到的。」第一次和他在训练场对枪的人，最后都在朝空气开火。', '[\n    {\"slot\":\"Q\",\"name\":\"幻影分身\",\"desc\":\"生成一个向前走的分身诱饵，用来骗第一枪、确认敌人架在哪。\"},\n    {\"slot\":\"E\",\"name\":\"遮断烟幕\",\"desc\":\"在指定位置落下烟幕切断视野，进点、拆包、撤退都靠它。\"},\n    {\"slot\":\"X\",\"name\":\"错觉领域\",\"desc\":\"大范围幻象区，敌人视野受阻且分不清真假身，能强行改写交火节奏。\"}\n  ]', '/agents/phantom.png', 52, 74, 93, 50, 95, 1, 12, 1, '2026-10-28 16:35:52', '2026-10-29 14:20:54');
-INSERT INTO `agent_archive` VALUES (4, 'AGENT', 'SENTINEL', 'A', 'onyx', 'ONYX', '壹决', 'O', '#FFB443', '以坚固壁垒庇护队友，是阵地攻防中不可撼动的支点。', '档案解密等级：B。\n\n ONYX 是全队唯一拒绝佩枪的特工。他曾是一支山地救援队的队长，在一次雪崩中用身体撑住坍塌的冰缝整整四十分钟，让七名被困者全部脱险——他的左肩里至今留着三枚钢钉，阴雨天会替他记住那天的气温。\n\n 入队后，他把「守住」变成了战术：他站的防线没有后退这个词。指挥部对他的评估只有一行字：把任何交火地点，变成我方主场。', '[\n    {\"slot\":\"Q\",\"name\":\"岩壁屏障\",\"desc\":\"竖起一道可再生的墙体，封住通路或专门挡对面狙击的枪线。\"},\n    {\"slot\":\"E\",\"name\":\"哨位陷阱\",\"desc\":\"布置自动预警装置，敌人靠近就减速并暴露位置。\"},\n    {\"slot\":\"X\",\"name\":\"壁垒成型\",\"desc\":\"短时间展开加固防线，站在后面的队友受到的伤害明显减少。\"}\n  ]', '/agents/onyx.png', 46, 52, 64, 96, 88, 1, 13, 1, '2026-10-28 16:35:52', '2026-10-29 14:21:20');
-INSERT INTO `agent_archive` VALUES (5, 'AGENT', 'CONTROL', 'A', 'tempest', 'TEMPEST', '海神', 'T', '#4DA6FF', '召唤风暴封锁通路，让敌人在自己的领地寸步难行。', '档案解密等级：A。\n\n TEMPEST 出生在气旋观测船「信风号」上，整个童年在风暴眼里度过。十六岁那年，她用自己的气象模型提前六小时预报了一场被官方判定「不可能生成」的台风，救下了一整座港口。\n\n 现在她召唤的风暴只封锁一件东西：敌人的退路。被她控住过通道的对手给出了一致评价：宁可绕路三公里。', '[\n    {\"slot\":\"Q\",\"name\":\"强风幕墙\",\"desc\":\"生成一堵风墙，敌人穿行时视野受损、移速下降。\"},\n    {\"slot\":\"E\",\"name\":\"乱流推挤\",\"desc\":\"用气流把敌人推向一侧，强行打乱他站位，为队友拉出击杀窗口。\"},\n    {\"slot\":\"X\",\"name\":\"风暴中心\",\"desc\":\"在一片区域降下持续风暴，长时间封锁通路，拖延或守点时极强。\"}\n  ]', '/agents/tempest.png', 54, 70, 90, 62, 84, 0, 14, 1, '2026-10-28 16:35:52', '2026-10-29 14:21:34');
-INSERT INTO `agent_archive` VALUES (6, 'AGENT', 'ASSAULT', 'B', 'ember', 'EMBER', '尚博乐', 'E', '#FF6B4A', '以烈焰灼烧前线的爆发型特工，高风险，也高回报。', '档案解密等级：S。\n\n EMBER 的档案从一个失败开始：爆破课程三次不及格，理由都是「当量超出教学大纲上限」。教官最后在评语里写：这不是学不会，是不甘心只炸那么大。\n\n 他是全队公认的疯子，也是公认的幸运儿——七次被判定「阵亡」的战报，七次都活着回来了。他的战前动员只有一句话：「烧完这把，就赢了。」', '[\n    {\"slot\":\"Q\",\"name\":\"燃焰喷发\",\"desc\":\"近距离喷射火焰，专门清理两个人就得挤过去的窄通道。\"},\n    {\"slot\":\"E\",\"name\":\"火墙封路\",\"desc\":\"在地面拉出一段火墙，穿过的敌人持续掉血，逼他们改路线。\"},\n    {\"slot\":\"X\",\"name\":\"燃尽冲刺\",\"desc\":\"自身短暂燃烧，移速和换弹大幅加快，代价是血量持续下降。\"}\n  ]', '/agents/ember.png', 90, 64, 52, 54, 79, 0, 15, 1, '2026-10-28 16:35:52', '2026-10-29 14:21:45');
-INSERT INTO `agent_archive` VALUES (7, 'GEAR', 'RIFLE', 'S', 'vandal', 'VANDAL', '姝蕊', 'V', '#FF4655', '高伤害全自动步枪，远距离头部一枪致命，正面交火的标杆。', '流水线上的第一支 VANDAL 编号 V-0001，至今仍在一线服役，其命中率常年霸榜军械库。', '[\n    {\"slot\":\"优势\",\"name\":\"任意距离一枪爆头\",\"desc\":\"不管多远，打中头就是秒杀，远距离对枪的标杆。\"},\n    {\"slot\":\"优势\",\"name\":\"伤害不衰减\",\"desc\":\"远距离伤害没有距离惩罚，架点可以完全不考虑站位深度。\"},\n    {\"slot\":\"代价\",\"name\":\"后坐大\",\"desc\":\"连射很飘，要点射、要压枪，不适合闭着眼泼。\"}\n  ]', '/agents/vandal.png', 88, 52, 40, 30, 96, 1, 20, 1, '2026-10-28 16:35:52', '2026-10-28 16:55:36');
-INSERT INTO `agent_archive` VALUES (8, 'GEAR', 'RIFLE', 'A', 'phantom-w', 'PHANTOM-W', '狂徒', 'P', '#A66CFF', '消音步枪，后坐可控，适合中距离压制与隐蔽推进。', '消音组件让它被称作「听不见的死神」，每一支出厂前都要在静音舱里过最后一道检测。', '[\n    {\"slot\":\"优势\",\"name\":\"消音\",\"desc\":\"开枪不会暴露自己的位置提示，隔着烟打人对方很难反查。\"},\n    {\"slot\":\"优势\",\"name\":\"后坐可控\",\"desc\":\"连发比劫掠者柔和得多，中距离压枪一串很稳。\"},\n    {\"slot\":\"代价\",\"name\":\"远距离衰减\",\"desc\":\"超过中远距离伤害明显下降，远点不如劫掠者。\"}\n  ]', '/agents/phantom-w.png', 76, 66, 52, 34, 90, 0, 21, 1, '2026-10-28 16:35:52', '2026-10-28 16:56:23');
-INSERT INTO `agent_archive` VALUES (9, 'GEAR', 'SMG', 'A', 'spectre', 'SPECTRE', '幻影', 'S', '#00E0C6', '高射速冲锋枪，近距离泼洒压制，经济局的性价比之选。', '经济局之王。老队员的说法：手头紧的时候，SPECTRE 比勇气可靠。', '[\n    {\"slot\":\"优势\",\"name\":\"高射速泼洒\",\"desc\":\"近距离短时间叠出成吨伤害，贴上脸几乎必胜。\"},\n    {\"slot\":\"优势\",\"name\":\"跑打稳定\",\"desc\":\"移动射击散布小，边走边输出也不至于全飘。\"},\n    {\"slot\":\"代价\",\"name\":\"距离衰减\",\"desc\":\"稍微远一点伤害就掉，中远距离基本打不动。\"}\n  ]', '/agents/spectre.png', 70, 74, 44, 28, 82, 0, 22, 1, '2026-10-28 16:35:52', '2026-10-28 16:53:17');
+INSERT INTO `agent_archive` VALUES (1, 'AGENT', 'ASSAULT', 'S', 'vector', 'Jett', '捷风', 'V', '#FF4655', '以极高机动性撕裂防线的突进型特工，擅长在瞬间改写交火态势。', '档案解密等级：S。\n\n VECTOR 原是环城竞速联盟最年轻的冠军车手，一场针对护送车队的伏击改变了她的轨迹——她以 217km/h 的极速连穿三道封锁线，把十二名伤员从火线上完整带回。战后审查官问她凭什么敢那样开，她只回了一句：「速度就是我的掩体。」\n\n 入队三年，她的突入记录无人打破：从破墙到占点，平均用时 1.7 秒。教官在评语栏里写：她不是在冲锋，是在瞬移。', '[\n    {\"slot\":\"Q\",\"name\":\"相位突进\",\"desc\":\"向准星方向瞬间位移一小段，用来抢点、拉枪线或脱离交叉火力。\"},\n    {\"slot\":\"E\",\"name\":\"破障射线\",\"desc\":\"放出一道穿透射线，短暂削弱命中敌人的护甲，正面硬刚更占便宜。\"},\n    {\"slot\":\"X\",\"name\":\"矢量过载\",\"desc\":\"短时疾行且移动射击精度不下降，适合一口气撕开一道防线。\"}\n  ]', '/agents/vector.png', 92, 76, 44, 38, 98, 1, 10, 1, '2026-10-28 16:35:52', '2026-11-05 14:53:13');
+INSERT INTO `agent_archive` VALUES (2, 'AGENT', 'RECON', 'A', 'arclight', 'Viper', '蝰蛇', 'A', '#00E0C6', '用电弧脉冲扫描战场，为队伍点亮迷雾中的每一个目标。', '档案解密等级：A。\n\n ARCLIGHT 曾是深空监听站的值守员，在长达四年的孤站生活里，他练就了从宇宙噪声中分辨一句耳语的耐心。一次例行检修中，他从一段被判定为背景辐射的信号里，还原出敌方跳频通讯的完整频率表，整个战区的预警时间因此提前了十一分钟。\n\n 如今他把监听天线换成了电弧脉冲，战场在他眼中是一张不断刷新的点云图。队友的说法更直接：「他开枪之前，地图早就打完了。」', '[\n    {\"slot\":\"Q\",\"name\":\"电弧脉冲\",\"desc\":\"向身前扇区释放脉冲，被命中的敌人轮廓会被标记，隔着墙也能看见。\"},\n    {\"slot\":\"E\",\"name\":\"全域扫描\",\"desc\":\"一次性点亮附近区域的敌人位置，持续时间短，进点前摸站位最好用。\"},\n    {\"slot\":\"X\",\"name\":\"电网陷阱\",\"desc\":\"布下电网，敌人经过会被减速并暴露位置，兼顾封锁与预警。\"}\n  ]', '/agents/arclight.png', 58, 86, 72, 46, 91, 1, 11, 1, '2026-10-28 16:35:52', '2026-11-05 14:53:26');
+INSERT INTO `agent_archive` VALUES (3, 'AGENT', 'CONTROL', 'S', 'phantom', 'Omen', '幽影', 'P', '#A66CFF', '制造幻象与烟幕，掌控每一次交火的节奏与视野。', '档案解密等级：S。\n\n 关于 PHANTOM 的入职档案只有一页，且一半被涂黑。已知信息：他曾在敌后情报部门服役九年，执行过十七次任务，无一次留下影像记录；他的上一任搭档坚称自己从未见过他的正脸。\n\n 他从不解释能力原理，只留下一句被全体队员记住的话：「你们看到的，是我想让你们看到的。」第一次和他在训练场对枪的人，最后都在朝空气开火。', '[\n    {\"slot\":\"Q\",\"name\":\"幻影分身\",\"desc\":\"生成一个向前走的分身诱饵，用来骗第一枪、确认敌人架在哪。\"},\n    {\"slot\":\"E\",\"name\":\"遮断烟幕\",\"desc\":\"在指定位置落下烟幕切断视野，进点、拆包、撤退都靠它。\"},\n    {\"slot\":\"X\",\"name\":\"错觉领域\",\"desc\":\"大范围幻象区，敌人视野受阻且分不清真假身，能强行改写交火节奏。\"}\n  ]', '/agents/phantom.png', 52, 74, 93, 50, 95, 1, 12, 1, '2026-10-28 16:35:52', '2026-11-05 14:53:40');
+INSERT INTO `agent_archive` VALUES (4, 'AGENT', 'SENTINEL', 'A', 'onyx', 'Iso', '壹决', 'O', '#FFB443', '以坚固壁垒庇护队友，是阵地攻防中不可撼动的支点。', '档案解密等级：B。\n\n ONYX 是全队唯一拒绝佩枪的特工。他曾是一支山地救援队的队长，在一次雪崩中用身体撑住坍塌的冰缝整整四十分钟，让七名被困者全部脱险——他的左肩里至今留着三枚钢钉，阴雨天会替他记住那天的气温。\n\n 入队后，他把「守住」变成了战术：他站的防线没有后退这个词。指挥部对他的评估只有一行字：把任何交火地点，变成我方主场。', '[\n    {\"slot\":\"Q\",\"name\":\"岩壁屏障\",\"desc\":\"竖起一道可再生的墙体，封住通路或专门挡对面狙击的枪线。\"},\n    {\"slot\":\"E\",\"name\":\"哨位陷阱\",\"desc\":\"布置自动预警装置，敌人靠近就减速并暴露位置。\"},\n    {\"slot\":\"X\",\"name\":\"壁垒成型\",\"desc\":\"短时间展开加固防线，站在后面的队友受到的伤害明显减少。\"}\n  ]', '/agents/onyx.png', 46, 52, 64, 96, 88, 1, 13, 1, '2026-10-28 16:35:52', '2026-11-05 14:53:55');
+INSERT INTO `agent_archive` VALUES (5, 'AGENT', 'CONTROL', 'A', 'tempest', 'Harbor', '海神', 'T', '#4DA6FF', '召唤风暴封锁通路，让敌人在自己的领地寸步难行。', '档案解密等级：A。\n\n TEMPEST 出生在气旋观测船「信风号」上，整个童年在风暴眼里度过。十六岁那年，她用自己的气象模型提前六小时预报了一场被官方判定「不可能生成」的台风，救下了一整座港口。\n\n 现在她召唤的风暴只封锁一件东西：敌人的退路。被她控住过通道的对手给出了一致评价：宁可绕路三公里。', '[\n    {\"slot\":\"Q\",\"name\":\"强风幕墙\",\"desc\":\"生成一堵风墙，敌人穿行时视野受损、移速下降。\"},\n    {\"slot\":\"E\",\"name\":\"乱流推挤\",\"desc\":\"用气流把敌人推向一侧，强行打乱他站位，为队友拉出击杀窗口。\"},\n    {\"slot\":\"X\",\"name\":\"风暴中心\",\"desc\":\"在一片区域降下持续风暴，长时间封锁通路，拖延或守点时极强。\"}\n  ]', '/agents/tempest.png', 54, 70, 90, 62, 84, 0, 14, 1, '2026-10-28 16:35:52', '2026-11-05 14:54:07');
+INSERT INTO `agent_archive` VALUES (6, 'AGENT', 'ASSAULT', 'B', 'ember', 'Phoenix', '不死鸟', 'E', '#FF6B4A', '以烈焰灼烧前线的爆发型特工，高风险，也高回报。', '档案解密等级：S。\n\n EMBER 的档案从一个失败开始：爆破课程三次不及格，理由都是「当量超出教学大纲上限」。教官最后在评语里写：这不是学不会，是不甘心只炸那么大。\n\n 他是全队公认的疯子，也是公认的幸运儿——七次被判定「阵亡」的战报，七次都活着回来了。他的战前动员只有一句话：「烧完这把，就赢了。」', '[\n    {\"slot\":\"Q\",\"name\":\"燃焰喷发\",\"desc\":\"近距离喷射火焰，专门清理两个人就得挤过去的窄通道。\"},\n    {\"slot\":\"E\",\"name\":\"火墙封路\",\"desc\":\"在地面拉出一段火墙，穿过的敌人持续掉血，逼他们改路线。\"},\n    {\"slot\":\"X\",\"name\":\"燃尽冲刺\",\"desc\":\"自身短暂燃烧，移速和换弹大幅加快，代价是血量持续下降。\"}\n  ]', '/agents/ember.png', 90, 64, 52, 54, 79, 0, 15, 1, '2026-10-28 16:35:52', '2026-11-05 14:54:17');
+INSERT INTO `agent_archive` VALUES (7, 'GEAR', 'RIFLE', 'S', 'vandal', 'Guardian', '戍卫', 'V', '#FF4655', '高伤害全自动步枪，远距离头部一枪致命，正面交火的标杆。', '流水线上的第一支 VANDAL 编号 V-0001，至今仍在一线服役，其命中率常年霸榜军械库。', '[\n    {\"slot\":\"优势\",\"name\":\"任意距离一枪爆头\",\"desc\":\"不管多远，打中头就是秒杀，远距离对枪的标杆。\"},\n    {\"slot\":\"优势\",\"name\":\"伤害不衰减\",\"desc\":\"远距离伤害没有距离惩罚，架点可以完全不考虑站位深度。\"},\n    {\"slot\":\"代价\",\"name\":\"后坐大\",\"desc\":\"连射很飘，要点射、要压枪，不适合闭着眼泼。\"}\n  ]', '/agents/vandal.png', 88, 52, 40, 30, 96, 1, 20, 1, '2026-10-28 16:35:52', '2026-11-05 14:55:54');
+INSERT INTO `agent_archive` VALUES (8, 'GEAR', 'RIFLE', 'A', 'phantom-w', 'Vandal', '狂徒', 'P', '#A66CFF', '消音步枪，后坐可控，适合中距离压制与隐蔽推进。', '消音组件让它被称作「听不见的死神」，每一支出厂前都要在静音舱里过最后一道检测。', '[\n    {\"slot\":\"优势\",\"name\":\"消音\",\"desc\":\"开枪不会暴露自己的位置提示，隔着烟打人对方很难反查。\"},\n    {\"slot\":\"优势\",\"name\":\"后坐可控\",\"desc\":\"连发比劫掠者柔和得多，中距离压枪一串很稳。\"},\n    {\"slot\":\"代价\",\"name\":\"远距离衰减\",\"desc\":\"超过中远距离伤害明显下降，远点不如劫掠者。\"}\n  ]', '/agents/phantom-w.png', 76, 66, 52, 34, 90, 0, 21, 1, '2026-10-28 16:35:52', '2026-11-05 14:56:17');
+INSERT INTO `agent_archive` VALUES (9, 'GEAR', 'SMG', 'A', 'spectre', 'Phantom', '幻影', 'S', '#00E0C6', '高射速冲锋枪，近距离泼洒压制，经济局的性价比之选。', '经济局之王。老队员的说法：手头紧的时候，SPECTRE 比勇气可靠。', '[\n    {\"slot\":\"优势\",\"name\":\"高射速泼洒\",\"desc\":\"近距离短时间叠出成吨伤害，贴上脸几乎必胜。\"},\n    {\"slot\":\"优势\",\"name\":\"跑打稳定\",\"desc\":\"移动射击散布小，边走边输出也不至于全飘。\"},\n    {\"slot\":\"代价\",\"name\":\"距离衰减\",\"desc\":\"稍微远一点伤害就掉，中远距离基本打不动。\"}\n  ]', '/agents/spectre.png', 70, 74, 44, 28, 82, 0, 22, 1, '2026-10-28 16:35:52', '2026-11-05 14:50:33');
 INSERT INTO `agent_archive` VALUES (10, 'GEAR', 'SNIPER', 'S', 'operator', 'OPERATOR', '冥狙', 'O', '#FFB443', '一击必杀的重型狙击枪，架点封锁整条通路的终极答案。', '每一支 OPERATOR 的镜桥都由匠人手工校准，编号刻在枪托内侧，遗失即全员追责。', '[\n    {\"slot\":\"优势\",\"name\":\"一枪必杀\",\"desc\":\"打中躯干直接终结，哪怕打腿也是重伤。\"},\n    {\"slot\":\"优势\",\"name\":\"封锁通路\",\"desc\":\"一个人架枪就能封死整条主路，对面必须花道具强行开。\"},\n    {\"slot\":\"代价\",\"name\":\"贵且笨重\",\"desc\":\"价格高、移速慢、开镜慢，一旦掉枪代价巨大。\"}\n  ]', '/agents/operator.png', 99, 30, 36, 44, 93, 1, 23, 1, '2026-10-28 16:35:52', '2026-10-28 16:54:40');
 INSERT INTO `agent_archive` VALUES (11, 'GEAR', 'SNIPER', 'B', 'marshal', 'MARSHAL', '鸟狙', 'M', '#4DA6FF', '轻型狙击枪，机动性更好，命中躯干即可终结交火。', '西部时代的精神续作。MARSHAL 的准星上没有多余的花纹，因为它只服务一件事。', '[\n    {\"slot\":\"优势\",\"name\":\"轻便好上手\",\"desc\":\"比战神便宜也轻得多，转移和补点灵活得多。\"},\n    {\"slot\":\"优势\",\"name\":\"躯干终结\",\"desc\":\"胸腹以上一枪致命，中距离一枪一个。\"},\n    {\"slot\":\"代价\",\"name\":\"容错低\",\"desc\":\"打腿杀不掉，开镜后不能连发，节奏慢。\"}\n  ]', '/agents/marshal.png', 82, 58, 40, 36, 71, 0, 24, 1, '2026-10-28 16:35:52', '2026-10-28 16:53:26');
 INSERT INTO `agent_archive` VALUES (12, 'GEAR', 'SIDEARM', 'B', 'classic', 'CLASSIC', '标配', 'C', '#FF6B4A', '开局标配手枪，右键三连发在贴脸距离拥有惊喜爆发。', '所有人拿到的第一支枪。训练营墙上的标语：CLASSIC 用得好，你缺的从来不是枪。', '[\n    {\"slot\":\"优势\",\"name\":\"开局自带\",\"desc\":\"每回合白给，经济落后时最稳的兜底武器。\"},\n    {\"slot\":\"优势\",\"name\":\"右键三连\",\"desc\":\"贴脸三连发爆发很高，近距离容错极低。\"},\n    {\"slot\":\"代价\",\"name\":\"远距离无力\",\"desc\":\"超过中距离伤害骤降，别指望用它架远点。\"}\n  ]', '/agents/classic.png', 54, 60, 32, 26, 68, 0, 25, 1, '2026-10-28 16:35:52', '2026-10-28 16:53:41');
 INSERT INTO `agent_archive` VALUES (13, 'GEAR', 'SIDEARM', 'A', 'sheriff', 'SHERIFF', '正义', 'H', '#FF4655', '高伤害左轮，一发入魂，是翻盘局最廉价的希望。', '赌徒的选择。一发命中叫翻盘，一发落空叫下班。', '[\n    {\"slot\":\"优势\",\"name\":\"躯干一枪\",\"desc\":\"打身子也是一枪致命，不用非得爆头。\"},\n    {\"slot\":\"优势\",\"name\":\"便宜高回报\",\"desc\":\"价格低但威力接近步枪，翻盘局最常见的选择。\"},\n    {\"slot\":\"代价\",\"name\":\"弹少且慢\",\"desc\":\"弹匣小、开火间隔长，空一枪就是致命失误。\"}\n  ]', '/agents/sheriff.png', 86, 50, 34, 30, 87, 0, 26, 1, '2026-10-28 16:35:52', '2026-10-28 16:53:51');
-INSERT INTO `agent_archive` VALUES (14, 'GEAR', 'RIFLE', 'A', 'odin', 'ODIN', '战神', 'D', '#00E0C6', '弹链供弹的重机枪，穿墙压制能力冠绝全场。', '代号来自北欧主神。士兵们说，它开火的时候，整条走廊都在替对面祈祷。', '[\n    {\"slot\":\"优势\",\"name\":\"弹链压制\",\"desc\":\"超大弹容持续输出，一个人就能压死一条通道。\"},\n    {\"slot\":\"优势\",\"name\":\"穿墙射击\",\"desc\":\"子弹能打穿墙体，可以直接透过掩体验证甚至击杀。\"},\n    {\"slot\":\"代价\",\"name\":\"又重又慢\",\"desc\":\"移速慢、开镜慢，架点无敌但被人绕后基本没救。\"}\n  ]', '/agents/odin.png', 94, 24, 58, 48, 80, 0, 27, 1, '2026-10-28 16:35:52', '2026-10-28 16:54:02');
-INSERT INTO `agent_archive` VALUES (15, 'MISSION', 'RANKED', 'A', 'ascent', 'ASCENT', '幽邃地窟', 'A', '#4DA6FF', '双点位地图，中路可开闭的闸门决定了整局的攻防节奏。', '高空平台 ASCENT 由旧轨道电梯中转站改建，中央闸门的开合至今沿用战前的机械逻辑。', NULL, '/missions/ascent.png', 62, 70, 66, 58, 92, 1, 30, 1, '2026-10-28 16:35:52', '2026-10-28 16:47:09');
-INSERT INTO `agent_archive` VALUES (16, 'MISSION', 'RANKED', 'S', 'bind', 'BIND', '天枢云阙', 'B', '#A66CFF', '无中路的双点图，两处单向传送门让绕后变得随心所欲。', 'BIND 的单向传送门是战前物流网络的遗产，如今搬运的只有子弹与坏消息。', NULL, '/missions/bind.png', 66, 78, 70, 54, 90, 0, 31, 1, '2026-10-28 16:35:52', '2026-10-28 16:48:03');
-INSERT INTO `agent_archive` VALUES (17, 'MISSION', 'RANKED', 'A', 'haven', 'HAVEN', '莲花古城', 'H', '#FFB443', '罕见的三点位地图，战线被拉长，信息收集比枪法更重要。', 'HAVEN 原是边境疗养院，三点位的布局让它成为侦察兵最爱的战场。', NULL, '/missions/haven.png', 60, 64, 74, 62, 86, 0, 32, 1, '2026-10-28 16:35:52', '2026-10-28 16:48:16');
-INSERT INTO `agent_archive` VALUES (18, 'MISSION', 'TRAINING', 'B', 'range', 'RANGE', '靶场', 'R', '#3DDC97', '训练场，靶机与 bots 全开放，压枪与急停的日常修行地。', 'RANGE 的靶机每天被击倒两万次，然后被维修技师救活两万次。', NULL, '/missions/range.png', 30, 40, 20, 20, 74, 0, 33, 1, '2026-10-28 16:35:52', '2026-10-28 16:48:32');
-INSERT INTO `agent_archive` VALUES (19, 'MISSION', 'EVENT', 'S', 'nightfall', 'NIGHTFALL', '', 'N', '#FF4655', '限时行动：夜幕下的据点争夺，视野受限，投掷物价值翻倍。', 'NIGHTFALL 行动只在停电的街区展开，目击报告里提到最多的东西是红色探照灯。', NULL, '/missions/nightfall.png', 78, 72, 80, 60, 89, 1, 34, 1, '2026-10-28 16:35:52', '2026-10-28 16:35:52');
-INSERT INTO `agent_archive` VALUES (20, 'MISSION', 'EVENT', 'B', 'breakout', 'BREAKOUT', '', 'K', '#FF6B4A', '限时行动：护送与突围交替，节奏快到没有喘息窗口。', 'BREAKOUT 的原型是一次真实的监狱护送行动，代号沿用至今。', NULL, '/missions/breakout.png', 74, 80, 56, 46, 70, 0, 35, 1, '2026-10-28 16:35:52', '2026-10-28 16:35:52');
+INSERT INTO `agent_archive` VALUES (14, 'GEAR', 'RIFLE', 'A', 'odin', 'Ares', '战神', 'D', '#00E0C6', '弹链供弹的重机枪，穿墙压制能力冠绝全场。', '代号来自北欧主神。士兵们说，它开火的时候，整条走廊都在替对面祈祷。', '[\n    {\"slot\":\"优势\",\"name\":\"弹链压制\",\"desc\":\"超大弹容持续输出，一个人就能压死一条通道。\"},\n    {\"slot\":\"优势\",\"name\":\"穿墙射击\",\"desc\":\"子弹能打穿墙体，可以直接透过掩体验证甚至击杀。\"},\n    {\"slot\":\"代价\",\"name\":\"又重又慢\",\"desc\":\"移速慢、开镜慢，架点无敌但被人绕后基本没救。\"}\n  ]', '/agents/odin.png', 94, 24, 58, 48, 80, 0, 27, 1, '2026-10-28 16:35:52', '2026-11-05 14:50:40');
+INSERT INTO `agent_archive` VALUES (15, 'MISSION', 'RANKED', 'A', 'ascent', 'ASCENT', '幽邃地窟', 'A', '#4DA6FF', '双点位地图，中路可开闭的闸门决定了整局的攻防节奏。', '高空平台 ASCENT 由旧轨道电梯中转站改建，中央闸门的开合至今沿用战前的机械逻辑。', '[\n  {\"slot\":\"适合枪械\",\"name\":\"步枪 + 狙击\",\"desc\":\"长道与中路枪线开阔，步枪中远距离最稳；狙击架长道收益高。冲锋枪只在 A 点管道与贴脸补枪时有用。\"},\n  {\"slot\":\"进攻\",\"name\":\"先夺中路控制\",\"desc\":\"用烟封住闸门两侧再开闸，配合闪光切 A/B 连接。没有道具就别硬冲长道，容易被一个人架死。\"},\n  {\"slot\":\"防守\",\"name\":\"闸门 + 长道架枪\",\"desc\":\"开局用闸门切断中路视野，一人架长道、一人守 B 主道，留一个自由人随时补位。\"},\n  {\"slot\":\"节奏\",\"name\":\"中慢速控图\",\"desc\":\"胜负由信息和道具决定，适合愿意慢慢磨掉对面耐心的队伍。\"}\n]', '/missions/ascent.png', 62, 70, 66, 58, 92, 1, 30, 1, '2026-10-28 16:35:52', '2026-11-05 14:20:31');
+INSERT INTO `agent_archive` VALUES (16, 'MISSION', 'RANKED', 'S', 'bind', 'BIND', '天枢云阙', 'B', '#A66CFF', '无中路的双点图，两处单向传送门让绕后变得随心所欲。', 'BIND 的单向传送门是战前物流网络的遗产，如今搬运的只有子弹与坏消息。', '[\n  {\"slot\":\"适合枪械\",\"name\":\"冲锋枪 / 霰弹\",\"desc\":\"传送门与短道全是贴脸距离，冲锋枪和霰弹爆发最高；狙击只在 A 短与 B 长窗有价值。\"},\n  {\"slot\":\"进攻\",\"name\":\"传送门做假动作\",\"desc\":\"先在 A 制造动静再从传送门转 B，或者反过来。两个点必须同时给压力，单点硬打必被回防。\"},\n  {\"slot\":\"防守\",\"name\":\"卡住传送出口\",\"desc\":\"别站在门的正对面，提前卡住出口侧身位；B 点长窗一定要有人架，否则被一个人看穿全图。\"},\n  {\"slot\":\"节奏\",\"name\":\"快节奏转点\",\"desc\":\"全图没有中路缓冲，一旦掉点就是几秒内的攻防互换，谁先转谁占便宜。\"}\n]', '/missions/bind.png', 66, 78, 70, 54, 90, 0, 31, 1, '2026-10-28 16:35:52', '2026-11-05 14:20:31');
+INSERT INTO `agent_archive` VALUES (17, 'MISSION', 'RANKED', 'A', 'haven', 'HAVEN', '莲花古城', 'H', '#FFB443', '罕见的三点位地图，战线被拉长，信息收集比枪法更重要。', 'HAVEN 原是边境疗养院，三点位的布局让它成为侦察兵最爱的战场。', '[\n  {\"slot\":\"适合枪械\",\"name\":\"步枪全能\",\"desc\":\"三条战线距离接近，步枪最不容易吃亏；狙击只在 C 长道与 A 长有价值，控场靠烟与燃烧瓶。\"},\n  {\"slot\":\"进攻\",\"name\":\"先拿一点再夹 B\",\"desc\":\"三点图最忌讳平均分兵，建议两人压 A 或 C 其中一点，三人从中路夹 B，逼对面来回救。\"},\n  {\"slot\":\"防守\",\"name\":\"一人一区 + 快速轮转\",\"desc\":\"三个点各留一人报信息，靠轮转补位；这张图信息收集比枪法更重要。\"},\n  {\"slot\":\"节奏\",\"name\":\"战线长 · 消耗战\",\"desc\":\"容易出现长时间拉锯，注意道具与经济的分配，别把把梭哈。\"}\n]', '/missions/haven.png', 60, 64, 74, 62, 86, 0, 32, 1, '2026-10-28 16:35:52', '2026-11-05 14:20:31');
+INSERT INTO `agent_archive` VALUES (18, 'MISSION', 'TRAINING', 'B', 'range', 'RANGE', '靶场', 'R', '#3DDC97', '训练场，靶机与 bots 全开放，压枪与急停的日常修行地。', 'RANGE 的靶机每天被击倒两万次，然后被维修技师救活两万次。', '[\n  {\"slot\":\"适合枪械\",\"name\":\"全枪械开放\",\"desc\":\"步枪练压枪与弹道，冲锋枪练急停与身法，狙击练甩枪与预瞄，靶场不限制经济。\"},\n  {\"slot\":\"进攻\",\"name\":\"专注专项练习\",\"desc\":\"固定靶练准度、移动靶练跟枪，建议每次只练一个项目，10 分钟一组。\"},\n  {\"slot\":\"节奏\",\"name\":\"从静止靶开始\",\"desc\":\"先把 30 米静止靶打稳，再上移动靶与跳靶，最后再进实战，别一上来就练身法。\"}\n]', '/missions/range.png', 30, 40, 20, 20, 74, 0, 33, 1, '2026-10-28 16:35:52', '2026-11-05 14:20:31');
+INSERT INTO `agent_archive` VALUES (19, 'MISSION', 'EVENT', 'S', 'nightfall', 'NIGHTFALL', '源工重镇', 'N', '#FF4655', '限时行动：夜幕下的据点争夺，视野受限，投掷物价值翻倍。', 'NIGHTFALL 行动只在停电的街区展开，目击报告里提到最多的东西是红色探照灯。', '[\n  {\"slot\":\"适合枪械\",\"name\":\"冲锋枪 / 霰弹\",\"desc\":\"视野受限，交火距离被压到十几米内，近距离爆发武器吃香，狙击价值明显下降。\"},\n  {\"slot\":\"进攻\",\"name\":\"道具开路\",\"desc\":\"闪光与烟必带，先照亮再进点，贴着探照灯边缘推进，别在黑暗里直着走。\"},\n  {\"slot\":\"防守\",\"name\":\"卡转角听脚步\",\"desc\":\"利用黑暗卡住转角与窄道，听见脚步再拉出去，主动拉枪线基本等于送。\"},\n  {\"slot\":\"节奏\",\"name\":\"慢而闷\",\"desc\":\"听觉和投掷物的价值翻倍，谁先暴露谁先死，耐心比手速重要。\"}\n]', '/missions/nightfall.png', 78, 72, 80, 60, 89, 1, 34, 1, '2026-10-28 16:35:52', '2026-11-05 14:46:04');
+INSERT INTO `agent_archive` VALUES (20, 'MISSION', 'EVENT', 'B', 'breakout', 'BREAKOUT', '盐海矿镇', 'K', '#FF6B4A', '限时行动：护送与突围交替，节奏快到没有喘息窗口。', 'BREAKOUT 的原型是一次真实的监狱护送行动，代号沿用至今。', '[\n  {\"slot\":\"适合枪械\",\"name\":\"步枪 + 冲锋枪混编\",\"desc\":\"中近距离连续交火，步枪打主线、冲锋枪贴脸护航，狙击带一把就够。\"},\n  {\"slot\":\"进攻\",\"name\":\"抱团推进\",\"desc\":\"护送目标时全队跟车走，别单走；用烟墙切断高台枪线，把对面逼进近身距离。\"},\n  {\"slot\":\"防守\",\"name\":\"两层埋伏\",\"desc\":\"远端卡视野、近端卡转角，重点封锁撤离路口，别把人都堆在最前面。\"},\n  {\"slot\":\"节奏\",\"name\":\"高节奏连续交战\",\"desc\":\"一波接一波，几乎没有喘息窗口，经济管理比单局枪法更影响结果。\"}\n]', '/missions/breakout.png', 74, 80, 56, 46, 70, 0, 35, 1, '2026-10-28 16:35:52', '2026-11-05 14:45:02');
+
+-- ----------------------------
+-- Table structure for agent_friend
+-- ----------------------------
+DROP TABLE IF EXISTS `agent_friend`;
+CREATE TABLE `agent_friend`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint NOT NULL COMMENT '发起方 agent_user.id',
+  `user_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '发起方代号（冗余展示）',
+  `friend_id` bigint NOT NULL COMMENT '对方 agent_user.id',
+  `friend_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '对方案号（冗余展示）',
+  `status` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING 待同意 / ACCEPTED 已是好友',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发起时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '处理时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_pair`(`user_id` ASC, `friend_id` ASC) USING BTREE,
+  INDEX `idx_friend`(`friend_id` ASC, `status` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友关系表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of agent_friend
+-- ----------------------------
+INSERT INTO `agent_friend` VALUES (6, 1, '爱打球的T', 9, 'gay', 'PENDING', '2026-11-05 21:25:16', '2026-11-05 21:25:16');
 
 -- ----------------------------
 -- Table structure for agent_oauth
@@ -160,6 +186,33 @@ CREATE TABLE `agent_oauth`  (
 -- ----------------------------
 -- Records of agent_oauth
 -- ----------------------------
+
+-- ----------------------------
+-- Table structure for agent_pk
+-- ----------------------------
+DROP TABLE IF EXISTS `agent_pk`;
+CREATE TABLE `agent_pk`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `challenger_id` bigint NOT NULL COMMENT '挑战方',
+  `challenger_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `defender_id` bigint NOT NULL COMMENT '应战方',
+  `defender_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `challenger_power` int NOT NULL DEFAULT 0 COMMENT '挑战方战力',
+  `defender_power` int NOT NULL DEFAULT 0 COMMENT '应战方战力',
+  `winner_id` bigint NULL DEFAULT NULL COMMENT '胜者 id',
+  `detail` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '结算描述',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_challenger`(`challenger_id` ASC) USING BTREE,
+  INDEX `idx_defender`(`defender_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'PK 战绩表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of agent_pk
+-- ----------------------------
+INSERT INTO `agent_pk` VALUES (13, 1, '爱打球的T', 9, 'gay', 424, 250, 1, '挑战方胜', '2026-11-05 21:54:17');
+INSERT INTO `agent_pk` VALUES (14, 1, '爱打球的T', 9, 'gay', 449, 256, 1, '挑战方胜', '2026-11-05 21:54:22');
+INSERT INTO `agent_pk` VALUES (15, 1, '爱打球的T', 9, 'gay', 423, 259, 1, '挑战方胜', '2026-11-05 21:54:24');
 
 -- ----------------------------
 -- Table structure for agent_reset_code
@@ -193,13 +246,15 @@ CREATE TABLE `agent_session`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_token`(`token` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '登录会话表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 77 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '登录会话表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_session
 -- ----------------------------
-INSERT INTO `agent_session` VALUES (25, '98976df13b4b4b2bb4a3108d825de04f', 1, '2026-11-05 15:05:04', '2026-10-29 15:05:03');
-INSERT INTO `agent_session` VALUES (28, 'd872487f3f3f48a09d4671ab554db9fb', 1, '2026-11-09 08:59:18', '2026-11-02 08:59:17');
+INSERT INTO `agent_session` VALUES (59, '0bcc85f7942848f8a70cd731a19ffe49', 9, '2026-11-12 20:24:33', '2026-11-05 20:24:32');
+INSERT INTO `agent_session` VALUES (72, 'ab30269eb5d940babba8c27e93a970f2', 1, '2026-11-12 21:24:36', '2026-11-05 21:24:35');
+INSERT INTO `agent_session` VALUES (75, '79450a04c58c425d980f919b2fa3ae2b', 1, '2026-11-12 21:53:18', '2026-11-05 21:53:18');
+INSERT INTO `agent_session` VALUES (76, '98074d383f3043dda78532ed9bf7669d', 1, '2026-11-12 21:58:10', '2026-11-05 21:58:10');
 
 -- ----------------------------
 -- Table structure for agent_user
@@ -213,20 +268,57 @@ CREATE TABLE `agent_user`  (
   `password_hash` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '（已废弃）旧版密码摘要',
   `salt` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '（已废弃）旧版随机盐',
   `agent_index` int NOT NULL DEFAULT 0 COMMENT '注册时选择的特工下标',
+  `hero_level` int NOT NULL DEFAULT 1 COMMENT '英雄等级（由 exp 推导，无上限）',
+  `credits` int NOT NULL DEFAULT 800 COMMENT '信用点余额（购买武器消耗）',
+  `exp` int NOT NULL DEFAULT 0 COMMENT '累计经验值（决定英雄等级，无上限）',
+  `equipped_weapon` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'classic' COMMENT '当前主武器 code（影响战力）',
+  `equipped_frame` int NOT NULL DEFAULT 0 COMMENT '当前佩戴头像框档位（0=跟随最新解锁）',
+  `pk_win` int NOT NULL DEFAULT 0 COMMENT 'PK 胜场',
+  `pk_lose` int NOT NULL DEFAULT 0 COMMENT 'PK 负场',
+  `last_login_date` date NULL DEFAULT NULL COMMENT '最近一次登录日期（每日登录经验去重）',
   `permission` tinyint NOT NULL DEFAULT 1 COMMENT '权限：1 默认权限，0 管理员权限',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_email`(`email` ASC) USING BTREE,
   UNIQUE INDEX `uk_name`(`name` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工账号表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工账号表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_user
 -- ----------------------------
-INSERT INTO `agent_user` VALUES (1, '爱打球的T', '264132801@qq.com', NULL, '3cb9bb890b91efdd310c935089eb3935b82ce46640a4b68bb0c5a2b72d28d2b5', '9e1431e9dbdaa424328eda90965d4ea6', 0, 0, '2026-10-28 16:36:07', '2026-10-29 14:26:51');
-INSERT INTO `agent_user` VALUES (9, 'gay', '3376460573@qq.com', 'tmz258412', NULL, NULL, 0, 1, '2026-10-29 15:04:01', '2026-10-29 15:04:01');
-INSERT INTO `agent_user` VALUES (10, 'RANGETEST01', 'rangetest01@test.com', 'test123456', NULL, NULL, 0, 1, '2026-11-02 09:28:59', '2026-11-02 09:28:59');
+INSERT INTO `agent_user` VALUES (1, '爱打球的T', '264132801@qq.com', NULL, '3cb9bb890b91efdd310c935089eb3935b82ce46640a4b68bb0c5a2b72d28d2b5', '9e1431e9dbdaa424328eda90965d4ea6', 0, 20, 3356, 10946, 'operator', 7, 3, 0, '2026-11-05', 0, '2026-10-28 16:36:07', '2026-11-05 21:57:34');
+INSERT INTO `agent_user` VALUES (9, 'gay', '3376460573@qq.com', 'tmz258412', NULL, NULL, 0, 1, 800, 20, 'classic', 0, 0, 3, '2026-11-05', 1, '2026-10-29 15:04:01', '2026-11-05 21:54:24');
+
+-- ----------------------------
+-- Table structure for agent_weapon
+-- ----------------------------
+DROP TABLE IF EXISTS `agent_weapon`;
+CREATE TABLE `agent_weapon`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '涓婚敭',
+  `user_id` bigint NOT NULL COMMENT '鍏宠仈 agent_user.id',
+  `user_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '特工代号（冗余，便于直查）',
+  `weapon_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '姝﹀櫒浠ｅ彿锛歝lassic/sheriff/marshal/odin/guardian/phantom/vandal/operator',
+  `weapon_name` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '武器中文名（冗余，便于直查）',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '璐?拱鏃堕棿',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_user_weapon`(`user_id` ASC, `weapon_code` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 32 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '鐗瑰伐宸茶喘姝﹀櫒琛' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of agent_weapon
+-- ----------------------------
+INSERT INTO `agent_weapon` VALUES (4, 1, '爱打球的T', 'classic', '标配', '2026-11-05 18:46:50');
+INSERT INTO `agent_weapon` VALUES (5, 1, '爱打球的T', 'operator', '冥狙', '2026-11-05 19:01:52');
+INSERT INTO `agent_weapon` VALUES (6, 1, '爱打球的T', 'guardian', '戍卫', '2026-11-05 19:01:53');
+INSERT INTO `agent_weapon` VALUES (7, 1, '爱打球的T', 'marshal', '鸟狙', '2026-11-05 19:01:54');
+INSERT INTO `agent_weapon` VALUES (8, 1, '爱打球的T', 'odin', '战神', '2026-11-05 19:01:55');
+INSERT INTO `agent_weapon` VALUES (9, 1, '爱打球的T', 'vandal', '狂徒', '2026-11-05 19:01:56');
+INSERT INTO `agent_weapon` VALUES (10, 1, '爱打球的T', 'sheriff', '正义', '2026-11-05 19:01:57');
+INSERT INTO `agent_weapon` VALUES (11, 1, '爱打球的T', 'phantom', '幻影', '2026-11-05 19:01:58');
+INSERT INTO `agent_weapon` VALUES (29, 23, 'FRAMETEST', 'classic', '标配', '2026-11-05 21:17:31');
+INSERT INTO `agent_weapon` VALUES (30, 24, 'PKA86292', 'classic', '标配', '2026-11-05 21:44:52');
+INSERT INTO `agent_weapon` VALUES (31, 25, 'PKB86292', 'classic', '标配', '2026-11-05 21:44:52');
 
 -- ----------------------------
 -- Table structure for archive_category
@@ -281,7 +373,7 @@ CREATE TABLE `feed_mark`  (
   UNIQUE INDEX `uk_user_feed`(`user_id` ASC, `feed_id` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE,
   INDEX `idx_feed`(`feed_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工情报交互（已读/收藏/点赞）' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工情报交互（已读/收藏/点赞）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of feed_mark
@@ -289,6 +381,9 @@ CREATE TABLE `feed_mark`  (
 INSERT INTO `feed_mark` VALUES (1, 1, 1, 1, 0, 0, '2026-11-02 08:45:07');
 INSERT INTO `feed_mark` VALUES (2, 1, 2, 1, 0, 0, '2026-11-02 08:45:15');
 INSERT INTO `feed_mark` VALUES (3, 1, 3, 1, 0, 1, '2026-11-02 08:56:41');
+INSERT INTO `feed_mark` VALUES (4, 1, 7, 1, 0, 0, '2026-11-05 15:06:38');
+INSERT INTO `feed_mark` VALUES (5, 1, 4, 1, 0, 1, '2026-11-05 21:57:07');
+INSERT INTO `feed_mark` VALUES (6, 1, 5, 1, 0, 0, '2026-11-05 21:57:19');
 
 -- ----------------------------
 -- Table structure for game_record
@@ -307,7 +402,7 @@ CREATE TABLE `game_record`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user_mode`(`user_id` ASC, `mode` ASC) USING BTREE,
   INDEX `idx_user_time`(`user_id` ASC, `create_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'RANGE 训练场成绩' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 43 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'RANGE 训练场成绩' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of game_record
@@ -327,6 +422,27 @@ INSERT INTO `game_record` VALUES (12, 1, 'TARGET', 27, 1, 3, 1, 0, '2026-11-02 0
 INSERT INTO `game_record` VALUES (13, 1, 'RECOIL', 9663, 1, 1, 1, 0, '2026-11-02 09:34:20');
 INSERT INTO `game_record` VALUES (14, 1, 'RECOIL', 8980, 1, 1, 1, 0, '2026-11-02 09:45:03');
 INSERT INTO `game_record` VALUES (15, 1, 'RECOIL', 9018, 1, 1, 1, 0, '2026-11-02 09:46:00');
+INSERT INTO `game_record` VALUES (16, 1, 'REACTION', 890, 0, 5, 5, 422, '2026-11-05 14:00:17');
+INSERT INTO `game_record` VALUES (17, 1, 'REACTION', 1105, 1, 5, 5, 379, '2026-11-05 14:00:37');
+INSERT INTO `game_record` VALUES (18, 1, 'REACTION', 920, 0, 5, 5, 416, '2026-11-05 14:01:20');
+INSERT INTO `game_record` VALUES (19, 1, 'RECOIL', 9668, 1, 1, 1, 0, '2026-11-05 14:01:39');
+INSERT INTO `game_record` VALUES (20, 1, 'RECOIL', 10248, 1, 1, 1, 0, '2026-11-05 14:01:55');
+INSERT INTO `game_record` VALUES (21, 1, 'TARGET', 362, 32, 38, 32, 0, '2026-11-05 14:02:32');
+INSERT INTO `game_record` VALUES (22, 1, 'TARGET', 359, 31, 32, 31, 0, '2026-11-05 14:03:07');
+INSERT INTO `game_record` VALUES (24, 1, 'REACTION', 975, 0, 5, 5, 405, '2026-11-05 18:47:42');
+INSERT INTO `game_record` VALUES (25, 1, 'RECOIL', 10184, 1, 1, 1, 0, '2026-11-05 18:48:03');
+INSERT INTO `game_record` VALUES (26, 1, 'TARGET', 390, 34, 34, 34, 0, '2026-11-05 18:48:48');
+INSERT INTO `game_record` VALUES (27, 1, 'RECOIL', 10653, 1, 1, 1, 0, '2026-11-05 18:49:10');
+INSERT INTO `game_record` VALUES (28, 1, 'RECOIL', 8932, 1, 1, 1, 0, '2026-11-05 18:49:26');
+INSERT INTO `game_record` VALUES (29, 1, 'REACTION', 1115, 1, 5, 5, 377, '2026-11-05 18:49:44');
+INSERT INTO `game_record` VALUES (30, 10, 'TARGET', 2000, 20, 22, 20, 400, '2026-11-05 19:28:23');
+INSERT INTO `game_record` VALUES (36, 1, 'REACTION', 1115, 1, 5, 5, 377, '2026-11-05 21:54:52');
+INSERT INTO `game_record` VALUES (37, 1, 'REACTION', 1115, 1, 5, 5, 377, '2026-11-05 21:55:09');
+INSERT INTO `game_record` VALUES (38, 1, 'REACTION', 1105, 1, 5, 5, 379, '2026-11-05 21:55:25');
+INSERT INTO `game_record` VALUES (39, 1, 'REACTION', 1050, 1, 5, 5, 390, '2026-11-05 21:55:48');
+INSERT INTO `game_record` VALUES (40, 1, 'RECOIL', 10708, 1, 1, 1, 0, '2026-11-05 21:56:04');
+INSERT INTO `game_record` VALUES (41, 1, 'RECOIL', 10182, 1, 1, 1, 0, '2026-11-05 21:56:22');
+INSERT INTO `game_record` VALUES (42, 1, 'TARGET', 399, 35, 36, 35, 0, '2026-11-05 21:56:59');
 
 -- ----------------------------
 -- Table structure for home_feed

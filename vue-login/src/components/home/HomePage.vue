@@ -5,13 +5,15 @@
    数据来源：后端 /api/home/*（见 src/store/api.js）
    数据表：archive_category / agent_archive / home_feed
    ============================================================ */
-import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { state, currentAgent, agentLevel, useSession } from '../../store/session'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { state, currentAgent, agentLevel, useSession, switchView } from '../../store/session'
 import { search, homeCategories, homeOverview, homeFeed } from '../../store/api'
+import { beep } from '../../composables/useSound'
 import HomeNav from './HomeNav.vue'
 import HomeSearch from './HomeSearch.vue'
 import AgentArchive from './AgentArchive.vue'
 import AgentDetailModal from './AgentDetailModal.vue'
+import IntelDetailModal from './IntelDetailModal.vue'
 
 const { showToast } = useSession()
 
@@ -136,6 +138,74 @@ function openDetail(code) {
   detailCode.value = code
 }
 
+/* ---------- 情报动态：点击展开详情 + 实时时间 ---------- */
+/** 当前打开的情报 id（复用情报中心的详情弹窗） */
+const feedId = ref(0)
+/** 每次计时器推进的时间戳，驱动「x 分钟前」实时刷新 */
+const now = ref(Date.now())
+let clockTimer = null
+let feedTimer = null
+
+/** 拉取动态流（首页只取最新 5 条） */
+async function loadFeed() {
+  if (!token.value) return
+  const r = await homeFeed(token.value, 1, 5)
+  if (r.code === 0) feeds.value = r.data?.list || []
+}
+
+function openFeed(f) {
+  if (!f?.id) return
+  feedId.value = f.id
+  beep(700, 0.05)
+}
+
+/** 弹窗内跳转（查看相关档案 / 情报中心） */
+function gotoView(view) {
+  feedId.value = 0
+  if (view) {
+    beep(660, 0.06)
+    switchView(view)
+  }
+}
+
+/** 弹窗里点赞 / 收藏 / 标记未读会改数据，关闭前后都重新拉一次 */
+function onFeedChanged() {
+  loadFeed()
+}
+
+/* ---------- 时间格式化：相对时间实时算 + 精确时间做悬浮提示 ---------- */
+function parseTime(v) {
+  if (!v) return 0
+  const t = new Date(String(v).replace(' ', 'T')).getTime()
+  return Number.isNaN(t) ? 0 : t
+}
+
+/** 相对时间：刚刚 / n 分钟前 / n 小时前 / n 天前 / n 个月前 / n 年前 */
+function relTime(v) {
+  const t = parseTime(v)
+  if (!t) return '—'
+  const diff = Math.max(0, now.value - t)
+  const min = Math.floor(diff / 60000)
+  if (min < 1) return '刚刚'
+  if (min < 60) return `${min} 分钟前`
+  const hour = Math.floor(min / 60)
+  if (hour < 24) return `${hour} 小时前`
+  const day = Math.floor(hour / 24)
+  if (day < 30) return `${day} 天前`
+  const month = Math.floor(day / 30)
+  if (month < 12) return `${month} 个月前`
+  return `${Math.floor(month / 12)} 年前`
+}
+
+/** 精确时间：2026-10-14 09:00 */
+function fullTime(v) {
+  const t = parseTime(v)
+  if (!t) return ''
+  const d = new Date(t)
+  const p = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`
+}
+
 /* ---------- 初始化：目录 + 概览 + 动态 + 首次检索 ---------- */
 onMounted(async () => {
   if (!token.value) return
@@ -148,6 +218,20 @@ onMounted(async () => {
   if (o.code === 0) overview.value = o.data
   if (f.code === 0) feeds.value = f.data?.list || []
   await runSearch(true)
+
+  // 时间每 30 秒重算一次，保证「x 分钟前」不会停在打开页面那一刻
+  clockTimer = setInterval(() => {
+    now.value = Date.now()
+  }, 30000)
+  // 动态流每分钟静默刷新，后台发了新情报不用手动刷新页面
+  feedTimer = setInterval(() => {
+    if (document.visibilityState === 'visible') loadFeed()
+  }, 60000)
+})
+
+onBeforeUnmount(() => {
+  clearInterval(clockTimer)
+  clearInterval(feedTimer)
 })
 </script>
 
@@ -227,21 +311,33 @@ onMounted(async () => {
         </div>
       </section>
 
-      <!-- ========== 情报动态 ========== -->
+      <!-- ========== 情报动态（点击条目展开详情） ========== -->
       <section v-if="feeds.length" class="feed">
         <div class="sechead">
           <h2>情报动态</h2>
           <span class="secsub">INTEL FEED</span>
           <span class="line"></span>
+          <button class="allintel" type="button" @click="gotoView('intel')">
+            全部情报 <i>→</i>
+          </button>
         </div>
         <ul class="flist">
-          <li v-for="f in feeds" :key="f.id">
+          <li
+            v-for="f in feeds"
+            :key="f.id"
+            role="button"
+            tabindex="0"
+            :aria-label="`查看情报：${f.title}`"
+            @click="openFeed(f)"
+            @keydown.enter.prevent="openFeed(f)"
+            @keydown.space.prevent="openFeed(f)"
+          >
             <span class="fkind">{{ f.tag || f.kind }}</span>
             <div class="fmain">
               <h4>{{ f.title }}</h4>
               <p>{{ f.summary }}</p>
             </div>
-            <span class="ftime">{{ String(f.publishedAt).slice(0, 10) }}</span>
+            <span class="ftime" :title="fullTime(f.publishedAt)">{{ relTime(f.publishedAt) }}</span>
           </li>
         </ul>
       </section>
@@ -252,6 +348,17 @@ onMounted(async () => {
       <span class="sp"></span>
       <span>SYS <b>OK</b> · 数据源 agent_archive · /api/home</span>
     </footer>
+
+    <!-- ========== 情报详情（点击动态条目打开：正文 + 认可 / 收藏 / 跳转） ========== -->
+    <IntelDetailModal
+      v-if="feedId"
+      :key="feedId"
+      :id="feedId"
+      :token="token"
+      @close="feedId = 0"
+      @changed="onFeedChanged"
+      @goto="gotoView"
+    />
 
     <!-- ========== 档案详情（点击卡片打开：介绍 + 人物故事） ========== -->
     <AgentDetailModal
@@ -468,6 +575,7 @@ onMounted(async () => {
   padding: 14px 18px;
   background: linear-gradient(160deg, rgba(22, 33, 44, .85), rgba(15, 25, 35, .9));
   border: 1px solid var(--line);
+  cursor: pointer;
   transition: .22s;
 }
 .flist li:hover {
@@ -475,6 +583,12 @@ onMounted(async () => {
   box-shadow: 0 0 26px -14px var(--ac);
   transform: translateX(4px);
 }
+.flist li:focus-visible {
+  outline: 1px solid var(--ac);
+  outline-offset: 2px;
+}
+.flist li:hover h4 { color: #fff; }
+.flist li:hover .ftime { color: var(--ac); }
 .fkind {
   justify-self: start;
   padding: 4px 8px;
@@ -491,6 +605,7 @@ onMounted(async () => {
   font-size: 16px;
   letter-spacing: 1.4px;
   color: var(--cream);
+  transition: color .2s;
 }
 .fmain p {
   margin: 0;
@@ -499,10 +614,35 @@ onMounted(async () => {
   color: var(--muted);
 }
 .ftime {
+  white-space: nowrap;
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 1.2px;
   color: var(--muted);
+  transition: color .2s;
+}
+
+/* 情报动态右上角：全部情报入口 */
+.allintel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  cursor: pointer;
+  transition: .2s;
+}
+.allintel i { font-style: normal; }
+.allintel:hover {
+  color: #fff;
+  border-color: var(--ac);
+  background: var(--ac);
+  box-shadow: 0 0 20px -10px var(--ac);
 }
 
 @media (max-width: 640px) {

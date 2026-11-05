@@ -9,7 +9,7 @@
    ============================================================ */
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { missionAccept, missionAbandon, missionClaim, missionToggle } from '../../store/api'
-import { state } from '../../store/session'
+import { state, applyLevelInfo } from '../../store/session'
 import { beep } from '../../composables/useSound'
 
 const props = defineProps({
@@ -24,6 +24,7 @@ const m = ref({ ...props.mission })
 const busy = ref('')          // 正在进行的动作：accept / toggle / abandon / claim
 const errorMsg = ref('')
 const justClaimed = ref(0)    // 本次结算获得的积分（>0 时展示成功条）
+const claimNote = ref('')     // 结算触发的升级提示（含边框解锁 / 奖励）
 
 const STATUS_TEXT = { IDLE: '待接取', ACTIVE: '执行中', READY: '待结算', DONE: '已完成' }
 const status = computed(() => m.value.status || 'IDLE')
@@ -112,6 +113,18 @@ async function claim() {
   }
   beep(980, 0.12)
   justClaimed.value = r.data?.reward || 0
+  // 结算 +50 EXP，可能直接升级：把等级 / 边框 / 奖励同步到顶栏
+  const lv = r.data?.level
+  if (lv) {
+    applyLevelInfo(lv)
+    if (lv.levelUp) {
+      const frameMsg =
+        lv.frameUnlocked && lv.unlockedFrames?.length
+          ? ` · 解锁边框 ${lv.unlockedFrames.join('、')}`
+          : ''
+      claimNote.value = `LV.UP · 升至 ${lv.level} 级 · 奖励 ${lv.creditsGained} 信用点${frameMsg}`
+    }
+  }
   apply(r.data?.mission)
   emit('changed', m.value)
 }
@@ -173,6 +186,7 @@ const storyParas = computed(() =>
       <!-- 结算成功提示 -->
       <div v-if="justClaimed" class="okbar">
         <b>+{{ justClaimed }}</b> 积分已入账 · 任务归档完成
+        <em v-if="claimNote" class="upnote">{{ claimNote }}</em>
       </div>
 
       <p v-if="errorMsg" class="errbar"><b>!</b> {{ errorMsg }}</p>
@@ -434,6 +448,14 @@ const storyParas = computed(() =>
   animation: slidein .3s ease both;
 }
 .okbar b { font-size: 15px; }
+.okbar .upnote {
+  display: block;
+  margin-top: 5px;
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #FFC24B;
+}
 @keyframes slidein { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
 .errbar {
   margin: 14px 0 0;

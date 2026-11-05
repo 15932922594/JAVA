@@ -7,6 +7,9 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   state,
   agentLevel,
+  heroExp,
+  frameTier,
+  currentAgent,
   accent,
   switchView,
   enterAdmin,
@@ -14,6 +17,7 @@ import {
   useSession
 } from '../../store/session'
 import { beep, toggleSound } from '../../composables/useSound'
+import { frameClassOf, frameStyleOf } from '../../data/frames'
 
 const { showToast, authLogout } = useSession()
 
@@ -26,6 +30,8 @@ const NAVS = [
   { key: 'home', label: '首页' },
   { key: 'agents', label: '特工档案' },
   { key: 'arsenal', label: '武器库' },
+  { key: 'armory', label: '军械商店' },
+  { key: 'arena', label: '竞技场' },
   { key: 'missions', label: '作战任务' },
   { key: 'intel', label: '情报中心' },
   { key: 'range', label: '训练场' }
@@ -86,6 +92,18 @@ async function onLogout() {
 
 /** 头像里的特工字母 */
 const mono = computed(() => (state.user?.name || '?').trim().charAt(0).toUpperCase())
+
+/** 头像框：佩戴中的档位（含星穹系列的程序化样式） */
+const frameClass = computed(() => frameClassOf(frameTier.value))
+const frameStyle = computed(() => frameStyleOf(frameTier.value))
+
+/** 头像框提示：当前档位 + 距离下一档 */
+const frameTip = computed(() => {
+  const u = state.user
+  if (!u) return ''
+  const name = u.frameName || ''
+  return `头像框：${name}（第 ${frameTier.value} 档）· LV.${u.nextFrameLevel || '—'} 解锁「${u.nextFrameName || ''}」`
+})
 </script>
 
 <template>
@@ -143,10 +161,21 @@ const mono = computed(() => (state.user?.name || '?').trim().charAt(0).toUpperCa
 
       <div ref="menuEl" class="user">
         <button class="chip" type="button" :class="{ open: menuOpen }" @click.stop="toggleMenu">
-          <span class="ava">{{ mono }}</span>
+          <span
+            class="ava"
+            :class="frameClass"
+            :style="{ ...frameStyle, '--hc': currentAgent.color }"
+            :title="frameTip"
+          >{{ mono }}</span>
           <span class="meta">
             <b>{{ state.user?.name || '未接入' }}</b>
-            <i>LV.{{ agentLevel }}<em v-if="canAdmin" class="adm">管理员</em></i>
+            <i>
+              LV.{{ agentLevel }}
+              · {{ state.user?.credits ?? 0 }} CR<em v-if="canAdmin" class="adm">管理员</em>
+            </i>
+            <span class="xp" :title="`${heroExp.inLevel} / ${heroExp.need} EXP`">
+              <em :style="{ width: (heroExp.pct * 100).toFixed(1) + '%' }"></em>
+            </span>
           </span>
           <svg class="caret" width="11" height="11" viewBox="0 0 24 24" fill="none">
             <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
@@ -317,8 +346,12 @@ const mono = computed(() => (state.user?.name || '?').trim().charAt(0).toUpperCa
   font-weight: 700;
   font-size: 14px;
   transform: skewX(-10deg);
+  transition: box-shadow .3s, border-color .3s;
 }
 .ava > * { transform: skewX(10deg); }
+
+/* 头像框的描边 / 光效统一在 styles/frames.css 里按档位定义 */
+
 .meta { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
 .meta b { font-size: 12.5px; letter-spacing: .5px; }
 .meta i {
@@ -328,6 +361,23 @@ const mono = computed(() => (state.user?.name || '?').trim().charAt(0).toUpperCa
   letter-spacing: 1.4px;
   color: var(--muted);
 }
+
+/* 经验进度条：填满即升级 */
+.meta .xp {
+  display: block;
+  width: 62px;
+  height: 2px;
+  margin-top: 3px;
+  background: rgba(236, 232, 225, .16);
+  overflow: hidden;
+}
+.meta .xp em {
+  display: block;
+  height: 100%;
+  background: var(--ac);
+  box-shadow: 0 0 8px var(--ac);
+  transition: width .45s cubic-bezier(.2, 1, .3, 1);
+}
 .meta .adm {
   font-style: normal;
   margin-left: 5px;
@@ -335,6 +385,7 @@ const mono = computed(() => (state.user?.name || '?').trim().charAt(0).toUpperCa
   color: #fff;
   background: var(--red);
 }
+
 .caret { color: var(--muted); transition: .2s; }
 .chip.open .caret { transform: rotate(180deg); color: var(--ac); }
 

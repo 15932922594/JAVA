@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fenglin.springboottest.common.HeroLevel;
 import com.fenglin.springboottest.entity.AgentArchive;
 import com.fenglin.springboottest.entity.ArchiveCategory;
 import com.fenglin.springboottest.entity.MissionBrief;
@@ -51,13 +52,16 @@ public class MissionService extends ServiceImpl<MissionProgressMapper, MissionPr
     private final MissionBriefMapper briefMapper;
     private final AgentArchiveMapper archiveMapper;
     private final ArchiveCategoryMapper categoryMapper;
+    private final HeroLevelService levelService;
 
     public MissionService(MissionBriefMapper briefMapper,
                           AgentArchiveMapper archiveMapper,
-                          ArchiveCategoryMapper categoryMapper) {
+                          ArchiveCategoryMapper categoryMapper,
+                          HeroLevelService levelService) {
         this.briefMapper = briefMapper;
         this.archiveMapper = archiveMapper;
         this.categoryMapper = categoryMapper;
+        this.levelService = levelService;
     }
 
     /* ==========================================================
@@ -231,12 +235,16 @@ public class MissionService extends ServiceImpl<MissionProgressMapper, MissionPr
         p.setFinishedAt(LocalDateTime.now());
         updateById(p);
 
+        // 任务结算经验：+50 EXP（升级时附带信用点奖励）
+        Map<String, Object> levelInfo = levelService.gain(userId, HeroLevel.MISSION_EXP, null);
+
         MissionBrief b = briefMapper.selectOne(
                 new QueryWrapper<MissionBrief>().eq("mission_code", code));
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("reward", b == null ? 0 : nz(b.getReward()));
         data.put("points", points(userId));
         data.put("mission", one(userId, code));
+        data.put("level", levelInfo);
         return new ActionResult(0, "任务结算完成", data);
     }
 
