@@ -2,9 +2,13 @@
 /* ============================================================
    档案详情弹窗 —— 点击卡片后展开
    数据来源：后端 /api/home/detail（agent_archive 单条，含 story）
-   左侧立绘 / 右侧：代号、定位、分级、简介、四维属性、人物故事
+   左侧立绘 / 右侧：代号、定位、分级、简介、四维属性、故事
+   文案随一级分类切换：
+     AGENT   能力解析 + 人物故事
+     GEAR    枪械特性 + 枪械故事
+     MISSION 地图介绍（适合枪械 / 进攻 / 防守）+ 地图故事
    ============================================================ */
-import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { homeDetail } from '../../store/api'
 import { STAT_LABELS, roleShort } from '../../data/agents'
 
@@ -36,7 +40,7 @@ async function load() {
   }
 }
 
-/** 人物故事按空行分段 */
+/** 故事正文按空行（\n）分段 */
 function paragraphs(text) {
   if (!text) return []
   return String(text).split('\n').map((s) => s.trim()).filter(Boolean)
@@ -46,6 +50,28 @@ function paragraphs(text) {
 function abilityList(v) {
   return Array.isArray(v) ? v : []
 }
+
+/* ---------- 按分类切换栏目文案 ---------- */
+const category = computed(() => data.value?.category || 'AGENT')
+const isMap = computed(() => category.value === 'MISSION')
+
+/** 上方能力区：特工=能力解析 / 枪械=枪械特性 / 地图=地图介绍 */
+const abilityHead = computed(() => {
+  if (category.value === 'GEAR') return { title: '枪械特性', en: 'TRAITS' }
+  if (category.value === 'MISSION') return { title: '地图介绍', en: 'MAP INTEL' }
+  return { title: '能力解析', en: 'ABILITIES' }
+})
+
+/** 下方故事区：特工=人物故事 / 枪械=枪械故事 / 地图=地图故事 */
+const storyHead = computed(() => {
+  if (category.value === 'GEAR') {
+    return { title: '枪械故事', en: 'WEAPON FILE', empty: '该枪械的枪械故事尚未解密。' }
+  }
+  if (category.value === 'MISSION') {
+    return { title: '地图故事', en: 'MAP FILE', empty: '该地图的地图故事尚未解密。' }
+  }
+  return { title: '人物故事', en: 'DOSSIER', empty: '该档案的人物故事尚未解密。' }
+})
 
 function onKey(e) {
   if (e.key === 'Escape') emit('close')
@@ -117,14 +143,14 @@ watch(() => props.code, load)
             </li>
           </ul>
 
-          <!-- 能力 / 特性 -->
+          <!-- 能力 / 特性 / 地图介绍 -->
           <div v-if="abilityList(data.abilities).length" class="abbox">
             <div class="shead">
               <span class="bar"></span>
-              <h3>{{ data.category === 'GEAR' ? '枪械特性' : '能力解析' }}</h3>
-              <span class="sen">ABILITIES</span>
+              <h3>{{ abilityHead.title }}</h3>
+              <span class="sen">{{ abilityHead.en }}</span>
             </div>
-            <ul class="abil">
+            <ul class="abil" :class="{ 'is-map': isMap }">
               <li v-for="(ab, i) in abilityList(data.abilities)" :key="i">
                 <span class="slot" :class="{ 'is-cost': ab.slot === '代价' }">{{ ab.slot }}</span>
                 <div class="abtxt">
@@ -135,17 +161,17 @@ watch(() => props.code, load)
             </ul>
           </div>
 
-          <!-- 人物故事 -->
+          <!-- 故事：人物故事 / 枪械故事 / 地图故事 -->
           <div class="storybox">
             <div class="shead">
               <span class="bar"></span>
-              <h3>人物故事</h3>
-              <span class="sen">DOSSIER</span>
+              <h3>{{ storyHead.title }}</h3>
+              <span class="sen">{{ storyHead.en }}</span>
             </div>
             <template v-if="paragraphs(data.story).length">
               <p v-for="(p, i) in paragraphs(data.story)" :key="i">{{ p }}</p>
             </template>
-            <p v-else class="nostory">该档案的人物故事尚未解密。</p>
+            <p v-else class="nostory">{{ storyHead.empty }}</p>
           </div>
 
           <p class="foot">
@@ -386,7 +412,17 @@ watch(() => props.code, load)
 .abname { margin: 0 0 3px; font-size: 13.5px; font-weight: 600; color: var(--cream); }
 .abdesc { margin: 0; font-size: 12.5px; line-height: 1.75; color: var(--muted); }
 
-/* 人物故事 */
+/* 地图介绍：标签是「适合枪械 / 进攻 / 防守」这类词组，需要更宽的标签列 */
+.abil.is-map li { grid-template-columns: 62px 1fr; }
+.abil.is-map .slot {
+  padding: 4px 2px;
+  font-family: var(--sans);
+  font-size: 9.5px;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+/* 故事 */
 .storybox {
   padding: 14px 16px;
   background: rgba(10, 17, 25, .55);

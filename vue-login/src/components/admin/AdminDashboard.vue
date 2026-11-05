@@ -91,8 +91,8 @@ const FORM_FIELDS = {
     { k: 'sort', lab: '排序', type: 'num' },
     { k: 'featured', lab: '首页精选', type: 'select', options: [1, 0] },
     { k: 'status', lab: '状态', type: 'select', options: [1, 0] },
-    { k: 'abilities', lab: '能力JSON [{slot,name,desc}]', type: 'area' },
-    { k: 'story', lab: '人物故事(空行分段)', type: 'area' }
+    { k: 'abilities', lab: '特性/地图介绍JSON [{slot,name,desc}]', type: 'area' },
+    { k: 'story', lab: '故事(人物/枪械/地图 · 空行分段)', type: 'area' }
   ],
   category: [
     { k: 'parent_id', lab: '父分类(0=一级)', type: 'select', options: [0, 1, 2, 3] },

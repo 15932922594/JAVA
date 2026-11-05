@@ -74,7 +74,7 @@ export const homeCategories = (token) => post('/api/home/categories', { token })
 
 /**
  * 档案详情（点击卡片展开）
- * 比检索列表多返回 story（人物故事，长文本）
+ * 比检索列表多返回 story（故事长文本：人物故事 / 枪械故事 / 地图故事）
  */
 export const homeDetail = (token, code) => post('/api/home/detail', { token, code })
 
