@@ -1,0 +1,128 @@
+/* ============================================================
+   头像框阶梯 —— 与后端 HeroLevel 的边框规则一一对应
+   ------------------------------------------------------------
+   固定 11 档：.frame-1 … .frame-11
+     1 Lv1 新兵   2 Lv3 银翼   3 Lv5 特工   4 Lv8 黄金
+     5 Lv12 猩红  6 Lv16 青碧  7 Lv20 紫晶  8 Lv25 熔岩
+     9 Lv30 星辉 10 Lv40 虚空 11 Lv50 不朽
+   星穹系列（Lv.50 后每 10 级一枚）：.fp + 内联颜色变量 --fp/--fr，
+   节奏类 .pulse / .breathe 由前端按档位序号生成，永无止境。
+   ============================================================ */
+
+/* 1 · 新兵：一条极淡的描边 */
+.frame-1 {
+  box-shadow: 0 0 0 1px rgba(236, 232, 225, .22);
+}
+
+/* 2 · 银翼：冷银描边 + 轻微外发光 */
+.frame-2 {
+  box-shadow: 0 0 0 2px #C9D3DC, 0 0 12px -4px #C9D3DC;
+}
+
+/* 3 · 特工：英雄主色描边 */
+.frame-3 {
+  box-shadow: 0 0 0 2px var(--hc, #FF4655), 0 0 16px -4px var(--hc, #FF4655);
+}
+
+/* 4 · 黄金 */
+.frame-4 {
+  box-shadow: 0 0 0 2px #FFC24B, 0 0 16px -4px #FFC24B;
+}
+
+/* 5 · 猩红脉冲 */
+.frame-5 {
+  --fp: #FF4655;
+  box-shadow: 0 0 0 2px var(--fp), 0 0 14px -2px var(--fp);
+  animation: framePulse 1.8s ease-in-out infinite;
+}
+
+/* 6 · 青碧：双层环 + 呼吸 */
+.frame-6 {
+  --fp: #00E0C6;
+  --fr: rgba(0, 224, 198, .22);
+  box-shadow: 0 0 0 2px var(--fp), 0 0 0 4px var(--fr), 0 0 18px -2px var(--fp);
+  animation: framePulseRing 2.4s ease-in-out infinite;
+}
+
+/* 7 · 紫晶：静态双环 */
+.frame-7 {
+  box-shadow: 0 0 0 2px #A66CFF, 0 0 0 5px rgba(166, 108, 255, .24), 0 0 22px -2px #A66CFF;
+}
+
+/* 8 · 熔岩：橙红双环 + 呼吸 */
+.frame-8 {
+  --fp: #FF6B4A;
+  --fr: rgba(255, 194, 75, .32);
+  box-shadow: 0 0 0 2px var(--fp), 0 0 0 5px var(--fr), 0 0 24px -2px var(--fp);
+  animation: framePulseRing 1.6s ease-in-out infinite;
+}
+
+/* 9 · 星辉：白金冷光，缓慢呼吸 */
+.frame-9 {
+  box-shadow: 0 0 0 2px #F2F6FF, 0 0 0 5px rgba(140, 190, 255, .28), 0 0 22px 0 rgba(140, 190, 255, .5);
+  animation: frameStellar 3.2s ease-in-out infinite;
+}
+
+/* 10 · 虚空：深紫环 + 青色内环 */
+.frame-10 {
+  --fp: #6C4DFF;
+  --fr: rgba(0, 224, 198, .3);
+  box-shadow: 0 0 0 2px var(--fp), 0 0 0 5px var(--fr), 0 0 28px 2px rgba(108, 77, 255, .6);
+  animation: framePulseRing 2s ease-in-out infinite;
+}
+
+/* 11 · 不朽：彩环流动（固定档最高） */
+.frame-11 {
+  box-shadow: 0 0 0 2px #FF4655, 0 0 0 5px rgba(255, 70, 85, .22), 0 0 26px 2px rgba(255, 70, 85, .6);
+  animation: frameLegend 6s linear infinite;
+}
+
+/* ---------- 星穹系列（程序化档位，颜色由内联 --fp/--fr 提供） ---------- */
+.fp {
+  box-shadow: 0 0 0 2px var(--fp, #6C4DFF), 0 0 0 5px var(--fr, rgba(108, 77, 255, .25)), 0 0 24px -2px var(--fp, #6C4DFF);
+}
+.fp.pulse {
+  animation: framePulseRing 1.8s ease-in-out infinite;
+}
+.fp.breathe {
+  animation: framePulseRing 3.4s ease-in-out infinite;
+}
+
+/* ---------- 动画 ---------- */
+@keyframes framePulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--fp), 0 0 12px -2px var(--fp); }
+  50% { box-shadow: 0 0 0 2px var(--fp), 0 0 26px 2px var(--fp); }
+}
+
+@keyframes framePulseRing {
+  0%, 100% {
+    box-shadow: 0 0 0 2px var(--fp), 0 0 0 4px var(--fr), 0 0 14px -2px var(--fp);
+  }
+  50% {
+    box-shadow: 0 0 0 2px var(--fp), 0 0 0 5px var(--fr), 0 0 28px 2px var(--fp);
+  }
+}
+
+@keyframes frameStellar {
+  0%, 100% {
+    box-shadow: 0 0 0 2px #F2F6FF, 0 0 0 5px rgba(140, 190, 255, .28), 0 0 22px 0 rgba(140, 190, 255, .5);
+  }
+  50% {
+    box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 6px rgba(140, 190, 255, .45), 0 0 34px 4px rgba(140, 190, 255, .75);
+  }
+}
+
+@keyframes frameLegend {
+  0% { box-shadow: 0 0 0 2px #FF4655, 0 0 0 5px rgba(255, 70, 85, .22), 0 0 26px 2px rgba(255, 70, 85, .6); }
+  25% { box-shadow: 0 0 0 2px #FFC24B, 0 0 0 5px rgba(255, 194, 75, .22), 0 0 26px 2px rgba(255, 194, 75, .6); }
+  50% { box-shadow: 0 0 0 2px #3DDC97, 0 0 0 5px rgba(61, 220, 151, .22), 0 0 26px 2px rgba(61, 220, 151, .6); }
+  75% { box-shadow: 0 0 0 2px #4DA6FF, 0 0 0 5px rgba(77, 166, 255, .22), 0 0 26px 2px rgba(77, 166, 255, .6); }
+  100% { box-shadow: 0 0 0 2px #FF4655, 0 0 0 5px rgba(255, 70, 85, .22), 0 0 26px 2px rgba(255, 70, 85, .6); }
+}
+
+/* 亮度/动效敏感用户：保留配色，关掉动画 */
+@media (prefers-reduced-motion: reduce) {
+  .frame-5, .frame-6, .frame-8, .frame-9, .frame-10, .frame-11, .fp.pulse, .fp.breathe {
+    animation: none;
+  }
+}
