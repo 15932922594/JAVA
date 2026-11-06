@@ -11,7 +11,7 @@
  Target Server Version : 80409 (8.4.9)
  File Encoding         : 65001
 
- Date: 05/11/2026 22:28:34
+ Date: 06/11/2026 09:38:12
 */
 
 SET NAMES utf8mb4;
@@ -32,7 +32,7 @@ CREATE TABLE `admin_log`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_admin`(`admin_id` ASC) USING BTREE,
   INDEX `idx_time`(`create_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '后台操作日志' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '后台操作日志' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of admin_log
@@ -55,6 +55,7 @@ INSERT INTO `admin_log` VALUES (15, 1, '爱打球的T', 'admin', 'LOGIN', '管�
 INSERT INTO `admin_log` VALUES (16, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-05 13:58:46');
 INSERT INTO `admin_log` VALUES (17, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-05 18:50:37');
 INSERT INTO `admin_log` VALUES (18, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-05 21:58:10');
+INSERT INTO `admin_log` VALUES (19, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-06 08:44:19');
 
 -- ----------------------------
 -- Table structure for admin_user
@@ -205,7 +206,7 @@ CREATE TABLE `agent_pk`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_challenger`(`challenger_id` ASC) USING BTREE,
   INDEX `idx_defender`(`defender_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'PK 战绩表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'PK 战绩表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of agent_pk
@@ -213,6 +214,13 @@ CREATE TABLE `agent_pk`  (
 INSERT INTO `agent_pk` VALUES (13, 1, '爱打球的T', 9, 'gay', 424, 250, 1, '挑战方胜', '2026-11-05 21:54:17');
 INSERT INTO `agent_pk` VALUES (14, 1, '爱打球的T', 9, 'gay', 449, 256, 1, '挑战方胜', '2026-11-05 21:54:22');
 INSERT INTO `agent_pk` VALUES (15, 1, '爱打球的T', 9, 'gay', 423, 259, 1, '挑战方胜', '2026-11-05 21:54:24');
+INSERT INTO `agent_pk` VALUES (16, 1, '爱打球的T', 26, '123', 464, 302, 1, '挑战方胜', '2026-11-06 08:44:06');
+INSERT INTO `agent_pk` VALUES (17, 1, '爱打球的T', 26, '123', 423, 278, 1, '挑战方胜', '2026-11-06 08:44:12');
+INSERT INTO `agent_pk` VALUES (18, 28, '星落大帝', 1, '爱打球的T', 309, 401, 1, '应战方胜', '2026-11-06 09:04:06');
+INSERT INTO `agent_pk` VALUES (19, 28, '星落大帝', 26, '123', 267, 264, 28, '挑战方胜', '2026-11-06 09:04:09');
+INSERT INTO `agent_pk` VALUES (20, 28, '星落大帝', 26, '123', 282, 318, 26, '应战方胜', '2026-11-06 09:04:13');
+INSERT INTO `agent_pk` VALUES (21, 28, '星落大帝', 26, '123', 289, 262, 28, '挑战方胜', '2026-11-06 09:04:18');
+INSERT INTO `agent_pk` VALUES (22, 28, '星落大帝', 9, 'gay', 309, 270, 28, '挑战方胜', '2026-11-06 09:26:42');
 
 -- ----------------------------
 -- Table structure for agent_reset_code
@@ -246,15 +254,17 @@ CREATE TABLE `agent_session`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_token`(`token` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 77 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '登录会话表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 85 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '登录会话表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_session
 -- ----------------------------
 INSERT INTO `agent_session` VALUES (59, '0bcc85f7942848f8a70cd731a19ffe49', 9, '2026-11-12 20:24:33', '2026-11-05 20:24:32');
-INSERT INTO `agent_session` VALUES (72, 'ab30269eb5d940babba8c27e93a970f2', 1, '2026-11-12 21:24:36', '2026-11-05 21:24:35');
-INSERT INTO `agent_session` VALUES (75, '79450a04c58c425d980f919b2fa3ae2b', 1, '2026-11-12 21:53:18', '2026-11-05 21:53:18');
-INSERT INTO `agent_session` VALUES (76, '98074d383f3043dda78532ed9bf7669d', 1, '2026-11-12 21:58:10', '2026-11-05 21:58:10');
+INSERT INTO `agent_session` VALUES (78, '256fe5a58bae4d25a7504b5a2b01db96', 26, '2026-11-12 22:55:15', '2026-11-05 22:55:14');
+INSERT INTO `agent_session` VALUES (80, '65022fabf21c41f793319f72b92eb310', 1, '2026-11-13 08:43:15', '2026-11-06 08:43:14');
+INSERT INTO `agent_session` VALUES (81, 'e2d3ba4a00774689aa9741bfb0982e3d', 1, '2026-11-13 08:44:19', '2026-11-06 08:44:19');
+INSERT INTO `agent_session` VALUES (83, '4b0f89b6525b44dda4c5daffbe4cb583', 28, '2026-11-13 09:00:01', '2026-11-06 09:00:00');
+INSERT INTO `agent_session` VALUES (84, '1e780452d5114e20867ccb69e6415929', 1, '2026-11-13 09:35:36', '2026-11-06 09:35:35');
 
 -- ----------------------------
 -- Table structure for agent_user
@@ -282,13 +292,15 @@ CREATE TABLE `agent_user`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_email`(`email` ASC) USING BTREE,
   UNIQUE INDEX `uk_name`(`name` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工账号表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工账号表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_user
 -- ----------------------------
-INSERT INTO `agent_user` VALUES (1, '爱打球的T', '264132801@qq.com', NULL, '3cb9bb890b91efdd310c935089eb3935b82ce46640a4b68bb0c5a2b72d28d2b5', '9e1431e9dbdaa424328eda90965d4ea6', 0, 20, 3356, 10946, 'operator', 7, 3, 0, '2026-11-05', 0, '2026-10-28 16:36:07', '2026-11-05 21:57:34');
-INSERT INTO `agent_user` VALUES (9, 'gay', '3376460573@qq.com', 'tmz258412', NULL, NULL, 0, 1, 800, 20, 'classic', 0, 0, 3, '2026-11-05', 1, '2026-10-29 15:04:01', '2026-11-05 21:54:24');
+INSERT INTO `agent_user` VALUES (1, '爱打球的T', '264132801@qq.com', NULL, '3cb9bb890b91efdd310c935089eb3935b82ce46640a4b68bb0c5a2b72d28d2b5', '9e1431e9dbdaa424328eda90965d4ea6', 0, 20, 3772, 11154, 'operator', 7, 6, 0, '2026-11-06', 0, '2026-10-28 16:36:07', '2026-11-06 09:09:37');
+INSERT INTO `agent_user` VALUES (9, 'gay', '3376460573@qq.com', 'tmz258412', NULL, NULL, 0, 1, 800, 20, 'classic', 0, 0, 4, '2026-11-05', 1, '2026-10-29 15:04:01', '2026-11-06 09:26:42');
+INSERT INTO `agent_user` VALUES (26, '123', '2099336743@qq.com', '123456', NULL, NULL, 4, 1, 36, 38, 'classic', 0, 1, 4, '2026-11-05', 1, '2026-11-05 22:55:03', '2026-11-06 09:04:17');
+INSERT INTO `agent_user` VALUES (28, '星落大帝', 'czh101481@qq.com', '10140801czh', NULL, NULL, 2, 7, 1668, 1381, 'marshal', 1, 3, 2, '2026-11-06', 1, '2026-11-06 08:59:45', '2026-11-06 09:29:08');
 
 -- ----------------------------
 -- Table structure for agent_weapon
@@ -303,7 +315,7 @@ CREATE TABLE `agent_weapon`  (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '璐?拱鏃堕棿',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_weapon`(`user_id` ASC, `weapon_code` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 32 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '鐗瑰伐宸茶喘姝﹀櫒琛' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 38 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '鐗瑰伐宸茶喘姝﹀櫒琛' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of agent_weapon
@@ -319,6 +331,11 @@ INSERT INTO `agent_weapon` VALUES (11, 1, '爱打球的T', 'phantom', '幻影', 
 INSERT INTO `agent_weapon` VALUES (29, 23, 'FRAMETEST', 'classic', '标配', '2026-11-05 21:17:31');
 INSERT INTO `agent_weapon` VALUES (30, 24, 'PKA86292', 'classic', '标配', '2026-11-05 21:44:52');
 INSERT INTO `agent_weapon` VALUES (31, 25, 'PKB86292', 'classic', '标配', '2026-11-05 21:44:52');
+INSERT INTO `agent_weapon` VALUES (32, 26, '123', 'classic', '标配', '2026-11-05 22:55:03');
+INSERT INTO `agent_weapon` VALUES (33, 26, '123', 'sheriff', '正义', '2026-11-05 22:56:03');
+INSERT INTO `agent_weapon` VALUES (35, 28, '星落大帝', 'classic', '标配', '2026-11-06 08:59:45');
+INSERT INTO `agent_weapon` VALUES (36, 28, '星落大帝', 'marshal', '鸟狙', '2026-11-06 09:03:38');
+INSERT INTO `agent_weapon` VALUES (37, 28, '星落大帝', 'odin', '战神', '2026-11-06 09:29:08');
 
 -- ----------------------------
 -- Table structure for archive_category
@@ -373,7 +390,7 @@ CREATE TABLE `feed_mark`  (
   UNIQUE INDEX `uk_user_feed`(`user_id` ASC, `feed_id` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE,
   INDEX `idx_feed`(`feed_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工情报交互（已读/收藏/点赞）' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工情报交互（已读/收藏/点赞）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of feed_mark
@@ -384,6 +401,12 @@ INSERT INTO `feed_mark` VALUES (3, 1, 3, 1, 0, 1, '2026-11-02 08:56:41');
 INSERT INTO `feed_mark` VALUES (4, 1, 7, 1, 0, 0, '2026-11-05 15:06:38');
 INSERT INTO `feed_mark` VALUES (5, 1, 4, 1, 0, 1, '2026-11-05 21:57:07');
 INSERT INTO `feed_mark` VALUES (6, 1, 5, 1, 0, 0, '2026-11-05 21:57:19');
+INSERT INTO `feed_mark` VALUES (7, 28, 1, 1, 0, 1, '2026-11-06 09:02:35');
+INSERT INTO `feed_mark` VALUES (8, 28, 2, 1, 0, 0, '2026-11-06 09:02:46');
+INSERT INTO `feed_mark` VALUES (9, 28, 3, 1, 0, 0, '2026-11-06 09:02:48');
+INSERT INTO `feed_mark` VALUES (10, 28, 4, 1, 0, 0, '2026-11-06 09:02:49');
+INSERT INTO `feed_mark` VALUES (11, 28, 5, 1, 0, 0, '2026-11-06 09:02:51');
+INSERT INTO `feed_mark` VALUES (12, 28, 6, 1, 0, 0, '2026-11-06 09:02:52');
 
 -- ----------------------------
 -- Table structure for game_record
@@ -402,7 +425,7 @@ CREATE TABLE `game_record`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user_mode`(`user_id` ASC, `mode` ASC) USING BTREE,
   INDEX `idx_user_time`(`user_id` ASC, `create_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 43 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'RANGE 训练场成绩' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 63 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'RANGE 训练场成绩' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of game_record
@@ -443,6 +466,26 @@ INSERT INTO `game_record` VALUES (39, 1, 'REACTION', 1050, 1, 5, 5, 390, '2026-1
 INSERT INTO `game_record` VALUES (40, 1, 'RECOIL', 10708, 1, 1, 1, 0, '2026-11-05 21:56:04');
 INSERT INTO `game_record` VALUES (41, 1, 'RECOIL', 10182, 1, 1, 1, 0, '2026-11-05 21:56:22');
 INSERT INTO `game_record` VALUES (42, 1, 'TARGET', 399, 35, 36, 35, 0, '2026-11-05 21:56:59');
+INSERT INTO `game_record` VALUES (43, 26, 'TARGET', 366, 32, 35, 32, 0, '2026-11-05 22:56:43');
+INSERT INTO `game_record` VALUES (44, 28, 'TARGET', 333, 29, 34, 29, 0, '2026-11-06 09:01:13');
+INSERT INTO `game_record` VALUES (45, 28, 'REACTION', 0, 0, 5, 5, 645, '2026-11-06 09:01:35');
+INSERT INTO `game_record` VALUES (46, 28, 'REACTION', 680, 0, 5, 5, 464, '2026-11-06 09:01:51');
+INSERT INTO `game_record` VALUES (47, 28, 'RECOIL', 4734, 1, 1, 1, 0, '2026-11-06 09:02:07');
+INSERT INTO `game_record` VALUES (48, 28, 'RECOIL', 5300, 0, 1, 0, 0, '2026-11-06 09:02:22');
+INSERT INTO `game_record` VALUES (49, 28, 'RECOIL', 2047, 0, 1, 0, 0, '2026-11-06 09:07:14');
+INSERT INTO `game_record` VALUES (50, 28, 'RECOIL', 8181, 1, 1, 1, 0, '2026-11-06 09:07:28');
+INSERT INTO `game_record` VALUES (51, 1, 'RECOIL', 10249, 1, 1, 1, 0, '2026-11-06 09:07:44');
+INSERT INTO `game_record` VALUES (52, 28, 'RECOIL', 715, 0, 1, 0, 0, '2026-11-06 09:07:59');
+INSERT INTO `game_record` VALUES (53, 28, 'RECOIL', 7817, 1, 1, 1, 0, '2026-11-06 09:08:15');
+INSERT INTO `game_record` VALUES (54, 28, 'RECOIL', 6218, 1, 1, 1, 0, '2026-11-06 09:08:28');
+INSERT INTO `game_record` VALUES (55, 28, 'RECOIL', 549, 0, 1, 0, 0, '2026-11-06 09:08:41');
+INSERT INTO `game_record` VALUES (56, 28, 'RECOIL', 10100, 1, 1, 1, 0, '2026-11-06 09:08:57');
+INSERT INTO `game_record` VALUES (57, 28, 'RECOIL', 533, 0, 1, 0, 0, '2026-11-06 09:09:12');
+INSERT INTO `game_record` VALUES (58, 28, 'REACTION', 810, 0, 5, 5, 438, '2026-11-06 09:09:35');
+INSERT INTO `game_record` VALUES (59, 1, 'REACTION', 960, 0, 5, 5, 408, '2026-11-06 09:09:38');
+INSERT INTO `game_record` VALUES (60, 28, 'REACTION', 870, 0, 5, 5, 426, '2026-11-06 09:09:52');
+INSERT INTO `game_record` VALUES (61, 28, 'RECOIL', 2119, 0, 1, 0, 0, '2026-11-06 09:28:03');
+INSERT INTO `game_record` VALUES (62, 28, 'RECOIL', 4347, 0, 1, 0, 0, '2026-11-06 09:28:29');
 
 -- ----------------------------
 -- Table structure for home_feed
@@ -526,11 +569,15 @@ CREATE TABLE `mission_progress`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_mission`(`user_id` ASC, `mission_code` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工任务进度' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '特工任务进度' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of mission_progress
 -- ----------------------------
 INSERT INTO `mission_progress` VALUES (1, 1, 'ascent', 3, '[0,1,2,3]', '2026-11-02 08:56:55', '2026-11-02 09:36:55', '2026-11-02 08:57:08', '2026-11-02 08:56:55');
+INSERT INTO `mission_progress` VALUES (2, 26, 'ascent', 1, '[2,3]', '2026-11-05 22:55:27', '2026-11-05 23:35:27', NULL, '2026-11-05 22:55:26');
+INSERT INTO `mission_progress` VALUES (3, 28, 'bind', 3, '[0,1,2,3]', '2026-11-06 09:03:02', '2026-11-06 09:48:02', '2026-11-06 09:03:09', '2026-11-06 09:03:01');
+INSERT INTO `mission_progress` VALUES (4, 28, 'ascent', 3, '[0,1,2,3]', '2026-11-06 09:03:15', '2026-11-06 09:43:15', '2026-11-06 09:03:18', '2026-11-06 09:03:14');
+INSERT INTO `mission_progress` VALUES (5, 28, 'nightfall', 3, '[0,1,2]', '2026-11-06 09:28:48', '2026-11-06 09:58:48', '2026-11-06 09:28:54', '2026-11-06 09:28:48');
 
 SET FOREIGN_KEY_CHECKS = 1;
