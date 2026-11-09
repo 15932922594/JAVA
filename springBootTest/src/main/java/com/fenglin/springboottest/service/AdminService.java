@@ -61,6 +61,8 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
     private final AgentUserMapper userMapper;
     private final AgentWeaponMapper weaponMapper;
     private final AgentUserService userService;
+    /** 武器目录（价格 / 需求等级 存库可编辑） */
+    private final WeaponCatalogService catalogService;
 
     public AdminService(AdminLogMapper logMapper,
                         AgentArchiveMapper archiveMapper,
@@ -69,7 +71,8 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
                         MissionBriefMapper missionMapper,
                         AgentUserMapper userMapper,
                         AgentWeaponMapper weaponMapper,
-                        AgentUserService userService) {
+                        AgentUserService userService,
+                        WeaponCatalogService catalogService) {
         this.logMapper = logMapper;
         this.archiveMapper = archiveMapper;
         this.categoryMapper = categoryMapper;
@@ -78,6 +81,7 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
         this.userMapper = userMapper;
         this.weaponMapper = weaponMapper;
         this.userService = userService;
+        this.catalogService = catalogService;
     }
 
     /* ================= 管理员登录态 ================= */
@@ -348,17 +352,17 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
         }
         int userCount = users.size();
 
-        // 武器侧统计
+        // 武器侧统计（目录取自数据库，可在后台修改价格与需求等级）
         Map<String, Integer> countByCode = new LinkedHashMap<>();
         Map<String, Long> revenueByCode = new LinkedHashMap<>();
-        for (WeaponCatalog.Weapon w : WeaponCatalog.all()) {
+        for (WeaponCatalog.Weapon w : catalogService.all()) {
             countByCode.put(w.code, 0);
             revenueByCode.put(w.code, 0L);
         }
         long revenue = 0;
         for (AgentWeapon aw : all) {
             String code = aw.getWeaponCode();
-            WeaponCatalog.Weapon w = WeaponCatalog.find(code);
+            WeaponCatalog.Weapon w = catalogService.find(code);
             int price = w == null ? 0 : w.price;
             revenue += price;
             countByCode.merge(code, 1, Integer::sum);
@@ -366,23 +370,25 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
         }
 
         List<Map<String, Object>> weapons = new ArrayList<>();
-        for (WeaponCatalog.Weapon w : WeaponCatalog.all()) {
+        for (WeaponCatalog.Weapon w : catalogService.all()) {
             Map<String, Object> m = new LinkedHashMap<>();
             m.put("code", w.code);
             m.put("name", w.name);
             m.put("category", w.category);
             m.put("price", w.price);
             m.put("req_level", w.level);
+            m.put("power", w.power);
+            m.put("status", w.status);
             m.put("count", countByCode.getOrDefault(w.code, 0));
             m.put("revenue", revenueByCode.getOrDefault(w.code, 0L));
             weapons.add(m);
         }
-        weapons.sort((a, b) -> Integer.compare((int) b.get("count"), (int) a.get("count")));
+        weapons.sort((a, b) -> Integer.compare((int) a.get("price"), (int) b.get("price")));
 
         List<Map<String, Object>> recent = new ArrayList<>();
         for (int i = 0; i < Math.min(12, all.size()); i++) {
             AgentWeapon aw = all.get(i);
-            WeaponCatalog.Weapon w = WeaponCatalog.find(aw.getWeaponCode());
+            WeaponCatalog.Weapon w = catalogService.find(aw.getWeaponCode());
             Map<String, Object> m = new LinkedHashMap<>();
             m.put("id", aw.getId());
             m.put("user_id", aw.getUserId());
@@ -410,6 +416,32 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
         data.put("recent", recent);
         data.put("userCount", userCount);
         return data;
+    }
+
+    /**
+     * 后台修改武器配置（价格 / 需求等级 / 战力 / 上下架）。
+     *
+     * @return "ok" 或 notfound / invalid-price / invalid-level
+     */
+    public String saveWeapon(Map<String, Object> d) {
+        if (d == null) {
+            return "notfound";
+        }
+        return catalogService.save(
+                longOf(d.get("id")),
+                str(d.get("code")),
+                str(d.get("name")),
+                str(d.get("category")),
+                intOfOrNull(d.get("price")),
+                intOfOrNull(d.get("req_level")),
+                intOfOrNull(d.get("power")),
+                intOfOrNull(d.get("sort")),
+                intOfOrNull(d.get("status")));
+    }
+
+    /** 后台武器目录明细（含 id / sort，供编辑回填） */
+    public List<Map<String, Object>> weaponList() {
+        return catalogService.listAll();
     }
 
     /* ================= 档案（agent_archive） ================= */
@@ -819,6 +851,22 @@ public class AdminService extends ServiceImpl<AdminUserMapper, AdminUser> {
 
     private static String str(Object o) {
         return o == null ? "" : String.valueOf(o).trim();
+    }
+
+    /** 数字字段：空串 / null 返回 null（表示「不修改」） */
+    private static Integer intOfOrNull(Object o) {
+        if (o == null) {
+            return null;
+        }
+        String s = String.valueOf(o).trim();
+        if (s.isEmpty()) {
+            return null;
+        }
+        try {
+            return (int) Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private static String strOr(Object o, String def) {

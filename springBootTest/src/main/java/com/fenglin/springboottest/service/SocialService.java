@@ -49,12 +49,15 @@ public class SocialService extends ServiceImpl<AgentFriendMapper, AgentFriend> {
     private final AgentUserMapper userMapper;
     private final AgentPkMapper pkMapper;
     private final HeroLevelService levelService;
+    /** 武器目录（战力加成取数据库里可编辑的配置） */
+    private final WeaponCatalogService catalog;
 
     public SocialService(AgentUserMapper userMapper, AgentPkMapper pkMapper,
-                         HeroLevelService levelService) {
+                         HeroLevelService levelService, WeaponCatalogService catalog) {
         this.userMapper = userMapper;
         this.pkMapper = pkMapper;
         this.levelService = levelService;
+        this.catalog = catalog;
     }
 
     /* ==========================================================
@@ -66,13 +69,13 @@ public class SocialService extends ServiceImpl<AgentFriendMapper, AgentFriend> {
         int level = HeroLevel.levelOf(u.getExp() == null ? 0 : u.getExp());
         String weapon = u.getEquippedWeapon() == null || u.getEquippedWeapon().isBlank()
                 ? "classic" : u.getEquippedWeapon();
-        return HeroStats.power(u.getAgentIndex(), level, weapon);
+        return HeroStats.power(u.getAgentIndex(), level, catalog.find(weapon));
     }
 
     /** 对外展示的玩家卡片 */
     private Map<String, Object> card(AgentUser u, String relation) {
         int level = HeroLevel.levelOf(u.getExp() == null ? 0 : u.getExp());
-        WeaponCatalog.Weapon w = WeaponCatalog.find(u.getEquippedWeapon());
+        WeaponCatalog.Weapon w = catalog.find(u.getEquippedWeapon());
         int frameTier = HeroLevel.shownFrameTier(level, u.getEquippedFrame());
 
         Map<String, Object> m = new LinkedHashMap<>();

@@ -68,14 +68,29 @@ public final class HeroStats {
      * @param weaponCode 当前主武器（null 视作标配）
      */
     public static int power(Integer agentIndex, int level, String weaponCode) {
+        return power(agentIndex, level, weaponCode, WeaponCatalog.find(weaponCode));
+    }
+
+    /**
+     * 计算战力（武器数据由调用方提供，便于使用数据库里可编辑的目录）。
+     *
+     * @param weapon 当前主武器（null 视作无加成）
+     */
+    public static int power(Integer agentIndex, int level, WeaponCatalog.Weapon weapon) {
         int[] s = stats(agentIndex);
         double base = s[0] * W_FIRE + s[1] * W_MOB + s[2] * W_CTRL + s[3] * W_DEF;
         int lv = Math.max(1, level);
         double growth = 1 + GROWTH * (lv - 1);
 
-        WeaponCatalog.Weapon w = WeaponCatalog.find(weaponCode);
-        int weaponBonus = w == null ? 0 : w.power;
+        int weaponBonus = weapon == null ? 0 : weapon.power;
 
         return (int) Math.round(base * growth + weaponBonus);
+    }
+
+    /**
+     * 计算战力（兼容旧调用：ignoredWeaponCode 仅为占位，实际以 weapon 为准）。
+     */
+    public static int power(Integer agentIndex, int level, String ignoredWeaponCode, WeaponCatalog.Weapon weapon) {
+        return power(agentIndex, level, weapon);
     }
 }

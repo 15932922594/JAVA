@@ -29,22 +29,35 @@ public final class WeaponCatalog {
         public final int level;
         /** 装备后的战力加成 */
         public final int power;
+        /** 1 上架 / 0 下架（下架后不可购买，但仍保留外观/战力数据） */
+        public final int status;
 
-        Weapon(String code, String name, String category, int price, int level, int power) {
+        public Weapon(String code, String name, String category, int price, int level, int power) {
+            this(code, name, category, price, level, power, 1);
+        }
+
+        public Weapon(String code, String name, String category, int price, int level, int power, int status) {
             this.code = code;
             this.name = name;
             this.category = category;
             this.price = price;
             this.level = level;
             this.power = power;
+            this.status = status;
         }
 
         public boolean free() {
             return price == 0;
         }
+
+        public boolean onSale() {
+            return status != 0;
+        }
     }
 
     /**
+     * 代码内的「初始目录」：仅在数据库 weapon_catalog 无数据时作为兜底，运行时以库为准。
+     *
      * 目录顺序即商店展示顺序（从免费到最贵）。
      * 等级门槛：越强的枪需要越高的英雄等级才允许购买。
      * 战力加成：装备为主武器后加在英雄战力上。
@@ -72,6 +85,11 @@ public final class WeaponCatalog {
 
     public static List<Weapon> all() {
         return ALL;
+    }
+
+    /** code 是否在初始目录内（用于校验后台修改的是不是已知武器） */
+    public static boolean exists(String code) {
+        return find(code) != null;
     }
 
     /** 按 code 查武器；不存在返回 null */

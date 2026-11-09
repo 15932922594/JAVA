@@ -112,6 +112,25 @@ RIOT 登录：`/api/auth/riot/authorize`（可选传 `uid` 复用同一个 Riot 
 - 登录时未勾选「保持登录」则不保存 token；`/api/auth/logout` 注销会话
 - 每次登录顺手清理已过期会话
 
+## 军械库后台可编辑（价格 / 需求等级）
+
+武器价格、需求等级、战力加成、上下架状态已从 Java 常量迁到数据库表 `weapon_catalog`，
+后台「军械」标签页可直接编辑，保存后前台商店即时生效。
+
+建表：`mysql -uroot -p123456 --default-character-set=utf8mb4 < sql/weapon_catalog.sql`
+
+| 方法 | 路径 | 入参 (JSON) | 返回 |
+| --- | --- | --- | --- |
+| POST | /api/admin/armory/list | `{ token }` | `{code:0, data:[{id,code,name,category,price,req_level,power,sort,status,update_time}]}` |
+| POST | /api/admin/armory/save | `{ token, data:{ code, name, category, price, req_level, power?, sort?, status? } }` | `{code:0}`；价格<0 / 等级<1 → `code:400` |
+
+说明：
+- 表里没有该武器时自动回落到 `WeaponCatalog.java` 的代码常量，**老库不执行脚本也能正常启动**；
+- `status = 0` 表示下架，前台商店不再展示，购买接口返回 `off-shelf`；
+- 战力（`HeroStats.power`）与好友 PK 战力均读取库内 `power` 字段，改完立即生效。
+
+前端：`vue-login/src/components/admin/AdminDashboard.vue`（军械 → 武器配置 → 编辑）。
+
 ## 启动
 
 ```bash
@@ -121,9 +140,13 @@ mysql -uroot -p123456 < sql/home.sql     # 档案 / 分类 / 动态流
 mysql -uroot -p123456 < sql/mission.sql  # 作战任务（简报 + 进度）
 mysql -uroot -p123456 < sql/intel.sql    # 情报中心（正文 + 交互记录）
 mysql -uroot -p123456 < sql/game.sql    # 训练场（小游戏成绩）
+mysql -uroot -p123456 --default-character-set=utf8mb4 < sql/weapon_catalog.sql  # 武器目录（后台可改价格 / 等级）
 # 2. 启动（端口 8081，配置在 application-dev.properties）
 mvnw.cmd spring-boot:run
 ```
+
+> Windows 下 mysql 客户端默认 GBK 字符集，导入含中文的 SQL **必须**加
+> `--default-character-set=utf8mb4`，否则会报 `Data too long for column 'category'`。
 
 数据源：`localhost:3306/agent_access`，root / 123456（见 `application-dev.properties`）。
 

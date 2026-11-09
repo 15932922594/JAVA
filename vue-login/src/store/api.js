@@ -273,6 +273,12 @@ export const adminStats = (token) => post('/api/admin/stats', { token })
 /** 军械经济统计：累计购枪 / 消费 / 武器销量 / 最近购买 */
 export const adminArmoryStats = (token) => post('/api/admin/armory/stats', { token })
 
+/** 武器目录明细（含 id / 排序，编辑回填用） */
+export const adminArmoryList = (token) => post('/api/admin/armory/list', { token })
+
+/** 修改武器售价 / 需求等级 / 战力 / 上下架 */
+export const adminArmorySave = (token, data) => post('/api/admin/armory/save', { token, data })
+
 /** 档案列表 */
 export const adminArchiveList = (token, params = {}) =>
   post('/api/admin/archive/list', { token, ...params })

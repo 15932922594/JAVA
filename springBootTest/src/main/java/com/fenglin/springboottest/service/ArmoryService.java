@@ -30,9 +30,12 @@ import java.util.Set;
 public class ArmoryService extends ServiceImpl<AgentWeaponMapper, AgentWeapon> {
 
     private final AgentUserMapper userMapper;
+    /** 武器目录（价格 / 需求等级 存库，后台可改） */
+    private final WeaponCatalogService catalog;
 
-    public ArmoryService(AgentUserMapper userMapper) {
+    public ArmoryService(AgentUserMapper userMapper, WeaponCatalogService catalog) {
         this.userMapper = userMapper;
+        this.catalog = catalog;
     }
 
     /* 商店页数据 */
@@ -44,7 +47,7 @@ public class ArmoryService extends ServiceImpl<AgentWeaponMapper, AgentWeapon> {
         data.put("heroLevel", levelOf(user));
         data.put("frameTier", HeroLevel.frameTier(levelOf(user)));
 
-        List<Map<String, Object>> weapons = WeaponCatalog.toList();
+        List<Map<String, Object>> weapons = catalog.shopList();
         String equipped = user.getEquippedWeapon() == null || user.getEquippedWeapon().isBlank()
                 ? "classic" : user.getEquippedWeapon();
         for (Map<String, Object> w : weapons) {
@@ -54,7 +57,7 @@ public class ArmoryService extends ServiceImpl<AgentWeaponMapper, AgentWeapon> {
         data.put("weapons", weapons);
         data.put("ownedCount", owned.size());
         data.put("equipped", equipped);
-        data.put("power", HeroStats.power(user.getAgentIndex(), levelOf(user), equipped));
+        data.put("power", HeroStats.power(user.getAgentIndex(), levelOf(user), equipped, catalog.find(equipped)));
         return data;
     }
 
@@ -64,7 +67,7 @@ public class ArmoryService extends ServiceImpl<AgentWeaponMapper, AgentWeapon> {
      * @return 成功返回装备信息；失败返回错误码 not-owned / level-too-low / unknown-weapon
      */
     public Object equip(AgentUser user, String code) {
-        WeaponCatalog.Weapon w = WeaponCatalog.find(code);
+        WeaponCatalog.Weapon w = catalog.find(code);
         if (w == null) {
             return "unknown-weapon";
         }
@@ -82,7 +85,7 @@ public class ArmoryService extends ServiceImpl<AgentWeaponMapper, AgentWeapon> {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("code", w.code);
         data.put("name", w.name);
-        data.put("power", HeroStats.power(user.getAgentIndex(), levelOf(user), w.code));
+        data.put("power", HeroStats.power(user.getAgentIndex(), levelOf(user), w.code, w));
         return data;
     }
 
@@ -90,12 +93,16 @@ public class ArmoryService extends ServiceImpl<AgentWeaponMapper, AgentWeapon> {
      * 购买武器。
      *
      * @return 成功返回 Map（新余额等）；失败返回错误码字符串：
-     *         unknown-weapon / already-owned / level-too-low / not-enough-credits
+     *         unknown-weapon / off-shelf / already-owned / level-too-low / not-enough-credits
      */
     public Object buy(AgentUser user, String code) {
-        WeaponCatalog.Weapon w = WeaponCatalog.find(code);
+        WeaponCatalog.Weapon w = catalog.find(code);
         if (w == null) {
             return "unknown-weapon";
+        }
+        // 后台下架的武器不再允许购买
+        if (!w.onSale()) {
+            return "off-shelf";
         }
 
         Set<String> owned = ownedCodes(user.getId());
