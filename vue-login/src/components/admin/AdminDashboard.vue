@@ -42,6 +42,7 @@ const stats = ref(null)
 
 /* ---------------- 军械经济统计 ---------------- */
 const armory = ref(null)
+const armoryTab = ref('weapons')   // weapons 武器配置 / recent 最近购买
 
 /* ---------------- 通用列表状态 ---------------- */
 const list = reactive({ rows: [], total: 0, pages: 0, page: 1, loading: false, q: '' })
@@ -62,6 +63,21 @@ function closeEdit() {
   editing.value = false
 }
 
+/** 军械行 → 编辑弹窗（字段名与后端返回的 req_level 保持一致） */
+function openEditArmory(row) {
+  openEdit('armory', {
+    id: row.id ?? null,
+    code: row.code,
+    name: row.name,
+    category: row.category,
+    price: row.price,
+    req_level: row.req_level,
+    power: row.power ?? 0,
+    sort: row.sort ?? 0,
+    status: row.status ?? 1
+  })
+}
+
 function defaultOf(type) {
   if (type === 'archive')
     return { id: null, category_code: 'AGENT', sub_code: '', tier: 'A', code: '', name: '', name_cn: '', mono: '', color: '#FF4655', bio: '', img: '', abilities: '', firepower: 5, mobility: 5, control: 5, defense: 5, heat: 0, featured: 0, sort: 0, status: 1, story: '' }
@@ -71,6 +87,8 @@ function defaultOf(type) {
     return { id: null, kind: 'NEWS', title: '', summary: '', body: '', source: '', importance: 'LOW', category_code: '', tag: '', heat: 0, status: 1 }
   if (type === 'mission')
     return { id: null, mission_code: '', briefing: '', objectives: '', reward: 100, duration_min: 30, region: '', squad: '', status: 1 }
+  if (type === 'armory')
+    return { id: null, code: '', name: '', category: '步枪', price: 0, req_level: 1, power: 0, sort: 0, status: 1 }
   return {}
 }
 
@@ -126,6 +144,17 @@ const FORM_FIELDS = {
     { k: 'region', lab: '区域', type: 'text' },
     { k: 'squad', lab: '小队要求', type: 'text' },
     { k: 'status', lab: '状态', type: 'select', options: [1, 0] }
+  ],
+  /* 军械：售价 / 需求等级 等在此修改，保存后前台商店即时生效 */
+  armory: [
+    { k: 'code', lab: '武器代号(不可改)', type: 'text', required: true, readonly: true },
+    { k: 'name', lab: '武器名', type: 'text', required: true },
+    { k: 'category', lab: '类别', type: 'select', options: ['手枪', '步枪', '狙击枪', '机枪'] },
+    { k: 'price', lab: '售价(信用点，0=免费)', type: 'num', required: true },
+    { k: 'req_level', lab: '购买所需等级', type: 'num', required: true },
+    { k: 'power', lab: '战力加成', type: 'num' },
+    { k: 'sort', lab: '商店排序(小的在前)', type: 'num' },
+    { k: 'status', lab: '状态(1上架/0下架)', type: 'select', options: [1, 0] }
   ]
 }
 
@@ -182,8 +211,21 @@ const saving = ref(false)
 async function saveEdit() {
   const f = FORM_FIELDS[editTab.value]
   for (const item of f) {
-    if (item.required && !String(form[item.k] ?? '').trim()) {
+    if (item.required && String(form[item.k] ?? '').trim() === '') {
       showToast(`请填写「${item.lab}」`, false)
+      return
+    }
+  }
+  // 军械：数字字段兜底为非负整数，避免空值把后端字段写成 0/脏数据
+  if (editTab.value === 'armory') {
+    form.price = Number(form.price ?? 0)
+    form.req_level = Number(form.req_level ?? 1)
+    if (form.price < 0) {
+      showToast('售价不能为负数', false)
+      return
+    }
+    if (form.req_level < 1) {
+      showToast('所需等级至少为 1', false)
       return
     }
   }
@@ -192,7 +234,8 @@ async function saveEdit() {
     archive: api.adminArchiveSave,
     category: api.adminCategorySave,
     feed: api.adminFeedSave,
-    mission: api.adminMissionSave
+    mission: api.adminMissionSave,
+    armory: api.adminArmorySave
   }
   const data = await call(saveFns[editTab.value], { ...form })
   saving.value = false
@@ -200,6 +243,10 @@ async function saveEdit() {
   beep(660, 0.08)
   showToast(form.id ? '修改已保存' : '新增成功', true)
   closeEdit()
+  if (editTab.value === 'armory') {
+    armory.value = await call(api.adminArmoryStats)
+    return
+  }
   load(tab.value !== 'stats')
 }
 
@@ -297,14 +344,14 @@ onMounted(load)
           </div>
         </div>
 
-        <h3 class="blk-title">武器销量 <i>SALES</i></h3>
+        <h3 class="blk-title">武器配置 <i>WEAPON CATALOG · 可直接编辑售价与需求等级</i></h3>
         <div class="tbl-wrap">
           <table class="tbl">
             <thead>
-              <tr><th>武器</th><th>类别</th><th>单价</th><th>需等级</th><th>销量</th><th>营收</th></tr>
+              <tr><th>武器</th><th>类别</th><th>售价</th><th>需等级</th><th>战力</th><th>状态</th><th>销量</th><th>营收</th><th>操作</th></tr>
             </thead>
             <tbody>
-              <tr v-for="w in armory.weapons" :key="w.code">
+              <tr v-for="w in armory.weapons" :key="w.code" :class="{ off: w.status === 0 }">
                 <td>
                   <b>{{ w.name }}</b>
                   <span class="mono sub">{{ w.code }}</span>
@@ -312,8 +359,13 @@ onMounted(load)
                 <td>{{ w.category }}</td>
                 <td class="mono">{{ w.price === 0 ? '免费' : w.price }}</td>
                 <td class="mono">LV.{{ w.req_level }}</td>
+                <td class="mono">+{{ w.power }}</td>
+                <td class="mono">{{ w.status === 0 ? '已下架' : '上架中' }}</td>
                 <td class="mono">{{ w.count }}</td>
                 <td class="mono">{{ w.revenue }}</td>
+                <td class="ops">
+                  <button class="op" type="button" @click="openEditArmory(w)">编辑</button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -488,10 +540,13 @@ onMounted(load)
               spellcheck="false"
             ></textarea>
             <input
-              v-else-if="f.type === 'num'"
-              v-model.number="form[f.k]"
-              type="number"
+              v-else-if="f.readonly"
+              v-model="form[f.k]"
+              type="text"
+              readonly
+              class="ro"
             />
+            <input v-else-if="f.type === 'num'" v-model.number="form[f.k]" type="number" />
             <input v-else v-model="form[f.k]" type="text" spellcheck="false" />
           </label>
         </div>

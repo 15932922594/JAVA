@@ -26,6 +26,9 @@ import java.util.Map;
  *   POST /api/admin/logout         退出
  *   POST /api/admin/change-pass    修改管理员密码
  *   POST /api/admin/stats          各表记录数
+ *   POST /api/admin/armory/stats   军械经济统计（销量 / 营收 / 最近购买）
+ *   POST /api/admin/armory/list    武器目录明细（含 id，编辑回填用）
+ *   POST /api/admin/armory/save    修改武器售价 / 需求等级 / 战力 / 上下架
  *   POST /api/admin/archive/*      档案 list / save / delete
  *   POST /api/admin/category/*     分类 list / save / delete（一级分类不可删）
  *   POST /api/admin/feed/*         动态(情报) list / save / delete
@@ -121,6 +124,43 @@ public class AdminController {
             return Result.fail(401, "notfound");
         }
         return Result.ok(adminService.armoryStats());
+    }
+
+    /** 武器目录明细（含 id / 排序，供后台编辑回填） */
+    @PostMapping("/armory/list")
+    public Result<Object> armoryList(@RequestBody Map<String, Object> body) {
+        AdminService.Actor actor = requireAdmin(body);
+        if (actor == null) {
+            return Result.fail(401, "notfound");
+        }
+        return Result.ok(adminService.weaponList());
+    }
+
+    /** 修改武器售价 / 需求等级 / 战力 / 上下架 */
+    @PostMapping("/armory/save")
+    public Result<Object> armorySave(@RequestBody Map<String, Object> body) {
+        AdminService.Actor actor = requireAdmin(body);
+        if (actor == null) {
+            return Result.fail(401, "notfound");
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, Object> data = (Map<String, Object>) body.get("data");
+        String reason = adminService.saveWeapon(data);
+        if ("ok".equals(reason)) {
+            adminService.record(actor, "armory", "UPDATE",
+                    "武器配置：" + (data == null ? "" : data.get("name"))
+                            + " 价格=" + (data == null ? "" : data.get("price"))
+                            + " 需等级=" + (data == null ? "" : data.get("req_level")));
+            return Result.ok();
+        }
+        return Result.fail(400, switch (reason) {
+            case "notfound" -> "武器不存在";
+            case "invalid-price" -> "售价不能为负数";
+            case "invalid-level" -> "所需等级至少为 1";
+            case "invalid-code" -> "武器代号不合法（小写字母 / 数字 / 下划线，最长 32 位）";
+            case "db-error" -> "数据库写入失败，请检查 weapon_catalog 表后重试";
+            default -> reason;
+        });
     }
 
     /* ================= 档案 ================= */

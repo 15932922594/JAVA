@@ -1,17 +1,17 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : 数据库
+ Source Server         : test
  Source Server Type    : MySQL
- Source Server Version : 80409 (8.4.9)
+ Source Server Version : 80039 (8.0.39)
  Source Host           : localhost:3306
  Source Schema         : agent_access
 
  Target Server Type    : MySQL
- Target Server Version : 80409 (8.4.9)
+ Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 06/11/2026 09:38:12
+ Date: 09/11/2026 10:00:22
 */
 
 SET NAMES utf8mb4;
@@ -32,7 +32,7 @@ CREATE TABLE `admin_log`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_admin`(`admin_id` ASC) USING BTREE,
   INDEX `idx_time`(`create_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '后台操作日志' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '后台操作日志' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of admin_log
@@ -56,6 +56,10 @@ INSERT INTO `admin_log` VALUES (16, 1, '爱打球的T', 'admin', 'LOGIN', '管�
 INSERT INTO `admin_log` VALUES (17, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-05 18:50:37');
 INSERT INTO `admin_log` VALUES (18, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-05 21:58:10');
 INSERT INTO `admin_log` VALUES (19, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-06 08:44:19');
+INSERT INTO `admin_log` VALUES (20, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-09 09:30:00');
+INSERT INTO `admin_log` VALUES (21, 1, 'admin', 'admin', 'LOGIN', '管理员登录', '2026-11-09 09:56:04');
+INSERT INTO `admin_log` VALUES (22, 1, 'admin', 'armory', 'UPDATE', '武器配置：狂徒 价格=2500 需等级=3', '2026-11-09 09:56:10');
+INSERT INTO `admin_log` VALUES (23, 1, 'admin', 'armory', 'UPDATE', '武器配置：狂徒 价格=2900 需等级=4', '2026-11-09 09:56:21');
 
 -- ----------------------------
 -- Table structure for admin_user
@@ -79,7 +83,7 @@ CREATE TABLE `admin_user`  (
 -- ----------------------------
 -- Records of admin_user
 -- ----------------------------
-INSERT INTO `admin_user` VALUES (1, 'admin', '超级管理员', 'b0b168d92e122cca122586f50d2e1d05af219d8eed3d79945d51cabef6de5bd3', '5f8a9b3c1d2e4f60718293a4b5c6d7e8', '576ddbed09fe4cb69c6a70c51c1b8822', '2026-10-31 14:37:18', 1, '2026-10-28 16:35:51', '2026-10-28 16:35:51');
+INSERT INTO `admin_user` VALUES (1, 'admin', '超级管理员', 'b0b168d92e122cca122586f50d2e1d05af219d8eed3d79945d51cabef6de5bd3', '5f8a9b3c1d2e4f60718293a4b5c6d7e8', 'd47e02ba1628457da9480d33f26c6d6b', '2026-11-11 09:56:04', 1, '2026-10-28 16:35:51', '2026-10-28 16:35:51');
 
 -- ----------------------------
 -- Table structure for agent_archive
@@ -157,7 +161,7 @@ CREATE TABLE `agent_friend`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_pair`(`user_id` ASC, `friend_id` ASC) USING BTREE,
   INDEX `idx_friend`(`friend_id` ASC, `status` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友关系表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友关系表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_friend
@@ -206,7 +210,7 @@ CREATE TABLE `agent_pk`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_challenger`(`challenger_id` ASC) USING BTREE,
   INDEX `idx_defender`(`defender_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'PK 战绩表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'PK 战绩表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_pk
@@ -254,17 +258,17 @@ CREATE TABLE `agent_session`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_token`(`token` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 85 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '登录会话表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 88 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '登录会话表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_session
 -- ----------------------------
 INSERT INTO `agent_session` VALUES (59, '0bcc85f7942848f8a70cd731a19ffe49', 9, '2026-11-12 20:24:33', '2026-11-05 20:24:32');
 INSERT INTO `agent_session` VALUES (78, '256fe5a58bae4d25a7504b5a2b01db96', 26, '2026-11-12 22:55:15', '2026-11-05 22:55:14');
-INSERT INTO `agent_session` VALUES (80, '65022fabf21c41f793319f72b92eb310', 1, '2026-11-13 08:43:15', '2026-11-06 08:43:14');
-INSERT INTO `agent_session` VALUES (81, 'e2d3ba4a00774689aa9741bfb0982e3d', 1, '2026-11-13 08:44:19', '2026-11-06 08:44:19');
 INSERT INTO `agent_session` VALUES (83, '4b0f89b6525b44dda4c5daffbe4cb583', 28, '2026-11-13 09:00:01', '2026-11-06 09:00:00');
-INSERT INTO `agent_session` VALUES (84, '1e780452d5114e20867ccb69e6415929', 1, '2026-11-13 09:35:36', '2026-11-06 09:35:35');
+INSERT INTO `agent_session` VALUES (85, 'c154626ffd6c461c9a318824295573c2', 1, '2026-11-16 08:46:00', '2026-11-09 08:46:00');
+INSERT INTO `agent_session` VALUES (86, '8e6c30f7387c40d0bba5b50093203d71', 1, '2026-11-16 09:30:01', '2026-11-09 09:30:00');
+INSERT INTO `agent_session` VALUES (87, 'b57729a772d446b6afd77099b392412d', 1, '2026-11-16 09:58:14', '2026-11-09 09:58:14');
 
 -- ----------------------------
 -- Table structure for agent_user
@@ -297,7 +301,7 @@ CREATE TABLE `agent_user`  (
 -- ----------------------------
 -- Records of agent_user
 -- ----------------------------
-INSERT INTO `agent_user` VALUES (1, '爱打球的T', '264132801@qq.com', NULL, '3cb9bb890b91efdd310c935089eb3935b82ce46640a4b68bb0c5a2b72d28d2b5', '9e1431e9dbdaa424328eda90965d4ea6', 0, 20, 3772, 11154, 'operator', 7, 6, 0, '2026-11-06', 0, '2026-10-28 16:36:07', '2026-11-06 09:09:37');
+INSERT INTO `agent_user` VALUES (1, '爱打球的T', '264132801@qq.com', NULL, '3cb9bb890b91efdd310c935089eb3935b82ce46640a4b68bb0c5a2b72d28d2b5', '9e1431e9dbdaa424328eda90965d4ea6', 0, 20, 3772, 11174, 'operator', 7, 6, 0, '2026-11-09', 0, '2026-10-28 16:36:07', '2026-11-09 08:46:38');
 INSERT INTO `agent_user` VALUES (9, 'gay', '3376460573@qq.com', 'tmz258412', NULL, NULL, 0, 1, 800, 20, 'classic', 0, 0, 4, '2026-11-05', 1, '2026-10-29 15:04:01', '2026-11-06 09:26:42');
 INSERT INTO `agent_user` VALUES (26, '123', '2099336743@qq.com', '123456', NULL, NULL, 4, 1, 36, 38, 'classic', 0, 1, 4, '2026-11-05', 1, '2026-11-05 22:55:03', '2026-11-06 09:04:17');
 INSERT INTO `agent_user` VALUES (28, '星落大帝', 'czh101481@qq.com', '10140801czh', NULL, NULL, 2, 7, 1668, 1381, 'marshal', 1, 3, 2, '2026-11-06', 1, '2026-11-06 08:59:45', '2026-11-06 09:29:08');
@@ -315,7 +319,7 @@ CREATE TABLE `agent_weapon`  (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '璐?拱鏃堕棿',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_weapon`(`user_id` ASC, `weapon_code` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 38 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '鐗瑰伐宸茶喘姝﹀櫒琛' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 38 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '鐗瑰伐宸茶喘姝﹀櫒琛' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_weapon
@@ -579,5 +583,36 @@ INSERT INTO `mission_progress` VALUES (2, 26, 'ascent', 1, '[2,3]', '2026-11-05 
 INSERT INTO `mission_progress` VALUES (3, 28, 'bind', 3, '[0,1,2,3]', '2026-11-06 09:03:02', '2026-11-06 09:48:02', '2026-11-06 09:03:09', '2026-11-06 09:03:01');
 INSERT INTO `mission_progress` VALUES (4, 28, 'ascent', 3, '[0,1,2,3]', '2026-11-06 09:03:15', '2026-11-06 09:43:15', '2026-11-06 09:03:18', '2026-11-06 09:03:14');
 INSERT INTO `mission_progress` VALUES (5, 28, 'nightfall', 3, '[0,1,2]', '2026-11-06 09:28:48', '2026-11-06 09:58:48', '2026-11-06 09:28:54', '2026-11-06 09:28:48');
+
+-- ----------------------------
+-- Table structure for weapon_catalog
+-- ----------------------------
+DROP TABLE IF EXISTS `weapon_catalog`;
+CREATE TABLE `weapon_catalog`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '武器代号：classic/sheriff/marshal/guardian/phantom/vandal/odin/operator',
+  `name` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '武器中文名',
+  `category` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '步枪' COMMENT '类别：手枪/步枪/狙击枪/机枪',
+  `price` int NOT NULL DEFAULT 0 COMMENT '售价（信用点，0 = 免费）',
+  `req_level` int NOT NULL DEFAULT 1 COMMENT '购买所需英雄等级',
+  `power` int NOT NULL DEFAULT 0 COMMENT '装备后战力加成',
+  `sort` int NOT NULL DEFAULT 0 COMMENT '商店展示顺序（小的在前）',
+  `on_sale` tinyint NOT NULL DEFAULT 1 COMMENT '1 上架 / 0 下架（下架后不可购买）',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_code`(`code` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '军械商店武器目录（后台可编辑价格与等级门槛）' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of weapon_catalog
+-- ----------------------------
+INSERT INTO `weapon_catalog` VALUES (1, 'classic', '标配', '手枪', 0, 1, 5, 1, 1, '2026-11-09 09:48:39');
+INSERT INTO `weapon_catalog` VALUES (2, 'sheriff', '正义', '手枪', 800, 1, 15, 2, 1, '2026-11-09 09:48:39');
+INSERT INTO `weapon_catalog` VALUES (3, 'marshal', '鸟狙', '狙击枪', 950, 2, 25, 3, 1, '2026-11-09 09:48:39');
+INSERT INTO `weapon_catalog` VALUES (4, 'guardian', '戍卫', '步枪', 2250, 3, 35, 4, 1, '2026-11-09 09:48:39');
+INSERT INTO `weapon_catalog` VALUES (5, 'phantom', '幻影', '步枪', 2900, 4, 45, 5, 1, '2026-11-09 09:48:39');
+INSERT INTO `weapon_catalog` VALUES (6, 'vandal', '狂徒', '步枪', 2900, 4, 45, 6, 1, '2026-11-09 09:48:39');
+INSERT INTO `weapon_catalog` VALUES (7, 'odin', '战神', '机枪', 3200, 6, 50, 7, 1, '2026-11-09 09:48:39');
+INSERT INTO `weapon_catalog` VALUES (8, 'operator', '冥狙', '狙击枪', 4700, 8, 60, 8, 1, '2026-11-09 09:48:39');
 
 SET FOREIGN_KEY_CHECKS = 1;
