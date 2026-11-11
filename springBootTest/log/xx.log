@@ -9239,3 +9239,7 @@ logging.pattern.console=2026-11-11 16:30:47  INFO org.springframework.web.servle
 logging.pattern.console=2026-11-11 16:30:47  INFO com.zaxxer.hikari.HikariDataSource.getConnection 109:HikariPool-1 - Starting...
 logging.pattern.console=2026-11-11 16:30:47  INFO com.zaxxer.hikari.pool.HikariPool.checkFailFast 554:HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7effd579
 logging.pattern.console=2026-11-11 16:30:47  INFO com.zaxxer.hikari.HikariDataSource.getConnection 122:HikariPool-1 - Start completed.
+logging.pattern.console=2026-11-11 16:31:39  INFO o.s.boot.web.embedded.tomcat.GracefulShutdown.shutDownGracefully 54:Commencing graceful shutdown. Waiting for active requests to complete
+logging.pattern.console=2026-11-11 16:31:39  INFO o.s.boot.web.embedded.tomcat.GracefulShutdown.doShutdown 76:Graceful shutdown complete
+logging.pattern.console=2026-11-11 16:31:39  INFO com.zaxxer.hikari.HikariDataSource.close 349:HikariPool-1 - Shutdown initiated...
+logging.pattern.console=2026-11-11 16:31:39  INFO com.zaxxer.hikari.HikariDataSource.close 351:HikariPool-1 - Shutdown completed.
