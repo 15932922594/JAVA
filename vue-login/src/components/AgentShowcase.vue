@@ -80,10 +80,24 @@ watch(
 
 <style scoped>
 .showcase {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 22px;
   animation: slideL .7s cubic-bezier(.2, 1, .3, 1) both;
+}
+/* 背景换成实景照片后，给左侧文案垫一层柔和压暗，保证代号 / 简介 / 属性可读 */
+.showcase::before {
+  content: "";
+  position: absolute;
+  inset: -20px -30px -22px -34px;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(115% 100% at 18% 62%, rgba(7, 12, 18, .9) 0%, rgba(7, 12, 18, .62) 55%, rgba(7, 12, 18, 0) 100%);
+}
+.showcase > * {
+  position: relative;
+  z-index: 1;
 }
 @keyframes slideL {
   from { opacity: 0; transform: translateX(-26px); }

@@ -50,7 +50,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="boot" :class="{ gone }" @click="enter">
     <div class="blogo">
-      <span class="sl"></span><span>AGENT ACCESS</span>
+      <span class="sl"></span><span>特工作战</span>
     </div>
     <div class="bbar"><i :style="{ width: width + '%' }"></i></div>
     <div class="bhint" :class="{ on: ready }">点击任意位置 / PRESS ANY KEY</div>

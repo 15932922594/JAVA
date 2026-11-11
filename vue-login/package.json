@@ -1,9 +1,9 @@
 {
-  "name": "vue-login",
+  "name": "agent-ops",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "无畏契约风格特工登录页 —— Vue 3 + Vite 重构版",
+  "description": "特工作战 —— 无畏契约风格特工登录页（Vue 3 + Vite 重构版）",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

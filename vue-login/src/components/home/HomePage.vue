@@ -344,7 +344,7 @@ onBeforeUnmount(() => {
     </main>
 
     <footer class="foot">
-      <span>AGENT ACCESS // TACTICAL TERMINAL v1.0</span>
+      <span>特工作战 // TACTICAL TERMINAL v1.0</span>
       <span class="sp"></span>
       <span>SYS <b>OK</b> · 数据源 agent_archive · /api/home</span>
     </footer>

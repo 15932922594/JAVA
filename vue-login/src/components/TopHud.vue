@@ -5,7 +5,7 @@ import { toggleSound } from '../composables/useSound'
 
 <template>
   <header class="hud-top">
-    <div class="brand"><span class="slash"></span>AGENT <b>ACCESS</b></div>
+    <div class="brand"><span class="slash"></span><span class="bn">特工<b>作战</b></span></div>
     <span class="sp"></span>
     <button
       class="icon-btn"

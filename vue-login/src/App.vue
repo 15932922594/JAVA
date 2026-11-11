@@ -33,6 +33,18 @@ const { showToast } = useSession()
  */
 const view = computed(() => state.view)
 
+/**
+ * 背景照片场景：
+ *   auth → 登录 / 注册页（霓虹特工海报）
+ *   home → 登录后的所有页面（燃烧战场海报）
+ *   ''   → 后台管理（保持纯渐变，避免与深色后台表格抢视线）
+ */
+const scene = computed(() => {
+  if (view.value === 'auth') return 'auth'
+  if (view.value === 'admin') return ''
+  return 'home'
+})
+
 function backHome() {
   beep(520, 0.06)
   switchView('home')
@@ -113,8 +125,8 @@ onBeforeUnmount(() => clearTimeout(flashTimer))
 </script>
 
 <template>
-  <!-- 背景特效层 -->
-  <FxBackground />
+  <!-- 背景特效层（含场景照片：登录页 / 登录后各一张） -->
+  <FxBackground :scene="scene" />
   <div class="scanline"></div>
   <div class="noise"></div>
 

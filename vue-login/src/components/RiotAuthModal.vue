@@ -163,7 +163,7 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="scope">
-            <p class="slab">AGENT ACCESS 请求获取以下权限</p>
+            <p class="slab">特工作战 请求获取以下权限</p>
             <ul>
               <li><i>✓</i>读取你的 Riot ID 与区域信息</li>
               <li><i>✓</i>创建并关联本站特工档案</li>

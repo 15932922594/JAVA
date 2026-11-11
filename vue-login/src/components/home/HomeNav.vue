@@ -112,7 +112,7 @@ const frameTip = computed(() => {
       <!-- 品牌 -->
       <a class="brand" href="#" @click.prevent="onNav(NAVS[0])">
         <span class="slash"></span>
-        AGENT <b>ACCESS</b>
+        <span class="bn">特工<b>作战</b></span>
       </a>
 
       <!-- 导航项 -->

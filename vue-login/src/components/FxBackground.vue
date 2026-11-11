@@ -1,6 +1,17 @@
 <script setup>
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 
+/* ============================================================
+   场景照片层
+   scene = 'auth'  → 登录 / 注册页背景（public/bg/auth-bg.jpg）
+   scene = 'home'  → 登录后的所有页面背景（public/bg/home-bg.jpg）
+   scene = ''      → 不铺照片（仅渐变，如后台管理）
+   两张图都常驻 DOM，靠 .on 做透明度交叉淡入，切视图不会闪白。
+   ============================================================ */
+defineProps({
+  scene: { type: String, default: 'auth' }
+})
+
 /* 漂浮粒子 + 邻近连线（原 IIFE 逻辑原样迁移） */
 const canvasEl = ref(null)
 let raf = 0
@@ -106,7 +117,13 @@ onBeforeUnmount(() => cleanupFns.forEach((fn) => fn()))
 </script>
 
 <template>
-  <div class="fx">
+  <div class="fx" :class="[scene ? `scene-${scene}` : '', { 'has-photo': !!scene }]">
+    <!-- 场景照片（最底层） -->
+    <div class="photo auth" :class="{ on: scene === 'auth' }" aria-hidden="true"></div>
+    <div class="photo home" :class="{ on: scene === 'home' }" aria-hidden="true"></div>
+    <!-- 压暗层：中心留亮、四周压深，保证表单与卡片上的文字可读 -->
+    <div class="veil"></div>
+
     <canvas ref="canvasEl" id="fx"></canvas>
     <div class="grad"></div>
     <div class="diag"></div>
@@ -124,16 +141,67 @@ onBeforeUnmount(() => cleanupFns.forEach((fn) => fn()))
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  background: linear-gradient(160deg, #0d1620, #0F1923 40%, #0a1119);
 }
 #fx { position: absolute; inset: 0; }
 
+/* ---------- 场景照片 ---------- */
+.photo {
+  position: absolute;
+  inset: -5%;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity .9s ease;
+  transform: translate3d(calc(var(--mx, 0) * -12px), calc(var(--my, 0) * -12px), 0) scale(1.02);
+  will-change: opacity, transform;
+}
+/* 登录 / 注册：霓虹特工海报，压暗后仍保留色彩 */
+.photo.auth {
+  background-image: url("/bg/auth-bg.jpg");
+  filter: saturate(1.06) contrast(1.03) brightness(.84);
+}
+/* 登录后（特工终端）：燃烧战场海报，压得更暗一些，避免抢卡片内容 */
+.photo.home {
+  background-image: url("/bg/home-bg.jpg");
+  filter: saturate(.98) brightness(.62);
+}
+.photo.on { opacity: 1; }
+
+/* ---------- 照片压暗层 ---------- */
+.veil {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .9s ease;
+  background:
+    radial-gradient(128% 105% at 50% 42%, rgba(9, 15, 22, .18) 0%, rgba(9, 15, 22, .52) 56%, rgba(5, 9, 14, .9) 100%),
+    linear-gradient(180deg, rgba(7, 12, 18, .88) 0%, rgba(7, 12, 18, .28) 26%, rgba(7, 12, 18, .32) 72%, rgba(7, 12, 18, .9) 100%);
+}
+.fx.has-photo .veil { opacity: 1; }
+/* 登录页：文案在左侧，左侧压得更深；右侧被表单面板覆盖，可以留亮 */
+.fx.scene-auth .veil {
+  opacity: 1;
+  background:
+    linear-gradient(90deg, rgba(6, 10, 16, .82) 0%, rgba(6, 10, 16, .58) 26%, rgba(6, 10, 16, .26) 46%, rgba(6, 10, 16, .14) 64%, rgba(6, 10, 16, .38) 100%),
+    linear-gradient(180deg, rgba(6, 10, 16, .84) 0%, rgba(6, 10, 16, .18) 24%, rgba(6, 10, 16, .26) 62%, rgba(6, 10, 16, .82) 100%);
+}
+/* 登录后内容更密（卡片 / 表格），底色再多压一点 */
+.fx.scene-home .veil {
+  opacity: 1;
+  background:
+    radial-gradient(128% 105% at 50% 40%, rgba(9, 15, 22, .42) 0%, rgba(9, 15, 22, .68) 58%, rgba(5, 9, 14, .95) 100%),
+    linear-gradient(180deg, rgba(7, 12, 18, .93) 0%, rgba(7, 12, 18, .46) 26%, rgba(7, 12, 18, .52) 72%, rgba(7, 12, 18, .93) 100%);
+}
+
+/* ---------- 渐变着色（照片之上的氛围色） ---------- */
 .fx .grad {
   position: absolute;
   inset: 0;
   background:
     radial-gradient(1100px 700px at 22% 30%, rgba(255, 70, 85, .10), transparent 60%),
-    radial-gradient(900px 600px at 82% 78%, rgba(70, 110, 160, .12), transparent 60%),
-    linear-gradient(160deg, #0d1620, #0F1923 40%, #0a1119);
+    radial-gradient(900px 600px at 82% 78%, rgba(70, 110, 160, .12), transparent 60%);
 }
 
 .fx .diag {
