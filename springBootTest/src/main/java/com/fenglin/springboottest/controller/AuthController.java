@@ -67,7 +67,9 @@ public class AuthController {
     public Result<Object> login(@RequestBody Map<String, Object> body) {
         String id = str(body.get("id"));
         String pass = str(body.get("pass"));
-        if (id.length() < 3 || pass.length() < 6) {
+        // 与注册规则保持一致：代号最少 2 个字符（如「小何」），密码最少 6 位。
+        // 原先 id < 3 会把合法的 2 字代号挡在门外，导致这类管理员登录后看不到「后台管理」入口。
+        if (id.length() < 2 || pass.length() < 6) {
             return Result.fail(400, "凭证校验失败，请检查输入");
         }
         Object outcome = userService.login(id, pass);
