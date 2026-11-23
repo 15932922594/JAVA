@@ -21,6 +21,7 @@ import ArenaPage from './components/home/ArenaPage.vue'
 import IntelPage from './components/home/IntelPage.vue'
 import MissionsPage from './components/home/MissionsPage.vue'
 import RangeGamePage from './components/home/RangeGamePage.vue'
+import AnomalyGamePage from './components/anomaly/AnomalyGamePage.vue'
 import AdminLogin from './components/admin/AdminLogin.vue'
 import AdminDashboard from './components/admin/AdminDashboard.vue'
 
@@ -178,6 +179,9 @@ onBeforeUnmount(() => clearTimeout(flashTimer))
 
   <!-- ---------- 训练场（RANGE 小游戏） ---------- -->
   <RangeGamePage v-else-if="view === 'range'" />
+
+  <!-- ---------- 异常档案（特工怪诞剧情游戏） ---------- -->
+  <AnomalyGamePage v-else-if="view === 'anomaly'" />
 
   <!-- ---------- 后台管理系统（独立登录态，先登录再进管理台；仅管理员权限可停留） ---------- -->
   <AdminLogin v-else-if="view === 'admin' && canAdmin && !state.admin" />

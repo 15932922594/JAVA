@@ -24,7 +24,7 @@ const { showToast, authLogout } = useSession()
 /**
  * 导航项（全部已实现，数据来自后端 /api/home/*）
  *  key 对应 state.view：home 首页 / agents 特工档案 / arsenal 武器库
- *  / missions 作战任务 / intel 情报中心
+ *  / missions 作战任务 / intel 情报中心 / range 训练场 / anomaly 异常档案（纯前端剧情游戏）
  */
 const NAVS = [
   { key: 'home', label: '首页' },
@@ -34,7 +34,8 @@ const NAVS = [
   { key: 'arena', label: '竞技场' },
   { key: 'missions', label: '作战任务' },
   { key: 'intel', label: '情报中心' },
-  { key: 'range', label: '训练场' }
+  { key: 'range', label: '训练场' },
+  { key: 'anomaly', label: '异常档案' }
 ]
 
 const active = computed(() => state.view)

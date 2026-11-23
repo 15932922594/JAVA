@@ -100,6 +100,17 @@ const today = computed(() => {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 })
 
+/** 异常档案已解锁结局数（读游戏 localStorage 存档，与图鉴共享） */
+const anomalyGot = computed(() => {
+  try {
+    const arr = JSON.parse(localStorage.getItem('anomaly_unlocked_v1') || '[]')
+    const n = Array.isArray(arr) ? arr.length : 0
+    return localStorage.getItem('anomaly_finale_v1') === '1' ? n + 1 : n
+  } catch {
+    return 0
+  }
+})
+
 /** 在线设备数（来自后端 /api/auth/sessions） */
 const devices = computed(() => state.sessions.length)
 
@@ -263,6 +274,27 @@ onBeforeUnmount(() => {
             <span class="tsub">{{ s.sub }}</span>
           </div>
         </div>
+      </section>
+
+      <!-- ========== 异常档案 · 怪诞剧情游戏入口 ========== -->
+      <section class="anomaly-banner">
+        <div class="ab-left">
+          <span class="ab-tag">NEW // 互动剧情</span>
+          <h2>异常档案 <i>ANOMALY FILES</i></h2>
+          <p>三宗特工怪诞案件 · 27 个结局 · 每一次选择都是一次复制。真相，藏在藏起来的选项里。</p>
+        </div>
+        <div class="ab-mid">
+          <span class="ab-stat"><b>03</b> 副本</span>
+          <span class="ab-stat"><b>27</b> 结局</span>
+          <span class="ab-stat"><b>10</b> 反转</span>
+          <span class="ab-stat ab-save"><b>{{ anomalyGot }}</b> 已解锁</span>
+        </div>
+        <button class="ab-go" type="button" @click="gotoView('anomaly')">
+          <span>接入档案</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12h13m-5-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
       </section>
 
       <!-- ========== 搜索栏（含分级分类筛选） ========== -->
@@ -473,6 +505,113 @@ onBeforeUnmount(() => {
   letter-spacing: 1.4px;
   color: var(--muted);
   opacity: .8;
+}
+
+/* ========== 异常档案游戏入口横幅 ========== */
+.anomaly-banner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 26px;
+  margin-top: 26px;
+  padding: 20px 24px;
+  background: linear-gradient(110deg, rgba(30, 18, 24, .95), rgba(15, 25, 35, .92));
+  border: 1px solid rgba(255, 70, 85, .35);
+  border-left: 3px solid var(--red);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+  overflow: hidden;
+  animation: up .5s .04s cubic-bezier(.2, 1, .3, 1) both;
+  transition: .25s;
+}
+.anomaly-banner::after {
+  content: '';
+  position: absolute;
+  right: -30px;
+  top: -50px;
+  width: 200px;
+  height: 160px;
+  background: radial-gradient(circle, var(--red), transparent 70%);
+  opacity: .1;
+  pointer-events: none;
+}
+.anomaly-banner:hover {
+  border-color: var(--red);
+  box-shadow: 0 18px 44px -30px var(--red);
+}
+.ab-tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 2.2px;
+  color: var(--red);
+}
+.ab-left h2 {
+  margin: 7px 0 6px;
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+.ab-left h2 i {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  margin-left: 8px;
+}
+.ab-left p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.ab-mid {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.ab-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.ab-stat b {
+  font-family: var(--disp);
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: var(--cream);
+}
+.ab-save b { color: #ffd166; }
+.ab-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border: 0;
+  background: var(--red);
+  color: #fff;
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 2px;
+  white-space: nowrap;
+  cursor: pointer;
+  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+  transition: .2s;
+}
+.ab-go:hover { filter: brightness(1.15); box-shadow: 0 0 24px -8px var(--red); }
+.ab-go svg { transition: transform .2s; }
+.ab-go:hover svg { transform: translateX(4px); }
+@media (max-width: 900px) {
+  .anomaly-banner { grid-template-columns: 1fr; gap: 16px; }
+  .ab-mid { justify-content: flex-start; }
 }
 
 /* ========== 搜索区 ========== */
