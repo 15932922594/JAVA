@@ -2,17 +2,18 @@
 /* ============================================================
    异常档案 · ANOMALY FILES —— 特工怪诞剧情游戏
    ------------------------------------------------------------
-   数据驱动（src/data/anomalyStory.js），页面状态机：
+   数据驱动（src/data/anomalyStory.js + anomalyEndingLore.js），页面状态机：
      select  副本选择
      play    剧情推进（场景 → 选项 → 场景/结局）
-     ending  结局展示（含结局图鉴解锁）
+     ending  结案档案（正文 / 余波 / 归档批注 / 复盘 / 档案链）
      gallery 结局图鉴（本地存档，集齐三关真相结局解锁终极结局）
-   视觉沿用项目统一 HUD：斜切裁角 / 等宽小标签 / 红辉光 / 扫描线。
+   视觉：恐怖档案风 —— 深黑底 / 噪点暗角 / CRT 扫描线 / 血污 / 故障字 / 归档血章。
    ============================================================ */
 import { computed, onBeforeUnmount, ref } from 'vue'
 import {
   CASES, FINALE, GRADE, SAN_MAX, allEndings
 } from '../../data/anomalyStory'
+import { loreFor, STAMP_BY_GRADE } from '../../data/anomalyEndingLore'
 import { switchView, useSession } from '../../store/session'
 import { beep } from '../../composables/useSound'
 import HomeNav from '../home/HomeNav.vue'
@@ -95,6 +96,18 @@ const currentEnding = ref(null)
 const isNewEnding = ref(false)
 const twistShow = ref(null)
 const galleryTab = ref('echo-ward')
+
+/** 本局复盘快照（结局页展示：走过多少场景 / 收了多少碎片 / 理智归宿） */
+const endingStats = ref({ scenes: 0, clues: 0, san: 0 })
+
+/** 按结局等级给出的归档抬头冷句，强化恐怖氛围 */
+const GRADE_MOOD = {
+  bad: '本档案已封存。以下内容不建议复核。',
+  normal: '本档案已归档。无异常，也就无人记得。',
+  good: '本档案已结案。结案，不等于结束。',
+  hidden: '本页不在目录中。你不该翻到这里。',
+  true: '原件认证通过。请确认：正在读取的，是你自己。'
+}
 
 /** 反转演出的延迟定时器：连续推进场景时必须取消上一个，避免弹错反转；卸载时也要清理 */
 let twistTimer = null
@@ -211,6 +224,9 @@ function choose(ch) {
 }
 
 function finish(ending, endId) {
+  // 进入结案档案前必须清掉反转演出，否则延迟弹层会盖在结局页上
+  clearTwistTimer()
+  twistShow.value = null
   const key = `${activeCase.value.id}:${endId}`
   isNewEnding.value = !unlocked.value.includes(key)
   if (isNewEnding.value) {
@@ -220,8 +236,23 @@ function finish(ending, endId) {
   }
   currentEnding.value = { id: endId, ...ending }
   currentEnding.value.gradeInfo = GRADE[ending.grade] || GRADE.normal
+  currentEnding.value.lore = loreFor(key)
+  currentEnding.value.mood = GRADE_MOOD[ending.grade] || GRADE_MOOD.normal
+  endingStats.value = {
+    scenes: visited.value.length,
+    clues: clues.value.length,
+    san: san.value
+  }
   phase.value = 'ending'
-  beep(ending.grade === 'true' ? 1040 : 880, 0.16)
+  if (ending.grade === 'true') {
+    beep(1040, 0.16)
+  } else if (ending.grade === 'bad') {
+    // 恶梦结局：一记下沉的低频，像门在身后合上
+    beep(880, 0.08)
+    window.setTimeout(() => beep(120, 0.34, 'sawtooth'), 130)
+  } else {
+    beep(880, 0.16)
+  }
 }
 
 function replayCase() {
@@ -235,14 +266,16 @@ const galleryCases = computed(() => CASES.map((c) => ({
     id,
     ...e,
     got: isUnlocked(c.id, id),
-    gradeInfo: GRADE[e.grade] || GRADE.normal
+    gradeInfo: GRADE[e.grade] || GRADE.normal,
+    lore: loreFor(`${c.id}:${id}`)
   }))
 })))
 
 const galleryFinale = computed(() => ({
   ...FINALE,
   got: finaleUnlocked.value,
-  gradeInfo: GRADE[FINALE.grade]
+  gradeInfo: GRADE[FINALE.grade],
+  lore: loreFor('finale')
 }))
 </script>
 
@@ -265,7 +298,7 @@ const galleryFinale = computed(() => ({
         <div class="hrow">
           <div>
             <h1 class="title">异常档案 <i>ANOMALY FILES</i></h1>
-            <p class="sub">三宗特工怪诞案件 · 27 个结局 · 每一次选择都是一次复制</p>
+            <p class="sub">三宗被封存的案件 · 27 份结案报告 · 每一次选择，都会被写进下一份档案</p>
           </div>
           <div class="hactions">
             <button class="hbtn" type="button" @click="toGallery">
@@ -283,9 +316,10 @@ const galleryFinale = computed(() => ({
         <div class="intro">
           <span class="tag">// 任务简报</span>
           <p>
-            你是特工 <b>K</b>。三份被封存的档案，记录了你三次"不可能的出任务"。
-            病房的门牌比记忆更早，大厦里每一层都有一个你，总部的局长坐在【00】号房间。
-            <b>结局由你决定——但真相，藏在那些藏起来的选项里。</b>
+            你是特工 <b>K</b>——至少档案上是这么写的。三份卷宗记录了你三次「不可能的出任务」，
+            也记录了三次「你没能回来」。病房的门牌比记忆更早，大厦每一层都有一个你，
+            总部的局长坐在【00】号房间，等你述职。<br />
+            <b>别急着选。有些选项，只在你不再相信自己时才会浮现。</b>
           </p>
         </div>
 
@@ -393,15 +427,25 @@ const galleryFinale = computed(() => ({
         </div>
       </section>
 
-      <!-- ============ 结局 ============ -->
-      <section v-else-if="phase === 'ending' && currentEnding" class="ending">
+      <!-- ============ 结局 · 结案档案 ============ -->
+      <section v-else-if="phase === 'ending' && currentEnding" class="ending" :class="'grade-' + currentEnding.grade">
         <div class="ebox" :style="{ '--g': currentEnding.gradeInfo.color }">
+          <!-- 归档血章 -->
+          <div class="stamp" :style="{ '--g': currentEnding.gradeInfo.color }">
+            <b>{{ currentEnding.lore?.stamp || STAMP_BY_GRADE[currentEnding.grade].word }}</b>
+            <i>{{ STAMP_BY_GRADE[currentEnding.grade].cn }}</i>
+          </div>
+
           <div class="etop">
             <span class="ecode">{{ currentEnding.code }}</span>
             <span class="egrade">{{ currentEnding.gradeInfo.label }}</span>
             <span v-if="isNewEnding" class="enew">✦ 新解锁</span>
           </div>
           <h2 class="etitle">{{ currentEnding.title }}</h2>
+          <p class="emood">// {{ currentEnding.mood }}</p>
+          <p class="estatus"><span>状态判定</span>{{ currentEnding.lore?.status || '主体状态 · 未记录' }}</p>
+
+          <!-- 结局正文 -->
           <div class="ebody">
             <p
               v-for="(line, i) in currentEnding.lines"
@@ -418,6 +462,42 @@ const galleryFinale = computed(() => ({
             </p>
           </div>
           <blockquote class="equote">{{ currentEnding.quote }}</blockquote>
+
+          <!-- 余波：结局之后发生的事，逐段浮现 -->
+          <div v-if="currentEnding.lore" class="epilogue">
+            <p class="blocktag">// 余波 <i>AFTERMATH</i></p>
+            <p
+              v-for="(p, i) in currentEnding.lore.epilogue"
+              :key="i"
+              class="ep-line"
+              :style="{ animationDelay: (0.15 + i * 0.32) + 's' }"
+            >{{ p }}</p>
+          </div>
+
+          <!-- 局里的归档批注：官方视角的冷 -->
+          <div v-if="currentEnding.lore" class="dossier">
+            <span class="dseal">局 里 归 档</span>
+            <p>{{ currentEnding.lore.dossier }}</p>
+          </div>
+
+          <!-- 氛围标签 + 本局复盘 -->
+          <div class="emeta">
+            <div class="etags">
+              <span v-for="t in (currentEnding.lore?.tags || [])" :key="t" class="etag">#{{ t }}</span>
+            </div>
+            <div class="erecord">
+              <span>本次记录</span>
+              <b>场景 {{ endingStats.scenes }}</b>
+              <b>碎片 {{ endingStats.clues }}</b>
+              <b>理智 {{ endingStats.san }}</b>
+            </div>
+          </div>
+
+          <!-- 档案链：串到下一份档案 / 隐藏结局 -->
+          <p v-if="currentEnding.lore" class="eomen">
+            <span>// 档案链</span>{{ currentEnding.lore.omen }}
+          </p>
+
           <p class="eunlock">解锁条件：{{ currentEnding.unlock }}</p>
           <div class="eactions">
             <button class="act primary" type="button" @click="replayCase">重玩本副本</button>
@@ -431,6 +511,10 @@ const galleryFinale = computed(() => ({
           <p class="qltitle">
             // {{ activeCase.title }} 结局收集
             <b>{{ caseProgress(activeCase).got }}/{{ caseProgress(activeCase).total }}</b>
+          </p>
+          <p v-if="caseProgress(activeCase).total - caseProgress(activeCase).got > 0" class="qlhint">
+            还有 {{ caseProgress(activeCase).total - caseProgress(activeCase).got }} 个结局未被记录。
+            某些选项只在集齐「真相碎片」后才会浮现——同一条走廊，值得再走一遍。
           </p>
           <div class="qlgrid">
             <span
@@ -485,6 +569,10 @@ const galleryFinale = computed(() => ({
               </div>
               <h3>{{ e.got ? e.title : '? ? ?' }}</h3>
               <p class="gquote">{{ e.got ? e.quote : '这段结局尚未被记录。' }}</p>
+              <p v-if="e.got && e.lore" class="gstatus">{{ e.lore.status }}</p>
+              <div v-if="e.got && e.lore" class="gtags">
+                <span v-for="t in e.lore.tags" :key="t" class="etag">#{{ t }}</span>
+              </div>
               <p class="ghint">线索：{{ e.unlock }}</p>
             </article>
           </div>
@@ -504,6 +592,12 @@ const galleryFinale = computed(() => ({
             <div v-if="finaleUnlocked" class="gfinalbody">
               <p v-for="(line, i) in galleryFinale.lines" :key="i" class="line">{{ line }}</p>
               <blockquote class="equote">{{ galleryFinale.quote }}</blockquote>
+              <template v-if="galleryFinale.lore">
+                <p class="blocktag">// 余波 <i>AFTERMATH</i></p>
+                <p v-for="(p, i) in galleryFinale.lore.epilogue" :key="'ep' + i" class="ep-line">{{ p }}</p>
+                <div class="dossier"><span class="dseal">局 里 归 档</span><p>{{ galleryFinale.lore.dossier }}</p></div>
+                <p class="eomen"><span>// 档案链</span>{{ galleryFinale.lore.omen }}</p>
+              </template>
             </div>
             <template v-else>
               <p class="gquote">三份档案的真相结局，全部集齐后才会显现。</p>
@@ -693,5 +787,242 @@ const galleryFinale = computed(() => ({
   .title i { display: block; margin: 6px 0 0; }
   .hrow { flex-direction: column; align-items: flex-start; }
   .story, .ebox { padding: 22px; }
+}
+
+/* ============================================================
+   恐怖档案风 · 氛围层 / 结局深化区块
+   ============================================================ */
+
+/* ---------- 全局：压暗底色 + 颗粒噪点 + 暗角 + 扫描线 + 灯闪 ---------- */
+.page {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -8%, rgba(96, 14, 20, .30), transparent 62%),
+    radial-gradient(ellipse 70% 45% at 50% 108%, rgba(0, 0, 0, .72), transparent 60%),
+    #06080b;
+  isolation: isolate;
+}
+.page::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 3; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  opacity: .07;
+  mix-blend-mode: overlay;
+}
+.page::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 4; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 45%, transparent 42%, rgba(0, 0, 0, .62) 100%),
+    repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0, 0, 0, .09) 3px 4px);
+  animation: lampFlicker 9s infinite;
+}
+@keyframes lampFlicker {
+  0%, 95%, 100% { opacity: 1; }
+  96% { opacity: .6; }
+  97% { opacity: .98; }
+  98% { opacity: .44; }
+  99% { opacity: .9; }
+}
+
+/* ---------- 标题 / 简报 ---------- */
+.title { text-shadow: 2px 0 rgba(255, 70, 85, .28), -2px 0 rgba(90, 190, 255, .16); }
+.title i { animation: tagFlicker 5.5s infinite; }
+@keyframes tagFlicker {
+  0%, 92%, 100% { opacity: 1; transform: none; }
+  93% { opacity: .32; transform: translateX(2px); }
+  95% { opacity: 1; transform: translateX(-1px); }
+  97% { opacity: .5; }
+}
+.intro {
+  position: relative;
+  background: linear-gradient(120deg, rgba(30, 10, 13, .84), rgba(7, 9, 12, .9));
+  border-left: 3px solid #b3121d;
+  box-shadow: inset 0 0 46px rgba(120, 0, 10, .13);
+}
+.intro::after {
+  content: 'RESTRICTED / 仅限本人阅读';
+  position: absolute; right: 16px; bottom: 10px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+  color: rgba(255, 70, 85, .28); transform: rotate(-3deg); pointer-events: none;
+}
+
+/* ---------- 副本卡：更暗 + 封存水印 ---------- */
+.case {
+  background: linear-gradient(165deg, rgba(20, 16, 19, .96), rgba(6, 8, 11, .97));
+  border-color: rgba(255, 70, 85, .15);
+}
+.case::before {
+  content: 'SEALED';
+  position: absolute; right: 12px; top: 56px;
+  font-family: var(--mono); font-size: 30px; letter-spacing: 8px;
+  color: rgba(255, 70, 85, .1);
+  pointer-events: none;
+}
+.case:hover {
+  box-shadow: 0 20px 50px -26px rgba(179, 18, 29, .6), inset 0 0 34px rgba(120, 0, 10, .1);
+}
+.cno { opacity: .8; text-shadow: 0 0 16px -4px var(--case-ac); }
+
+/* ---------- 剧情：呼吸暗角 + 血丝扫描线 ---------- */
+.story {
+  background: linear-gradient(155deg, rgba(20, 16, 18, .95), rgba(5, 7, 10, .97));
+  border-left: 2px solid #a3101b;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, .58);
+}
+.story::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(60, 0, 6, .24) 100%);
+  animation: breathe 4.5s ease-in-out infinite;
+}
+@keyframes breathe { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+.story .scan {
+  background: repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0, 0, 0, .2) 2px 3px);
+  opacity: .75;
+}
+.line { text-shadow: 0 0 14px rgba(0, 0, 0, .8); }
+.line.speech { border-left-color: #b3121d; }
+.line .who { color: #ff6a72; }
+.low-san .story { animation: glitch 2.4s infinite, dreadPulse 1.6s ease-in-out infinite; }
+.low-san .story::before { background: linear-gradient(transparent 50%, rgba(255, 30, 45, .09) 50%); background-size: 100% 4px; }
+@keyframes dreadPulse {
+  0%, 100% { box-shadow: inset 0 0 60px rgba(0, 0, 0, .58); }
+  50% { box-shadow: inset 0 0 74px rgba(120, 0, 10, .46); }
+}
+.choice:hover:not(:disabled) {
+  border-color: #b3121d;
+  background: rgba(120, 10, 18, .17);
+  box-shadow: inset 3px 0 0 #b3121d, 0 0 22px -10px #ff4655;
+}
+
+/* ---------- 反转演出：血色频闪 + 裂痕 ---------- */
+.twistmask { background: rgba(3, 4, 6, .93); backdrop-filter: blur(8px) saturate(.6); animation: twistFlash .5s both; }
+@keyframes twistFlash {
+  0% { background: rgba(120, 0, 10, .88); }
+  40% { background: rgba(3, 4, 6, .93); }
+  62% { background: rgba(90, 0, 8, .58); }
+  100% { background: rgba(3, 4, 6, .93); }
+}
+.twistbox {
+  border-color: #c21825;
+  box-shadow: 0 0 90px -18px rgba(200, 20, 35, .85), inset 0 0 50px rgba(90, 0, 8, .26);
+}
+.twistbox::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 47.6%, rgba(255, 60, 70, .13) 48.2%, transparent 48.8%),
+    linear-gradient(72deg, transparent 63%, rgba(255, 60, 70, .09) 63.4%, transparent 64%);
+}
+.twbadge { color: #ff5a63; text-shadow: 0 0 14px rgba(255, 40, 55, .8); animation: tagFlicker 4s infinite; }
+.twtext { text-shadow: 0 0 18px rgba(255, 60, 70, .28); }
+
+/* ---------- 结案档案 ---------- */
+.ending .ebox {
+  position: relative;
+  background: linear-gradient(155deg, rgba(18, 15, 17, .97), rgba(5, 7, 10, .98));
+  border-color: rgba(255, 255, 255, .08);
+  box-shadow: inset 0 0 74px rgba(0, 0, 0, .6);
+}
+.grade-bad .ebox { box-shadow: inset 0 0 80px rgba(120, 0, 10, .22); }
+.grade-true .ebox { box-shadow: inset 0 0 90px rgba(255, 209, 102, .07); }
+.grade-hidden .ebox { box-shadow: inset 0 0 90px rgba(199, 155, 255, .08); }
+.grade-bad .etitle { animation: badPulse 3.2s ease-in-out infinite; }
+@keyframes badPulse {
+  0%, 100% { text-shadow: 0 0 30px -8px var(--g); }
+  50% { text-shadow: 0 0 44px -4px var(--g), 0 0 10px rgba(255, 30, 45, .5); }
+}
+
+/* 归档血章 */
+.stamp {
+  position: absolute; top: 74px; right: 34px;
+  display: grid; place-content: center; gap: 4px;
+  width: 112px; height: 112px; padding: 10px;
+  border: 3px double var(--g); border-radius: 50%;
+  color: var(--g); text-align: center; transform: rotate(-14deg);
+  box-shadow: 0 0 26px -8px var(--g), inset 0 0 20px -6px var(--g);
+  animation: stampDown .55s cubic-bezier(.2, 1.4, .4, 1) both;
+  pointer-events: none; z-index: 2;
+}
+.stamp b { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; line-height: 1.25; word-break: break-word; }
+.stamp i { font-style: normal; font-family: var(--mono); font-size: 10px; letter-spacing: 2px; opacity: .85; }
+@keyframes stampDown {
+  0% { opacity: 0; transform: rotate(-14deg) scale(2.1); }
+  60% { opacity: .92; transform: rotate(-14deg) scale(.93); }
+  100% { opacity: .8; transform: rotate(-14deg) scale(1); }
+}
+
+.emood { margin: -6px 0 14px; font-family: var(--mono); font-size: 11px; letter-spacing: 1.6px; color: #c86a70; }
+.estatus {
+  display: flex; align-items: center; gap: 12px; margin: 0 0 20px; padding: 9px 13px;
+  background: rgba(255, 70, 85, .055); border-left: 2px solid var(--g);
+  font-family: var(--mono); font-size: 12px; color: var(--cream);
+}
+.estatus span { color: var(--g); font-size: 10px; letter-spacing: 2px; white-space: nowrap; }
+.ending .ebody { border-color: rgba(255, 255, 255, .07); }
+.equote { border-left-color: var(--g); text-shadow: 0 0 16px rgba(0, 0, 0, .7); }
+
+/* 余波 */
+.epilogue {
+  margin-top: 26px; padding: 20px 22px;
+  background: linear-gradient(160deg, rgba(34, 10, 14, .5), rgba(6, 8, 11, .5));
+  border: 1px solid rgba(255, 70, 85, .16); border-left: 2px solid rgba(255, 70, 85, .5);
+}
+.blocktag { margin: 0 0 16px; font-family: var(--mono); font-size: 11px; letter-spacing: 2.5px; color: #ff6a72; }
+.blocktag i { font-style: normal; opacity: .55; letter-spacing: 3px; margin-left: 6px; }
+.ep-line {
+  position: relative; margin: 0 0 12px; padding-left: 17px;
+  font-size: 14px; line-height: 1.95; color: #e8e2dc; animation: fadein .7s both;
+}
+.ep-line::before { content: '—'; position: absolute; left: 0; color: rgba(255, 70, 85, .5); }
+.ep-line:last-child { margin-bottom: 0; }
+
+/* 局里的归档批注 */
+.dossier {
+  position: relative; margin-top: 20px; padding: 18px 20px 18px 22px;
+  background: rgba(9, 11, 14, .74); border: 1px dashed rgba(255, 255, 255, .15);
+  font-family: var(--mono);
+}
+.dossier p { margin: 0; font-size: 12.5px; line-height: 1.9; color: #9aa7b2; letter-spacing: .3px; }
+.dseal {
+  display: inline-block; margin-bottom: 10px; padding: 3px 10px;
+  font-size: 10px; letter-spacing: 3px; color: #ff5a63;
+  border: 1px solid rgba(255, 70, 85, .5); transform: rotate(-2deg);
+}
+
+/* 标签 + 复盘 */
+.emeta {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;
+  margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, .08);
+}
+.etags { display: flex; flex-wrap: wrap; gap: 7px; }
+.etag {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1px; color: #c98a8f;
+  border: 1px solid rgba(255, 70, 85, .25); padding: 3px 8px; background: rgba(255, 70, 85, .04);
+}
+.erecord { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.erecord span { color: var(--g); letter-spacing: 2px; font-size: 10px; }
+.erecord b { color: var(--cream); font-weight: 400; border: 1px solid var(--line); padding: 3px 8px; }
+
+/* 档案链 */
+.eomen {
+  display: flex; gap: 12px; align-items: baseline; margin: 22px 0 0; padding: 14px 18px;
+  background: rgba(255, 209, 102, .05); border-left: 2px solid rgba(255, 209, 102, .55);
+  font-size: 13.5px; line-height: 1.85; color: #e6ddc7;
+}
+.eomen span { flex: none; font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: #ffd166; }
+.eunlock { opacity: .82; }
+.qlhint { margin: 9px 0 0; font-size: 12px; line-height: 1.75; color: #b98a8e; }
+
+/* 图鉴新增 */
+.gstatus { margin: 0 0 10px; font-family: var(--mono); font-size: 10.5px; color: #9fb0bb; }
+.gtags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.gtags .etag { font-size: 9px; padding: 2px 6px; }
+.gfinalbody .epilogue, .gfinalbody .dossier, .gfinalbody .eomen { margin-top: 16px; }
+
+@media (max-width: 900px) {
+  .stamp { width: 82px; height: 82px; top: 14px; right: 12px; }
+  .stamp b { font-size: 9px; }
+  .stamp i { font-size: 8px; }
+  .emeta { flex-direction: column; align-items: flex-start; }
 }
 </style>
