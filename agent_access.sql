@@ -352,12 +352,12 @@ CREATE TABLE `agent_user`  (
 INSERT INTO `agent_user` VALUES (1, '爱打球的T', '264132801@qq.com', NULL, '3cb9bb890b91efdd310c935089eb3935b82ce46640a4b68bb0c5a2b72d28d2b5', '9e1431e9dbdaa424328eda90965d4ea6', 0, 20, 3805, 11300, 'operator', 7, 10, 0, '2026-11-16', 0, '2026-10-28 16:36:07', '2026-11-16 09:45:33');
 INSERT INTO `agent_user` VALUES (9, 'gay', '3376460573@qq.com', 'tmz258412', NULL, NULL, 0, 1, 800, 20, 'classic', 0, 1, 6, '2026-11-05', 1, '2026-10-29 15:04:01', '2026-11-16 09:45:29');
 INSERT INTO `agent_user` VALUES (26, '123', '2099336743@qq.com', '123456', NULL, NULL, 4, 1, 36, 38, 'classic', 0, 2, 6, '2026-11-05', 1, '2026-11-05 22:55:03', '2026-11-16 09:46:01');
-INSERT INTO `agent_user` VALUES (28, '星落大帝', 'czh101481@qq.com', '10140801czh', NULL, NULL, 2, 7, 1668, 1381, 'marshal', 1, 6, 3, '2026-11-06', 1, '2026-11-06 08:59:45', '2026-11-16 09:45:41');
+INSERT INTO `agent_user` VALUES (28, '星落大帝', 'czh101481@qq.com', '10140801czh', NULL, NULL, 2, 7, 1668, 1381, 'marshal', 1, 6, 3, '2026-11-06', 0, '2026-11-06 08:59:45', '2026-11-16 09:45:41');
 INSERT INTO `agent_user` VALUES (29, 'ww', 'ww@qq.com', '123456', NULL, NULL, 5, 1, 96, 88, 'classic', 1, 0, 4, '2026-11-16', 1, '2026-11-16 08:43:19', '2026-11-16 08:45:54');
 INSERT INTO `agent_user` VALUES (30, '罗磊', '3260423989@qq.com', '123456', NULL, NULL, 4, 2, 1232, 135, 'classic', 0, 0, 1, '2026-11-16', 1, '2026-11-16 08:45:53', '2026-11-16 08:56:28');
 INSERT INTO `agent_user` VALUES (31, 'ljljll', '2510754590@qq.com', '123456', NULL, NULL, 2, 1, 162, 99, 'classic', 0, 0, 0, '2026-11-16', 1, '2026-11-16 08:47:17', '2026-11-16 08:50:34');
 INSERT INTO `agent_user` VALUES (32, 'xx', 'ss@163.com', '123123', NULL, NULL, 0, 1, 800, 0, 'classic', 0, 0, 0, NULL, 1, '2026-11-16 08:54:35', '2026-11-16 08:54:35');
-INSERT INTO `agent_user` VALUES (33, '小何', '1573473522@qq.com', '200776', '', '', 0, 1, 800, 40, 'classic', 0, 0, 3, '2026-11-26', 1, '2026-11-16 08:55:10', '2026-11-26 14:00:04');
+INSERT INTO `agent_user` VALUES (33, '小何', '1573473522@qq.com', '200776', '', '', 0, 1, 800, 40, 'classic', 0, 0, 3, '2026-11-26', 0, '2026-11-16 08:55:10', '2026-11-26 14:00:04');
 INSERT INTO `agent_user` VALUES (34, 'xxx', 'xxx@163.com', '123123', NULL, NULL, 0, 1, 60, 40, 'classic', 0, 1, 0, '2026-11-16', 1, '2026-11-16 08:55:18', '2026-11-16 08:56:28');
 INSERT INTO `agent_user` VALUES (35, '5456', '1@qq.com', '123456', NULL, NULL, 0, 1, 800, 0, 'classic', 0, 0, 0, NULL, 1, '2026-11-16 09:00:36', '2026-11-16 09:00:36');
 INSERT INTO `agent_user` VALUES (36, '康神', '123@qq.com', '123456', NULL, NULL, 0, 6, 527, 1077, 'classic', 0, 9, 7, '2026-11-16', 1, '2026-11-16 09:31:11', '2026-11-16 09:46:39');
