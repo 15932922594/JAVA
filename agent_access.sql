@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 16/11/2026 09:52:43
+ Date: 26/11/2026 14:12:02
 */
 
 SET NAMES utf8mb4;
@@ -32,7 +32,7 @@ CREATE TABLE `admin_log`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_admin`(`admin_id` ASC) USING BTREE,
   INDEX `idx_time`(`create_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '后台操作日志' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '后台操作日志' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of admin_log
@@ -65,6 +65,7 @@ INSERT INTO `admin_log` VALUES (25, 1, '爱打球的T', 'admin', 'LOGIN', '管�
 INSERT INTO `admin_log` VALUES (26, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-12 14:26:23');
 INSERT INTO `admin_log` VALUES (27, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-16 08:38:36');
 INSERT INTO `admin_log` VALUES (28, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-16 08:47:32');
+INSERT INTO `admin_log` VALUES (29, 1, '爱打球的T', 'admin', 'LOGIN', '管理员登录：爱打球的T', '2026-11-26 14:02:30');
 
 -- ----------------------------
 -- Table structure for admin_user
@@ -285,16 +286,14 @@ CREATE TABLE `agent_session`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_token`(`token` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 109 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '登录会话表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 112 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '登录会话表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_session
 -- ----------------------------
-INSERT INTO `agent_session` VALUES (100, 'cc34a3805a7a4c3786429982f7f0f703', 29, '2026-11-23 08:43:49', '2026-11-16 08:43:49');
-INSERT INTO `agent_session` VALUES (101, 'b4d87c08dba845a1afd94f2d05cb6d05', 30, '2026-11-23 08:46:28', '2026-11-16 08:46:27');
-INSERT INTO `agent_session` VALUES (102, 'd28b114585784ade9fe254c602cfab24', 31, '2026-11-23 08:47:30', '2026-11-16 08:47:30');
-INSERT INTO `agent_session` VALUES (105, '5debfa4e7e2c43ea898beb1c9fe06413', 33, '2026-11-23 08:58:42', '2026-11-16 08:58:41');
-INSERT INTO `agent_session` VALUES (108, '7277401f0ffd469d812fefdf47d8dfe4', 36, '2026-11-23 09:44:09', '2026-11-16 09:44:09');
+INSERT INTO `agent_session` VALUES (109, 'cc11bbb917ad4f3ca66396ac21d40e90', 1, '2026-12-03 13:59:11', '2026-11-26 13:59:11');
+INSERT INTO `agent_session` VALUES (110, '1ebc685f3f0c4d6c8bcff32d85cd36e7', 1, '2026-12-03 14:02:30', '2026-11-26 14:02:30');
+INSERT INTO `agent_session` VALUES (111, 'eae9d5050ed348189ec30941e8d37fb5', 1, '2026-12-03 14:10:03', '2026-11-26 14:10:02');
 
 -- ----------------------------
 -- Table structure for agent_user
@@ -327,15 +326,15 @@ CREATE TABLE `agent_user`  (
 -- ----------------------------
 -- Records of agent_user
 -- ----------------------------
-INSERT INTO `agent_user` VALUES (1, '爱打球的T', '264132801@qq.com', NULL, '3cb9bb890b91efdd310c935089eb3935b82ce46640a4b68bb0c5a2b72d28d2b5', '9e1431e9dbdaa424328eda90965d4ea6', 0, 20, 3805, 11300, 'operator', 7, 10, 0, '2026-11-16', 0, '2026-10-28 16:36:07', '2026-11-16 09:45:33');
+INSERT INTO `agent_user` VALUES (1, '爱打球的T', '264132801@qq.com', NULL, '3cb9bb890b91efdd310c935089eb3935b82ce46640a4b68bb0c5a2b72d28d2b5', '9e1431e9dbdaa424328eda90965d4ea6', 0, 20, 3805, 11320, 'operator', 7, 10, 0, '2026-11-26', 0, '2026-10-28 16:36:07', '2026-11-26 13:59:11');
 INSERT INTO `agent_user` VALUES (9, 'gay', '3376460573@qq.com', 'tmz258412', NULL, NULL, 0, 1, 800, 20, 'classic', 0, 1, 6, '2026-11-05', 1, '2026-10-29 15:04:01', '2026-11-16 09:45:29');
 INSERT INTO `agent_user` VALUES (26, '123', '2099336743@qq.com', '123456', NULL, NULL, 4, 1, 36, 38, 'classic', 0, 2, 6, '2026-11-05', 1, '2026-11-05 22:55:03', '2026-11-16 09:46:01');
-INSERT INTO `agent_user` VALUES (28, '星落大帝', 'czh101481@qq.com', '10140801czh', NULL, NULL, 2, 7, 1668, 1381, 'marshal', 1, 6, 3, '2026-11-06', 1, '2026-11-06 08:59:45', '2026-11-16 09:45:41');
+INSERT INTO `agent_user` VALUES (28, '星落大帝', 'czh101481@qq.com', '10140801czh', NULL, NULL, 2, 7, 1668, 1381, 'marshal', 1, 6, 3, '2026-11-06', 0, '2026-11-06 08:59:45', '2026-11-26 14:09:02');
 INSERT INTO `agent_user` VALUES (29, 'ww', 'ww@qq.com', '123456', NULL, NULL, 5, 1, 96, 88, 'classic', 1, 0, 4, '2026-11-16', 1, '2026-11-16 08:43:19', '2026-11-16 08:45:54');
 INSERT INTO `agent_user` VALUES (30, '罗磊', '3260423989@qq.com', '123456', NULL, NULL, 4, 2, 1232, 135, 'classic', 0, 0, 1, '2026-11-16', 1, '2026-11-16 08:45:53', '2026-11-16 08:56:28');
 INSERT INTO `agent_user` VALUES (31, 'ljljll', '2510754590@qq.com', '123456', NULL, NULL, 2, 1, 162, 99, 'classic', 0, 0, 0, '2026-11-16', 1, '2026-11-16 08:47:17', '2026-11-16 08:50:34');
 INSERT INTO `agent_user` VALUES (32, 'xx', 'ss@163.com', '123123', NULL, NULL, 0, 1, 800, 0, 'classic', 0, 0, 0, NULL, 1, '2026-11-16 08:54:35', '2026-11-16 08:54:35');
-INSERT INTO `agent_user` VALUES (33, '小何', '1573473522@qq.com', '20070818', '', '', 0, 1, 800, 20, 'classic', 0, 0, 3, '2026-11-16', 1, '2026-11-16 08:55:10', '2026-11-16 09:45:21');
+INSERT INTO `agent_user` VALUES (33, '小何', '1573473522@qq.com', '20070818', '', '', 0, 1, 800, 20, 'classic', 0, 0, 3, '2026-11-16', 0, '2026-11-16 08:55:10', '2026-11-26 14:09:02');
 INSERT INTO `agent_user` VALUES (34, 'xxx', 'xxx@163.com', '123123', NULL, NULL, 0, 1, 60, 40, 'classic', 0, 1, 0, '2026-11-16', 1, '2026-11-16 08:55:18', '2026-11-16 08:56:28');
 INSERT INTO `agent_user` VALUES (35, '5456', '1@qq.com', '123456', NULL, NULL, 0, 1, 800, 0, 'classic', 0, 0, 0, NULL, 1, '2026-11-16 09:00:36', '2026-11-16 09:00:36');
 INSERT INTO `agent_user` VALUES (36, '康神', '123@qq.com', '123456', NULL, NULL, 0, 6, 527, 1077, 'classic', 0, 9, 7, '2026-11-16', 1, '2026-11-16 09:31:11', '2026-11-16 09:46:39');
