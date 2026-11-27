@@ -31,15 +31,38 @@ echo ============================================================
 echo  [Step 0] Environment check
 echo ============================================================
 
-REM ---------- Java ----------
+REM ---------- Java (JDK 17+) ----------
+REM A terminal opened before the JDK was installed keeps an old PATH,
+REM so probe the usual install locations instead of trusting PATH alone.
+set "JAVABIN="
 java -version >nul 2>&1
-if errorlevel 1 (
+if not errorlevel 1 goto :java_ready
+for %%d in ("%JAVA_HOME%\bin" "C:\Program Files\Java\jdk-17\bin" "C:\Program Files\Zulu\zulu-21\bin") do (
+    if not defined JAVABIN if exist "%%~d\java.exe" (
+        "%%~d\java.exe" -version >nul 2>&1
+        if not errorlevel 1 set "JAVABIN=%%~d"
+    )
+)
+if not defined JAVABIN (
     echo   [FAIL] java not found in PATH ^(need JDK 17+^)
     set "FAIL=1"
+    goto :java_done
+)
+set "PATH=!JAVABIN!;%PATH%"
+:java_ready
+set "JAVAVER=unknown"
+set "JAVAMAJ=0"
+for /f "tokens=3" %%v in ('java -version 2^>^&1 ^| findstr /i "version"') do set "JAVAVER=%%~v"
+for /f "tokens=1 delims=." %%m in ("!JAVAVER!") do set "JAVAMAJ=%%m"
+if "!JAVAMAJ!"=="0" (
+    echo   [ OK ] java !JAVAVER!
+) else if !JAVAMAJ! LSS 17 (
+    echo   [FAIL] java !JAVAVER! is too old - need JDK 17+
+    set "FAIL=1"
 ) else (
-    for /f "tokens=3" %%v in ('java -version 2^>^&1 ^| findstr /i "version"') do set "JAVAVER=%%v"
     echo   [ OK ] java !JAVAVER!
 )
+:java_done
 
 REM ---------- Node / npm ----------
 REM NOTE: npm is npm.cmd on Windows. Calling a .cmd from a .bat WITHOUT
