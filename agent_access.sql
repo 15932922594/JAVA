@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 27/11/2026 14:53:17
+ Date: 27/11/2026 15:08:54
 */
 
 SET NAMES utf8mb4;
@@ -323,7 +323,7 @@ CREATE TABLE `agent_session`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_token`(`token` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 115 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '登录会话表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 116 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '登录会话表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_session
@@ -334,6 +334,7 @@ INSERT INTO `agent_session` VALUES (111, '194a39f3bab245a69e20a3f2b26a3903', 33,
 INSERT INTO `agent_session` VALUES (112, '7eb456a37924496c9faa94ba35854b5d', 33, '2026-12-04 13:57:50', '2026-11-27 13:57:49');
 INSERT INTO `agent_session` VALUES (113, 'd1d47679487745a9ba1575eebf9e36e9', 33, '2026-12-04 14:36:11', '2026-11-27 14:36:11');
 INSERT INTO `agent_session` VALUES (114, '751214aa29104416a5c1963e7732b7ba', 33, '2026-12-04 14:52:25', '2026-11-27 14:52:24');
+INSERT INTO `agent_session` VALUES (115, 'af5ae5f89ec547faaa5a5bdf203afa78', 33, '2026-12-04 14:59:00', '2026-11-27 14:59:00');
 
 -- ----------------------------
 -- Table structure for agent_user
